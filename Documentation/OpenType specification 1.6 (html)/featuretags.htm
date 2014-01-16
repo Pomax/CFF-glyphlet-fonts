@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+  <head>
+    <title>OpenType Layout tag registry</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="STYLESHEET" href="otspec.css" type="text/css">
+  </head>
+  <body>
+    <div class="toprule">
+    </div>
+    <p class="menu">
+      <a href="/typography/default.mspx">Microsoft Typography</a> | <a href="/typography/creators.htm">Developer Info</a> | <a href="default.htm">OpenType specification</a> | <a href="ttoreg.htm">OpenType Layout tag registry</a></p>
+    <div class="middlerule">
+    </div>
+    <div class="contents">
+      <h1>Feature tags</h1>
+      <p>Features provide information about how to use the glyphs in a font to render a script or language. For example, an Arabic font might have a feature for substituting initial glyph forms, and a Kanji font might have a feature for positioning glyphs vertically. All OpenType Layout features define data for glyph substitution, glyph positioning, or&nbsp;both.</p>
+      <p>Each OpenType Layout feature has a feature tag that identifies its typographic function and effects. By examining a feature's tag, a text-processing client can determine what a feature does and decide whether to implement it. All tags are 4-byte character strings composed of a limited set of ASCII characters in the 0x20-0x7E range. Microsoft-registered feature tags use four lowercase letters. For instance, the &ldquo;mark&rdquo; feature manages the placement of diacritical marks, and the &ldquo;swsh&rdquo; feature renders swash&nbsp;glyphs.</p>
+      <p>A feature definition may not provide all the information required to properly implement glyph substitution or positioning actions. In many cases, a text-processing client may need to supply additional data. For example, the function of the &ldquo;init&rdquo; feature is to provide initial glyph forms. Nothing in the feature's lookup tables indicates when or where to apply this feature during text processing. To correctly use the &ldquo;init&rdquo; feature in Arabic text where initial glyph forms appear at the beginning of words, text-processing clients must be able to identify the first glyph position in each word before making the glyph substitution. In all cases, the text-processing client is responsible for applying, combining, and arbitrating among features and rendering the&nbsp;result.</p>
+      <p>The tag space defined by tags consisting of four uppercase letters (A-Z) with no punctuation, spaces, or numbers, is reserved as a vendor space. Font vendors may use such tags to identify private features. For example, the feature tag &ldquo;PKRN&rdquo; might designate a private feature that may be used to kern punctuation marks. Microsoft does not guarantee the compatibility or usability of private features, and it cannot ensure that two font vendors will not choose the same tag for a private feature.</p>
+      <p>This version of the Tag Registry describes all the OpenType Layout features Microsoft has developed to date. It also includes details that identify the lookups that Microsoft uses to implement each feature. Lookup information is provided for reference purposes only; the set of lookups used to implement a feature will vary across system platforms, applications, fonts, and font developers.</p>
+      <h2>Registered features</h2>
+      <ul>
+        <li>
+          <a href="featurelist.htm">Features listed alphabetically</a>
+        </li>
+        <li>
+          <a href="features_ae.htm">Feature descriptions and implementations</a>
+        </li>
+      </ul>
+      <h2>How to register features</h2>
+      <p>Microsoft encourages font developers to use 'registered' feature tags when implementing registered features. However, font developers also may define and register their own&nbsp;features.</p>
+      <p>Microsoft welcomes nominations for new features and feature tags to register. To qualify for registration, a feature must have a single function that is clearly identified by its tag. The function of the feature should be defined at the lowest useful level and must be distinctly different from the functions of currently registered features. When font developers register feature tags and functions with Microsoft, they do not have to supply implementation details.</p>
+      <p>Microsoft reserves the right to officially assign feature tags in the Microsoft Tag Registry. Although Microsoft has reserved the feature and feature tag definitions listed in this registry, Microsoft fonts do not necessarily contain all of the&nbsp;features.</p>
+      <hr class="separator">
+      <p class="fineprint">This page was last updated 4 April 2002.</p>
+      <p class="fineprint">&copy; 2002 Microsoft Corporation. All rights reserved. <a href="/info/cpyright.htm">Terms of use</a>.</p>
+      <p class="fineprint">Comments to the MST group: <a href="/typography/AboutMST.mspx">how to contact us</a></p>
+    </div>
+    <div class="middlerule">
+    </div>
+    <p class="menu">
+      <a href="/typography/default.mspx">Microsoft Typography</a> | <a href="/typography/creators.htm">Developer information</a> | <a href="/typography/specs/default.htm">Specifications</a> | <a href="ttoreg.htm">OpenType Layout tag registry</a></p>
+    <div class="bottomrule">
+    </div>
+  </body>
+</html>

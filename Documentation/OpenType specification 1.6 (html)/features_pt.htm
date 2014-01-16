@@ -1,0 +1,752 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+  <head>
+    <title>OpenType Layout tag registry</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="STYLESHEET" href="otspec.css" type="text/css">
+  </head>
+  <body>
+    <div class="toprule">
+    </div>
+    <p class="menu">
+      <a href="/typography/default.mspx">Microsoft Typography</a> | <a href="/typography/creators.htm">Developer Info</a> | <a href="default.htm">OpenType specification</a> | <a href="ttoreg.htm">OpenType Layout tag registry</a></p>
+    <div class="middlerule">
+    </div>
+    <div class="contents">
+      <h1>Registered features - <i>definitions and implementations</i></h1>
+      <p>
+        <a href="features_ae.htm">a - e</a> | <a href="features_fj.htm">f - j</a> | <a href="features_ko.htm">k - o</a> | p - t | <a href="features_uz.htm">u - z</a></p>
+      <h2>
+        <a name="palt" id="palt">
+        </a>Tag: 'palt'</h2>
+      <p>
+        <i>Friendly name: </i>Proportional Alternate Widths</p>
+      <p>
+        <i>Registered by: </i>Adobe</p>
+      <p>
+        <i>Function: </i>Respaces glyphs designed to be set on full-em widths, fitting them onto individual (more or less proportional) horizontal widths. This differs from pwid in that it does not substitute new glyphs (GPOS, not GSUB feature). The user may prefer the monospaced form, or may simply want to ensure that the glyph is well-fit and not rotated in vertical setting (Latin forms designed for proportional spacing would be rotated).</p>
+      <p>
+        <i>Example: </i>The user may invoke this feature in a Japanese font to get Latin, Kanji, Kana or Symbol glyphs with the full-width design but individual metrics.</p>
+      <p>
+        <i>Recommended implementation: </i>The font specifies alternate metrics for the full-width glyphs (GPOS lookup type 1).</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the palt coverage table, the application passes the GIDs to the table and gets back positional adjustments (XPlacement, XAdvance, YPlacement and YAdvance).</p>
+      <p>
+        <i>UI suggestion: </i>This feature would be off by default.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Used mostly in CJKV fonts.</p>
+      <p>
+        <i>Feature interaction: </i>This feature is mutually exclusive with all other glyph-width features (e.g. <a href="features_fj.htm#fwid">fwid</a>, <a href="features_fj.htm#halt">halt</a>, <a href="features_fj.htm#hwid">hwid</a>, <a href="#qwid">qwid</a> and <a href="#twid">twid</a>), which should be turned off when it's applied. If <a href="#palt">palt</a> is activated, there is no requirement that <a href="features_ko.htm#kern">kern</a> must also be activated. If <a href="features_ko.htm#kern">kern</a> is activated, <a href="#palt">palt</a> must also be activated if it exists. See also <a href="features_uz.htm#vpal">vpal</a>.</p>
+      <h2>
+        <a name="pcap" id="pcap">
+        </a>Tag:'pcap'</h2>
+      <p>
+        <i>Friendly name: </i>Petite Capitals</p>
+      <p>
+        <i>Registered by: </i>Tiro Typeworks / Emigre</p>
+      <p>
+        <i>Function: </i>Some fonts contain an additional size of capital letters, shorter than the regular smallcaps and whimsically referred to as petite caps. Such forms are most likely to be found in designs with a small lowercase x-height, where they better harmonise with lowercase text than the taller smallcaps (for examples of petite caps, see the Emigre type families Mrs Eaves and Filosofia). This feature turns lowercase characters into petite capitals. Forms related to petite capitals, such as specially designed figures, may be included.</p>
+      <table class="image">
+        <tr>
+          <td>
+            <img src="pcapprop.gif" alt="pcapprop.gif">
+          </td>
+        </tr>
+      </table>
+      <p>
+        <i>Example: </i>The user enters text as lowercase or mixed case, and gets petite cap text or text with regular uppercase and petite caps. Note that some designers, might extend the petite cap lookups to include uppercase-to-smallcap substitutions, creating a shifting hierarchy of uppercase forms.</p>
+      <p>
+        <i>Recommended implementation: </i>The pcap table maps lowercase glyphs to the corresponding petite cap forms (GSUB lookup type 1).</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the pcap coverage table, the application passes GIDs to the pcap table, and gets back new GIDs. Petite cap substitutions should follow language rules for smallcap (<a href="#smcp">smcp</a>) substitutions.</p>
+      <p>
+        <i>UI suggestion: </i>This feature should be off by default.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Applies only to scripts with both upper- and lowercase forms (e.g. Latin, Cyrillic, Greek).</p>
+      <p>
+        <i>Feature interaction:</i> This feature may be used in combination with other substitution (GSUB) features, whose results it may override.</p>
+      <h2>
+        <a name="pkna" id="pkna">
+        </a>Tag: 'pkna'</h2>
+      <p>
+        <i>Friendly name: </i>Proportional Kana</p>
+      <p>
+        <i>Registered by: </i>Adobe</p>
+      <p>
+        <i>Function: </i>Replaces glyphs, kana and kana-related, set on uniform widths (half or full-width) with proportional glyphs.</p>
+      <p>
+        <i>Example: </i>The user may invoke this feature in a Japanese font to get a proportional glyph instead of a corresponding half- or full-width kana glyph.</p>
+      <p>
+        <i>Recommended implementation: </i>The font contains alternate kana and kana-related glyphs designed to be set on proportional widths (GSUB lookup type 1).</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the pkna coverage table, the application passes the GIDs to the table and gets back new GIDs.</p>
+      <p>
+        <i>UI suggestion: </i>This feature would normally be off by default.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Generally used only in Japanese fonts.</p>
+      <p>
+        <i>Feature interaction: </i>This feature is mutually exclusive with all other glyph-width features (e.g. <a href="features_fj.htm#fwid">fwid</a>, <a href="features_fj.htm#halt">halt</a>, <a href="features_fj.htm#hwid">hwid</a>, <a href="features_pt.htm#palt">palt</a>, <a href="features_pt.htm#pwid">pwid</a>, <a href="features_pt.htm#qwid">qwid</a>, <a href="features_pt.htm#twid">twid</a>, and <a href="features_uz.htm#vhal">vhal</a>), which should be turned off when it's applied. Applying this feature should activate the <a href="features_ko.htm#kern">kern</a> feature.</p>
+      <h2>
+        <a name="pnum" id="pnum">
+        </a>Tag: 'pnum'</h2>
+      <p>
+        <i>Friendly name: </i>Proportional Figures</p>
+      <p>
+        <i>Registered by: </i>Microsoft/Adobe</p>
+      <p>
+        <i>Function: </i>Replaces figure glyphs set on uniform (tabular) widths with corresponding glyphs set on glyph-specific (proportional) widths. Tabular widths will generally be the default, but this cannot be safely assumed. Of course this feature would not be present in monospaced designs.</p>
+      <p>
+        <i>Example: </i>The user may apply this feature to get even spacing for lining figures used as dates in an all-cap headline.</p>
+      <p>
+        <i>Recommended implementation: </i>In order to simplify associated kerning and get the best glyph design for a given width, this feature should use new glyphs for the figures, rather than only adjusting the fit of the tabular glyphs (although some may be simple copies); i.e. not a GPOS feature. The pnum table maps tabular versions of lining and/or oldstyle figures to corresponding proportional glyphs (GSUB lookup type 1).</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the pnum coverage table, the application passes GIDs to the pnum table and gets back new GIDs.</p>
+      <p>
+        <i>UI suggestion: </i>This feature should be off by default. The application may want to query the user about this feature when the user changes figure style (<a href="features_ko.htm#onum">onum</a> or <a href="features_ko.htm#lnum">lnum</a>).</p>
+      <p>
+        <i>Script/language sensitivity: </i>None.</p>
+      <p>
+        <i>Feature interaction: </i>This feature overrides the results of the Tabular Figures feature (<a href="#tnum">tnum</a>).</p>
+      <h2>
+        <a name="pref">
+        </a>Tag: 'pref'</h2>
+      <p>
+        <i>Friendly name: </i>Pre-base Forms</p>
+      <p>
+        <i>Registered by: </i>Microsoft</p>
+      <p>
+        <i>Function: </i>Substitutes the pre-base form of a consonant.</p>
+      <p>In some scripts of south or southeast Asia, such as Khmer, the conjoined form of certain consonants is always denoted as a pre-base form. In the case of some scripts of south India, variations in writing conventions exist such that a conjoined Ra consonant may be written as a pre-base form, or a below-base or post-base form. Fonts may be designed to support one or another convention. If a font is designed to support a writing convention in which conjoined Ra is a pre-base form, the Pre-Base Forms feature would be used.</p>
+      <p>
+        <i>Example: </i> In the Khmer script, the consonant Ra has a pre-base subscript form called Coeng Ra. When the sequence of Coeng followed by Ra occurs, its pre-base form is substituted.</p>
+      <p>
+        <i>Recommended implementation: </i>The <b>pref</b> table maps the sequence required to convert a consonant into its pre-base form (GSUB lookup type 4).</p>
+      <p>
+        <i>Application interface: </i>For substitutions defined in the <b>pref</b> table, the application passes the sequence of GIDs to the table, and gets back the GID for the pre base form of the consonant. When shaping scripts of south India, the application may examine the results of processing this feature to determine if the conjoining consonant form needs to be re-ordered.</p>
+      <p>
+        <i>UI suggestion: </i> In recommended usage, this feature triggers substitutions that are required for correct display of the given script. It should be applied in the appropriate contexts, as determined by script-specific processing. Control of the feature should not generally be exposed to the user.</p>
+      <p>
+        <i>Script/language sensitivity: </i> Required in Khmer and Myanmar (Burmese) scripts that have pre-base forms for consonants.It is also required for southern Indic scripts that may display a pre-base form of Ra, such as Malayalam or Telugu.</p>
+      <p>
+        <i>Feature interaction: </i>This feature is used in conjunction with certain other features to derive required forms of certain Indic and southeast Asian scripts. The application is expected to process this feature and certain other features in an appropriate order to obtain the correct set of basic forms for the given script. For Indic scripts, the following features should be applied in order: <a href="features_ko.htm#nukt">nukt</a>, <a href="features_ae.htm#akhn">akhn</a>, <a href="features_pt.htm#rphf">rphf</a>, <a href="features_pt.htm#rkrf">rkrf</a>, <a href="features_pt.htm#pref">pref</a>, <a href="features_ae.htm#blwf">blwf</a>, <a href="features_fj.htm#half">half</a>, <a href="features_pt.htm#pstf">pstf</a>, <a href="features_ae.htm#cjct">cjct</a>. Other discretionary features for optional typographic effects may also be applied. Lookups for such discretionary features should be processed after lookups for this feature have been processed.</p>
+      <h2>
+        <a name="pres">
+        </a>Tag: 'pres'</h2>
+      <p>
+        <i>Friendly name: </i> Pre-base Substitutions</p>
+      <p>
+        <i>Registered by: </i> Microsoft</p>
+      <p>
+        <i>Function: </i> Produces the pre-base forms of conjuncts in Indic scripts. It can also be used to substitute the appropriate glyph variant for pre-base vowel signs.</p>
+      <p>
+        <i>Example: </i> In the Gujarati (Indic) script, the doubling of consonant Ka requires the first Ka to be substituted by its pre-base form. This in turn ligates with the second Ka. Applying this feature would result in the ligaturised version of the doubled Ka.</p>
+      <p>
+        <i>Recommended implementation: </i>The <b>pres</b> table maps a sequence of consonants separated by the virama (halant), to the ligated conjunct form (GSUB lookup type 4). In the case of pre-base matra substitution, the appropriate matra can be substituted using contextual substitution (GSUB lookup type 5).</p>
+      <p>
+        <i>Application interface: </i>For substitutions defined in the <b>pres</b> table, the application passes the sequence of GIDs to the feature, and gets back the GID for the ligature (or matra as the case may be).</p>
+      <p>
+        <i>UI suggestion: </i> This feature should be on by default.</p>
+      <p>
+        <i>Script/language sensitivity: </i> Required in Indic scripts.</p>
+      <p>
+        <i>Feature interaction: </i> This feature overrides the results of all other features.</p>
+      <h2>
+        <a name="pstf">
+        </a>Tag:  'pstf'</h2>
+      <p>
+        <i>Friendly name: </i> Post-base Forms</p>
+      <p>
+        <i>Registered by: </i> Microsoft</p>
+      <p>
+        <i>Function: </i> Substitutes the post-base form of a consonant.</p>
+      <p>
+        <i>Example: </i> In the Gurmukhi (Indic) script, the consonant Ya has a post base form. When the Ya is used as the second consonant in conjunct formation, its post-base form is substituted.</p>
+      <p>
+        <i>Recommended implementation: </i>The <b>pstf</b> table maps the sequence required to convert a consonant into its post-base form (GSUB lookup type 4).</p>
+      <p>
+        <i>Application interface: </i>For substitutions defined in the <b>pstf</b> table, the application passes the sequence of GIDs to the feature, and gets back the GID for the post base form of the consonant.</p>
+      <p>
+        <i>UI suggestion: </i>In recommended usage, this feature triggers substitutions that are required for correct display of the given script. It should be applied in the appropriate contexts, as determined by script-specific processing. Control of the feature should not generally be exposed to the user.</p>
+      <p>
+        <i>Script/language sensitivity: </i> Required in scripts of south and southeast Asia that have post-base forms for consonants eg: Gurmukhi, Malayalam, Khmer.</p>
+      <p>
+        <i>Feature interaction: </i>This feature is used in conjunction with certain other features to derive required forms of Indic and other related scripts. The application is expected to process this feature and certain other features in an appropriate order to obtain the correct set of basic forms for the given script. For Indic scripts, the following features should be applied in order: <a href="features_ko.htm#nukt">nukt</a>, <a href="features_ae.htm#akhn">akhn</a>, <a href="features_pt.htm#rphf">rphf</a>, <a href="features_pt.htm#rkrf">rkrf</a>, <a href="features_pt.htm#pref">pref</a>, <a href="features_ae.htm#blwf">blwf</a>, <a href="features_fj.htm#half">half</a>, <a href="features_pt.htm#pstf">pstf</a>, <a href="features_ae.htm#cjct">cjct</a>. Other discretionary features for optional typographic effects may also be applied. Lookups for such discretionary features should be processed after lookups for this feature have been processed.</p>
+      <h2>
+        <a name="psts">
+        </a>Tag:  'psts'</h2>
+      <p>
+        <i>Friendly name: </i> Post-base Substitutions</p>
+      <p>
+        <i>Registered by: </i> Microsoft</p>
+      <p>
+        <i>Function: </i> Substitutes a sequence of a base glyph and post-base glyph, with its ligaturised form.</p>
+      <p>
+        <i>Example: </i> In the Malayalam (Indic) script, the consonant Va has a post base form. When the Va is doubled to form a conjunct- VVa; the first Va [base] and the post base form that follows it, is substituted with a ligature.</p>
+      <p>
+        <i>Recommended implementation: </i>The <b>psts</b> table maps identified conjunct formation sequences to corresponding ligatures (GSUB lookup type 4).</p>
+      <p>
+        <i>Application interface: </i>For substitutions defined in the <b>psts</b> table, the application passes the sequence of GIDs to the feature, and gets back the GID for the ligature.</p>
+      <p>
+        <i>UI suggestion: </i> This feature should be on by default.</p>
+      <p>
+        <i>Script/language sensitivity: </i> Can be used in any alphabetic script. Required in Indic scripts.</p>
+      <p>
+        <i>Feature interaction: </i> This feature overrides the results of all other features.</p>
+      <h2>
+        <a name="pwid" id="pwid">
+        </a>Tag: 'pwid'</h2>
+      <p>
+        <i>Friendly name: </i>Proportional Widths</p>
+      <p>
+        <i>Registered by: </i>Adobe</p>
+      <p>
+        <i>Function: </i>Replaces glyphs set on uniform widths (typically full or half-em) with proportionally spaced glyphs. The proportional variants are often used for the Latin characters in CJKV fonts, but may also be used for Kana in Japanese fonts.</p>
+      <p>
+        <i>Example: </i>The user may invoke this feature in a Japanese font to get a proportionally-spaced glyph instead of a corresponding half-width Roman glyph or a full-width Kana glyph.</p>
+      <p>
+        <i>Recommended implementation: </i>The font contains alternate glyphs designed to be set on proportional widths (GSUB lookup type 1).</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the pwid coverage table, the application passes the GIDs to the table and gets back new GIDs.</p>
+      <p>
+        <i>UI suggestion: </i>Applications may want to have this feature active or inactive by default depending on their markets.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Although used mostly in CJKV fonts, this feature could be applied in European scripts.</p>
+      <p>
+        <i>Feature interaction: </i>This feature is mutually exclusive with all other glyph-width features (e.g. <a href="features_fj.htm#fwid">fwid</a>, <a href="features_fj.htm#halt">halt</a>, <a href="features_fj.htm#hwid">hwid</a>, <a href="#palt">palt</a>, <a href="#qwid">qwid</a>, <a href="#twid">twid</a>, <a href="features_uz.htm#valt">valt</a> and <a href="features_uz.htm#vhal">vhal</a>), which should be turned off when it's applied. Applying this feature should activate the <a href="features_ko.htm#kern"> kern</a> feature.</p>
+      <h2>
+        <a name="qwid" id="qwid">
+        </a>Tag: 'qwid'</h2>
+      <p>
+        <i>Friendly name: </i>Quarter Widths</p>
+      <p>
+        <i>Registered by: </i>Adobe</p>
+      <p>
+        <i>Function: </i>Replaces glyphs on other widths with glyphs set on widths of one quarter of an em (half an en). The characters involved are normally figures and some forms of punctuation.</p>
+      <p>
+        <i>Example: </i>The user may apply qwid to place a four-digit figure in a single slot in a column of vertical text.</p>
+      <p>
+        <i>Recommended implementation: </i>The font may contain alternate glyphs designed to be set on quarter-em widths (GSUB lookup type 1), or it may specify alternate metrics for the original glyphs (GPOS lookup type 1) which adjust their spacing to fit in quarter-em widths.</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the qwid coverage table, the application passes the GIDs to the table and gets back either new GIDs or positional adjustments (XPlacement and XAdvance).</p>
+      <p>
+        <i>UI suggestion: </i>This feature would normally be off by default.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Generally used only in CJKV fonts.</p>
+      <p>
+        <i>Feature interaction: </i>This feature is mutually exclusive with all other glyph-width features (e.g. <a href="features_fj.htm#fwid">fwid</a>, <a href="features_fj.htm#halt">halt</a>, <a href="features_fj.htm#hwid">hwid</a> and <a href="#twid">twid</a>), which should be turned off when it's applied. It deactivates the <a href="features_ko.htm#kern">kern</a> feature.</p>
+      <h2>
+        <a name="rand" id="rand">
+        </a>Tag: 'rand'</h2>
+      <p>
+        <i>Friendly name: </i>Randomize</p>
+      <p>
+        <i>Registered by: </i>Adobe</p>
+      <p>
+        <i>Function: </i>In order to emulate the irregularity and variety of handwritten text, this feature allows multiple alternate forms to be used.</p>
+      <p>
+        <i>Example: </i>The user applies this feature in FF Kosmic to get three forms of f in one word.</p>
+      <p>
+        <i>Recommended implementation: </i>The rand table maps GIDs for default glyphs to one or more GIDs for corresponding alternates (GSUB lookup type 3).</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the rand coverage table, the application passes a GID to the rand table and gets back one or more new GIDs. The application selects one of these either by a pseudo-random algorithm, or by noting the sequence of IDs returned, storing that sequence, and stepping through that set as the corresponding character code is invoked.</p>
+      <p>
+        <i>UI suggestion: </i>This feature should be enabled/disabled via a preference setting; &ldquo;enabled&rdquo; is the recommended default.</p>
+      <p>
+        <i>Script/language sensitivity: </i>None.</p>
+      <p>
+        <i>Feature interaction: </i>This feature may be used in combination with other substitution (GSUB) features, whose results it may override.</p>
+      <h2>
+        <a name="rlig" id="rlig">
+        </a>Tag: 'rlig'</h2>
+      <p>
+        <i>Friendly name: </i>Required Ligatures</p>
+      <p>
+        <i>Registered by: </i>Microsoft</p>
+      <p>
+        <i>Function: </i>Replaces a sequence of glyphs with a single glyph which is preferred for typographic purposes. This feature covers those ligatures, which the script determines as required to be used in normal conditions. This feature is important for some scripts to insure correct glyph formation.</p>
+      <p>
+        <i>Example: </i>The Arabic character lam followed by alef will always form a ligated lamalef form. This ligated form is a requirement of the script's shaping. The same happens with the Syriac script.</p>
+      <p>
+        <i>Recommended implementation: </i>The rlig table maps GIDs for default glyphs to one or more GIDs for corresponding alternates (GSUB lookup type 3).</p>
+      <p>
+        <i>Application interface: </i>The rlig table maps sequences of glyphs to corresponding ligatures (GSUB lookup type 4). Ligatures with more components must be stored ahead of those with fewer components in order to be found. The set of standard ligatures will normally remain constant by script.</p>
+      <p>
+        <i>UI suggestion: </i>This feature should be active by default. It is recommended that this feature not be turned off to avoid breaking obligatory script shaping.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Applies to Arabic and Syriac. May apply to some other scripts.</p>
+      <p>
+        <i>Feature interaction: </i>This feature may be used in combination with other substitution (GSUB) features, whose results it may override. See also liga.</p>
+      <h2>
+        <a name="rkrf">
+        </a>Tag: 'rkrf'</h2>
+      <p>
+        <i>Friendly name: </i>Rakar Forms</p>
+      <p>
+        <i>Registered by: </i>Microsoft</p>
+      <p>
+        <i>Function: </i>Produces conjoined forms for consonants with rakar in Devanagari and Gujarati scripts.</p>
+      <p>In Devanagari and Gujarati scripts, consonant clusters involving Ra following another consonant are denoted by conjoining an alternate form of Ra to the preceding consonant. Depending on the particular syllable, the preceding consonant may be denoted in its full form or as a half form. Because of interactions involving other behaviors of these scripts, a font implementation may need to process substitution lookups for rakar forms and half forms in a particular sequence in order to derive the appropriate display for various sequences. In recommended usage, the Rakar Forms feature is processed before the Half Forms feature; a half form for a given consonant-Ra combination can be derived by subsequent application of the Half Forms feature. This sequential ordering allows for correct display results.</p>
+      <p>
+        <i>Example: </i>In Hindi (Devanagari script), the conjunct KRa is denoted with a conjunct ligature form.</p>
+      <p>
+        <i>Recommended implementation: </i>The rkrf table maps the sequence of a consonant (the nominal form only) followed by a virama (halant) followed by Ra (the nominal form) to the corresponding conjoined form (GSUB lookup type 4).</p>
+      <p>
+        <i>Application interface: </i>For substitution sequences defined in the rkrf table, the application passes the sequence of GIDs to the table, and gets back the GID for the half form.</p>
+      <p>
+        <i>UI suggestion: </i>In recommended usage, this feature triggers substitutions that are required for correct display of the given script. It should be applied in the appropriate contexts, as determined by script-specific processing. Control of the feature should not generally be exposed to the user.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Required in Devanagari and Gujarati scripts.</p>
+      <p>
+        <i>Feature interaction: </i>This feature is used in conjunction with certain other features to derive required forms of Indic scripts. The application is expected to process this feature and certain other features in an appropriate order to obtain the correct set of basic forms: <a href="features_ko.htm#nukt">nukt</a>, <a href="features_ae.htm#akhn">akhn</a>, <a href="features_pt.htm#rphf">rphf</a>, <a href="features_pt.htm#rkrf">rkrf</a>, <a href="features_pt.htm#pref">pref</a>, <a href="features_ae.htm#blwf">blwf</a>, <a href="features_fj.htm#half">half</a>, <a href="features_pt.htm#pstf">pstf</a>, <a href="features_ae.htm#cjct">cjct</a>. Other discretionary features for optional typographic effects may also be applied. Lookups for such discretionary features should be processed after lookups for this feature have been processed.</p>
+      <h2>
+        <a name="rphf">
+        </a>Tag: 'rphf'</h2>
+      <p>
+        <i>Friendly name: </i> Reph Form</p>
+      <p>
+        <i>Registered by: </i> Microsoft</p>
+      <p>
+        <i>Function:</i> Substitutes the Reph form for a consonant and halant sequence.</p>
+      <p>
+        <i>Example: </i> In the Devanagari (Indic) script, the consonant Ra possesses a reph form. When the Ra is a syllable initial consonant and is followed by the virama, it is repositioned after the post base vowel sign within the syllable, and also substituted with a mark that sits above the base glyph.</p>
+      <p>
+        <i>Recommended implementation: </i>The <b>rphf</b> table maps the sequence of default form of Ra and virama to the Reph (GSUB lookup type 4).</p>
+      <p>
+        <i>Application interface: </i> The application passes the GIDs for Ra and virama to the table and gets back the GID for the reph mark. The application may examine the results of processing other features to determine where in the sequence the reph mark should be re-ordered to.</p>
+      <p>
+        <i>UI suggestion: </i>In recommended usage, this feature triggers substitutions that are required for correct display of the given script. It should be applied in the appropriate contexts, as determined by script-specific processing. Control of the feature should not generally be exposed to the user.</p>
+      <p>
+        <i>Script/language sensitivity: </i> Required in Indic scripts. eg: Devanagari, Kannada.</p>
+      <p>
+        <i>Feature interaction: </i>This feature is used in conjunction with certain other features to derive required forms of Indic scripts. The application is expected to process this feature and certain other features in an appropriate order to obtain the correct set of basic forms: <a href="features_ko.htm#nukt">nukt</a>, <a href="features_ae.htm#akhn">akhn</a>, <a href="features_pt.htm#rphf">rphf</a>, <a href="features_pt.htm#rkrf">rkrf</a>, <a href="features_pt.htm#pref">pref</a>, <a href="features_ae.htm#blwf">blwf</a>, <a href="features_fj.htm#half">half</a>, <a href="features_pt.htm#pstf">pstf</a>, <a href="features_ae.htm#cjct">cjct</a>. Other discretionary features for optional typographic effects may also be applied. Lookups for such discretionary features should be processed after lookups for this feature have been processed.</p>
+      <h2>
+        <a name="rtbd" id="rtbd">
+        </a>Tag: 'rtbd'</h2>
+      <p>
+        <i>Friendly name: </i>Right Bounds</p>
+      <p>
+        <i>Registered by: </i>Adobe</p>
+      <p>
+        <i>Function: </i>Aligns glyphs by their apparent right extents at the right ends of horizontal lines of text, replacing the default behavior of aligning glyphs by their origins. This feature is called by the Optical Bounds (opbd) feature above.</p>
+      <p>
+        <i>Example: </i>Succeeding lines ending with r, h and y would shift to the right by differing degrees when the text is right-justified and this feature is applied.</p>
+      <p>
+        <i>Recommended implementation: </i>Values for affected glyphs describe the amount by which the placement and advance width should be altered (GPOS lookup type 1).</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the rtbd coverage table, the application passes a GID to the table and gets back a new XPlacement and XAdvance value.</p>
+      <p>
+        <i>UI suggestion: </i>This feature is called by an application when the user invokes the opbd feature.</p>
+      <p>
+        <i>Script/language sensitivity: </i>None.</p>
+      <p>
+        <i>Feature interaction: </i>Should not be applied to glyphs which use fixed-width features (e.g. <a href="features_fj.htm#fwid"> fwid</a>, <a href="features_fj.htm#halt">halt</a>, <a href="features_fj.htm#hwid">hwid</a>, <a href="#qwid">qwid</a> and <a href="#twid">twid</a>) or vertical features (e.g. <a href="features_uz.htm#vert">vert</a>, <a href="features_uz.htm#vrt2">vrt2</a>, <a href="features_uz.htm#vpal">vpal</a>, <a href="features_uz.htm#valt">valt</a> and <a href="features_uz.htm#vhal">vhal</a>). Is called by <a href="features_ko.htm#opbd"> opbd</a> feature.</p>
+      <h2>
+        <a name="rtla" id="rtla">
+        </a>Tag: 'rtla'</h2>
+      <p>
+        <i>Friendly name: </i>Right-to-left alternates</p>
+      <p>
+        <i>Registered by: </i>Adobe</p>
+      <p>
+        <i>Function: </i>This feature applies glyphic variants (other than mirrored forms) appropriate for right-to-left text. (For mirrored forms, see <a href="features_pt.htm#rtlm">'rtlm'</a>.)</p>
+      <p>
+        <i>Recommended implementation: </i>These are required to be glyph substitutions, and it is recommended that they be one-to-one (GSUB lookup type 1).</p>
+      <p>
+        <i>Application interface: </i>See section &ldquo;Left-to-right and right-to-left text&rdquo; on the <a href="TTOCHAP1.htm#ltrrtl">Advanced Typographic Extensions</a> page.</p>
+      <p>
+        <i>UI suggestion: </i>None.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Right-to-left runs of text.</p>
+      <p>
+        <i>Feature interaction: </i>This feature is to be applied simultaneously with other pre-shaping features such as <a href="features_ae.htm#ccmp">'ccmp'</a> and <a href="features_ko.htm#locl">'locl'</a>.</p>
+      <h2>
+        <a name="rtlm" id="rtlm">
+        </a>Tag: 'rtlm'</h2>
+      <p>
+        <i>Friendly name:</i> Right-to-left mirrored forms</p>
+      <p>
+        <i>Registered by:</i> Adobe</p>
+      <p>
+        <i>Function:</i> This feature applies mirrored forms appropriate for right-to-left text <i>other</i> than for those characters that would be covered by the character-level mirroring step performed by an OpenType layout engine. (For right-to-left glyph alternates, see <a href="features_pt.htm#rtla">'rtla'</a>.)</p>
+      <p>
+        <i>Example:</i> The 'rtlm' feature replaces the glyph for U+2232, CLOCKWISE CONTOUR INTEGRAL, with one in which the integral sign is mirrored but the circular arrow has retained its direction.</p>
+      <p>
+        <i>Implementation:</i> These are required to be glyph substitutions, and it is recommended that they be one-to-one (GSUB lookup type 1).</p>
+      <p>
+        <i>Application interface: </i>See section &ldquo;Left-to-right and right-to-left text&rdquo; on the <a href="TTOCHAP1.htm#ltrrtl">Advanced Typographic Extensions</a> page.</p>
+      <p>
+        <i>UI suggestion:</i> None.</p>
+      <p>
+        <i>Script/language sensitivity:</i> Right-to-left runs of text.</p>
+      <p>
+        <i>Feature interaction:</i> This feature is to be applied simultaneously with other pre-shaping features such as <a href="features_ae.htm#ccmp">'ccmp'</a> and <a href="features_ko.htm#locl">'locl'</a>.</p>
+      <h2>
+        <a name="ruby" id="ruby">
+        </a>Tag: 'ruby'</h2>
+      <p>
+        <i>Friendly name: </i>Ruby Notation Forms</p>
+      <p>
+        <i>Registered by: </i>Adobe</p>
+      <p>
+        <i>Function: </i>Japanese typesetting often uses smaller kana glyphs, generally in superscripted form, to clarify the meaning of kanji which may be unfamiliar to the reader. These are called ruby, from the old typesetting term for four-point-sized type. This feature identifies glyphs in the font which have been designed for this use, substituting them for the default designs.</p>
+      <p>
+        <i>Example: </i>The user applies this feature to the kana character U+3042, to get the ruby form for annotation.</p>
+      <p>
+        <i>Recommended implementation: </i>The font contains alternate glyphs for all kana characters which are enabled for ruby notation. The ruby table maps GIDs for default forms to GIDs for corresponding ruby alternates. These are one-to-one substitutions (GSUB lookup type 1).</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the ruby coverage table, the application passes the GIDs for default forms to the table and gets back new GIDs for ruby forms. The application then scales and positions these forms according to its defaults, which may take user parameters.</p>
+      <p>
+        <i>UI suggestion: </i>This feature should be inactive by default. Applications may offer the user an opportunity to specify the degree of scaling and baseline shift.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Applies only to Japanese.</p>
+      <p>
+        <i>Feature interaction:</i>This feature overrides the results of any other feature for the affected characters.</p>
+      <h2>
+        <a name="salt" id="salt">
+        </a>Tag: 'salt'</h2>
+      <p>
+        <i>Friendly name: </i>Stylistic Alternates</p>
+      <p>
+        <i>Registered by: </i>Adobe</p>
+      <p>
+        <i>Function: </i>Many fonts contain alternate glyph designs for a purely esthetic effect; these don't always fit into a clear category like swash or historical. As in the case of swash glyphs, there may be more than one alternate form. This feature replaces the default forms with the stylistic alternates.</p>
+      <p>
+        <i>Example: </i>The user applies this feature to Industria to get the alternate form of g.</p>
+      <p>
+        <i>Recommended implementation: </i>The salt table maps GIDs for default forms to one or more GIDs for corresponding stylistic alternatives. While many of these substitutions are one-to-one (GSUB lookup type 1), others require a selection from a set (GSUB lookup type 3). The manufacturer may choose to build two tables (one for each lookup type) or only one which uses lookup type 3 for all substitutions. As in any one-from-many substitution, alternates present in more than one face should be ordered consistently across a family, so that those alternates can work correctly when switching between family members.</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the salt coverage table, the application passes the GIDs to the salt table and gets back one or more new GIDs. If more than one GID is returned, the application must provide a means for the user to select the one desired.</p>
+      <p>
+        <i>UI suggestion: </i>This feature should be inactive by default. When more than one GID is returned, an application could display the forms sequentially in context, or present a palette showing all the forms at once, or give the user a choice between these approaches. The application may assume that the first glyph in a set is the preferred form, so the font developer should order them accordingly.</p>
+      <p>
+        <i>Script/language sensitivity: </i>None.</p>
+      <p>
+        <i>Feature interaction: </i>This feature may be used in combination with other substitution (GSUB) features, whose results it may override.</p>
+      <h2>
+        <a name="sinf" id="sinf">
+        </a>Tag: 'sinf'</h2>
+      <p>
+        <i>Friendly name: </i>Scientific Inferiors</p>
+      <p>
+        <i>Registered by: </i>Microsoft/Adobe</p>
+      <p>
+        <i>Function: </i>Replaces lining or oldstyle figures with inferior figures (smaller glyphs which sit lower than the standard baseline, primarily for chemical or mathematical notation). May also replace lowercase characters with alphabetic inferiors.</p>
+      <p>
+        <i>Example: </i>The application can use this feature to automatically access the inferior figures (more legible than scaled figures).</p>
+      <p>
+        <i>Recommended implementation: </i>The sinf table maps figures to the corresponding inferior forms (GSUB lookup type 1).</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the sinf coverage table, the application passes a GID to the feature and gets back a new GID.</p>
+      <p>
+        <i>UI suggestion: </i>This feature should be off by default.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Can apply to nearly any script.</p>
+      <p>
+        <i>Feature interaction: </i>This feature may be used in combination with other substitution (GSUB) features, whose results it may override.</p>
+      <h2>
+        <a name="size" id="size">
+        </a>Tag: 'size'</h2>
+      <p>
+        <i>Friendly name: </i>Optical size</p>
+      <p>
+        <i>Registered by: </i>Adobe</p>
+      <p>
+        <i>Function: </i>This feature stores two kinds of information about the optical size of the font: design size (the point size for which the font is optimized) and size range (the range of point sizes which the font can serve well), as well as other information which helps applications use the size range. The design size is useful for determining proper tracking behavior. The size range is useful in families which have fonts covering several ranges. Additional values serve to identify the set of fonts which share related size ranges, and to identify their shared name. Note that sizes refer to nominal final output size, and are independent of viewing magnification or resolution.</p>
+      <h3>Required implementation:</h3>
+      <p class="Body">The Feature table of this GPOS feature contains no lookups; its Feature Parameters field records an offset from the beginning of the Feature table to an array of five 16-bit unsigned integer values. The size feature must be implemented in all fonts in any family which uses the feature. In this usage, a family is a set of fonts which share a Preferred Family name (name ID 16), or Font Family name (name ID 1) if the Preferred Family name is absent.</p>
+      <ul>
+        <li>The first value represents the design size in 720/inch units (decipoints). The design size entry must be non-zero. When there is a design size but no recommended size range, the rest of the array will consist of zeros.</li>
+        <li>The second value has no independent meaning, but serves as an identifier that associates fonts in a subfamily. All fonts which share a Preferred or Font Family name and which differ only by size range shall have the same subfamily value, and no fonts which differ in weight or style shall have the same subfamily value. If this value is zero, the remaining fields in the array will be ignored.</li>
+        <li>The third value enables applications to use a single name for the subfamily identified by the second value. If the preceding value is non-zero, this value must be set in the range 256 - 32767 (inclusive). It records the value of a field in the name table, which must contain English-language strings encoded in Windows Unicode and Macintosh Roman, and may contain additional strings localized to other scripts and languages. Each of these strings is the name an application should use, in combination with the family name, to represent the subfamily in a menu. Applications will choose the appropriate version based on their selection criteria.</li>
+        <li>The fourth and fifth values represent the small end of the recommended usage range (exclusive) and the large end of the recommended usage range (inclusive), stored in 720/inch units (decipoints). Ranges must not overlap, and should generally be contiguous.</li>
+      </ul>
+      <p>
+        <i>Example: </i>The size information in Bell Centennial is [60 0 0 0 0]. This tells an application that the fontÃ¢s design size is six points, so larger sizes may need proportionate reduction in default inter-glyph spacing. The size information in Minion Pro Semibold Condensed Subhead is [180 3 257 139 240]. These values tell an application that:</p>
+      <ul>
+        <li>The font's design size is 18 points;</li>
+        <li>This font is part of a subfamily of fonts that differ only by the size range which each covers, and which share the arbitrary identifier number 3;</li>
+        <li>ID 257 in the name table is the suggested menu name for this subfamily. In this case, the string at name ID 257 is Semibold Condensed;</li>
+        <li>This font is the recommended choice from sizes greater than 13.9-point up through 24-points.</li>
+      </ul>
+      <p>
+        <i>Application interface: </i>When the user specifies a size, the application checks for a size feature in the active font. If none is found, the application follows its default behavior. If one is found, the application follows the specified offset to retrieve the five values.</p>
+      <ul>
+        <li>
+          <i>Design size: </i>Applications which offer size-based tracking have a pre-defined curve which they can apply. By default, this curve should be set to produce no adjustment at the font's design size (first value in the array, in decipoints).<br></li>
+        <li>
+          <i>Size ranges: </i>If the second value in the size array is non-zero, the font has a recommended size range. When any such font is selected by the user, the application builds a list of all fonts with this subfamily value and the same Preferred Family name, and notes the size range in the current font. Applications may want to cache the subfamily list at this point. If the specified size falls in the current font's range, the application uses the current font. If not, the application checks the other ranges in the subfamily, and if the specified size falls in one of them, uses that font. If the specified size is not in any range present, the font with the range closest to the specified value is used. If the specified size falls exactly between two ranges, the range with the larger values is used. Since adding or removing fonts from a subfamily may cause reflow, applications should note which fonts are used for which text.</li>
+      </ul>
+      <p>
+        <i>UI suggestion: </i>This feature should be active by default. Applications may want to present the tracking curve to the user for adjustments via a GUI. At start-up, and when fonts are added or removed, applications may want to build a list of fonts with such ranges, and display the filtered subfamily names in their font selection UI, with each filtered name representing the full set of related sizes. Applications may also present a setting which allows the user to select non-default sizes (for example, in the case where final output is intended for on-screen viewing, a smaller optical size will produce better results). In such a case, the font-selection UI should present the unfiltered names. Applications should notify the user if fonts are removed or added from a subfamily with size ranges, and query about desired behavior.</p>
+      <p>
+        <i>Script/language sensitivity: </i>None. The FeatureParams of all 'size' features in the GPOS FeatureList must point to the same set of values.</p>
+      <p>
+        <i>Feature interaction: </i>None.</p>
+      <h2>
+        <a name="smcp" id="smcp">
+        </a>Tag: 'smcp'</h2>
+      <p>
+        <i>Friendly name: </i>Small Capitals</p>
+      <p>
+        <i>Registered by: </i>Microsoft/Adobe</p>
+      <p>
+        <i>Function: </i>This feature turns lowercase characters into small capitals. This corresponds to the common SC font layout. It is generally used for display lines set in Large &amp; small caps, such as titles. Forms related to small capitals, such as oldstyle figures, may be included.</p>
+      <p>
+        <i>Example: </i>The user enters text as mixed capitals and lowercase, and gets Large &amp; small cap text.</p>
+      <p>
+        <i>Recommended implementation: </i>The smcp table maps lowercase glyphs to the corresponding small-cap forms (GSUB lookup type 1).</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the smcp coverage table, the application passes GIDs to the smcp table, and gets back new GIDs. Note that applications should treat ÃŸ (U+00DF) as a pair of s characters, and that the Turkish dotless i maps to the normal small cap I.</p>
+      <p>
+        <i>UI suggestion: </i>This feature should be off by default.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Applies only to bicameral scripts (i.e. those with case differences), such as Latin, Greek, Cyrillic, and Armenian.</p>
+      <p>
+        <i>Feature interaction: </i>This feature may be used in combination with other substitution (GSUB) features, whose results it may override. Also see <a href="features_ae.htm#c2sc"> c2sc</a>.</p>
+      <h2>
+        <a name="smpl" id="smpl">
+        </a>Tag: 'smpl'</h2>
+      <p>
+        <i>Friendly name: </i>Simplified Forms</p>
+      <p>
+        <i>Registered by: </i>Adobe</p>
+      <p>
+        <i>Function: </i>Replaces 'traditional' Chinese or Japanese forms with the corresponding 'simplified' forms.</p>
+      <p>
+        <i>Example: </i>The user gets U+53F0 when U+6AAF, U+81FA, or U+98B1 is entered.</p>
+      <p>
+        <i>Recommended implementation: </i>The smpl table maps each traditional form in a font to a corresponding simplified form (GSUB lookup type 1). Note that more than one traditional form may map to a single simplified form.</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the smpl coverage table, the application passes the GIDs to the table and gets back one new GID for each. Note: This is a change of character code. Besides the original character code, the application should store the code for the new character.</p>
+      <p>
+        <i>UI suggestion: </i>This feature would be off by default, but could be made the default by a preference setting.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Applies only to Chinese and Japanese.</p>
+      <p>
+        <i>Feature interaction: </i>This feature is mutually exclusive with all other features, which should be turned off when it's applied, except the <a href="#palt">palt</a>, <a href="features_uz.htm#vert">vert</a> and <a href="features_uz.htm#vrt2">vrt2</a> features, which may be used in addition; <a href="#trad">trad</a> and <a href="#tnam">tnam</a> are mutally exclusive, and override the results of smpl.</p>
+      <h2>
+        <a name="ssxx" id="ssxx">
+        </a>Tag: 'ss01' - 'ss20'</h2>
+      <p>
+        <i>Friendly name: </i>Stylistic Set 1 - Stylistic Set 20</p>
+      <p>
+        <i>Registered by: </i>Tiro Typeworks</p>
+      <p>
+        <i>Function: </i>In addition to, or instead of, stylistic alternatives of individual glyphs (see <a href="#salt">'salt'</a> feature), some fonts may contain sets of stylistic variant glyphs corresponding to portions of the character set, e.g. multiple variants for lowercase letters in a Latin font. Glyphs in stylistic sets may be designed to harmonise visually, interract in particular ways, or otherwise work together. Examples of fonts including stylistic sets are Zapfino Linotype and Adobe's Poetica. Individual features numbered sequentially with the tag name convention 'ss01' 'ss02' 'ss03' . 'ss20' provide a mechanism for glyphs in these sets to be associated via GSUB lookup indexes to default forms and to each other, and for users to select from available stylistic sets.</p>
+      <p>
+        <i>Recommended implementation: </i>An ssXX table maps GIDs for default forms to GIDs for corresponding stylistic alternatives in each set. Each ssXX feature uses one-to-one (GSUB lookup type 1) substitutions. Font developers may choose to map only from default forms to variants for each stylistic set, or may choose to map between all stylistic sets in each feature, depending on intended user experience. For example, feature 'ss03' might contain lookups mapping variant glyphs from 'ss01' and 'sso2' to corresponding variants in 'ss03', in addition to mapping from default forms.<br><br></p>
+      <p>The FeatureParams field of the Feature Table of these GSUB features may be set to 0, or to an offset to a Feature Parameters table comprising two successive USHORT values, as follows:</p>
+      <ul>
+        <li>
+          <i>Version (set to 0):</i> This corresponds to a &ldquo;minor&rdquo; version number. Additional data may be added to the end of this Feature Parameters table in the future. <br></li>
+        <li>
+          <i>UI Name ID:</i> The <a href="name.htm#">'name'</a> table name ID that specifies a string (or strings, for multiple languages) for a user-interface label for this feature. The values of uiLabelNameId and sampleTextNameId are expected to be in the font-specific name ID range (256-32767), though that is not a requirement in this Feature Parameters specification. The user-interface label for the feature can be provided in multiple languages. An English string should be included as a fallback. The string should be kept to a minimal length to fit comfortably with different application interfaces.</li>
+      </ul>
+      <p>
+        <i>Application interface: </i>Note that the application is responsible for counting and enumerating the number of features in the font with tag names of the format 'ss01' to 'ss20', and for presenting the user with an appropriate selection mechanism. For GIDs found in the ssXX coverage table, the application passes the GIDs to the ssXX table and gets back one or more new GIDs.</p>
+      <p>
+        <i>UI suggestion: </i>This feature should be off by default.</p>
+      <p>
+        <i>Script/language sensitivity: </i>None.</p>
+      <p>
+        <i>Feature interaction: </i>This feature may be used in combination with other substitution (GSUB) features, whose results it may override. Note that after an ssXX feature has been applied, the user may wish to apply glyph-specific features, e.g. 'salt', to individual glyphs in the resulting layout; font developers are responsible for ordering substitution lookups to obtain desired user experience.</p>
+      <h2>
+        <a name="subs" id="subs">
+        </a>Tag: 'subs'</h2>
+      <p>
+        <i>Friendly name: </i>Subscript</p>
+      <p>
+        <i>Registered by: </i>Microsoft/Adobe</p>
+      <p>
+        <i>Function: </i>The 'subs' feature may replace a default glyph with a subscript glyph, or it may combine a glyph substitution with positioning adjustments for proper placement.</p>
+      <p>
+        <i>Recommended implementation: </i>First, a single or contextual substitution lookup implements the subscript glyph (GSUB lookup type 1). Then, if the glyph needs repositioning, an application may apply a single adjustment, pair adjustment, or contextual adjustment positioning lookup to modify its&nbsp;position.</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the subs coverage table, the application passes a GID to the feature and gets back a new GID. Note: This is a change of semantic value. Besides the original character codes, the application should store the code for the new character.</p>
+      <p>
+        <i>UI suggestion: </i>This feature should be off by default.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Can apply to nearly any script.</p>
+      <p>
+        <i>Feature interaction: </i>This feature may be used in combination with other substitution (GSUB) features, whose results it may override.</p>
+      <h2>
+        <a name="sups" id="sups">
+        </a>Tag: 'sups'</h2>
+      <p>
+        <i>Friendly name: </i>Superscript</p>
+      <p>
+        <i>Registered by: </i>Microsoft/Adobe</p>
+      <p>
+        <i>Function: </i>Replaces lining or oldstyle figures with superior figures (primarily for footnote indication), and replaces lowercase letters with superior letters (primarily for abbreviated French titles).</p>
+      <p>
+        <i>Example: </i>The application can use this feature to automatically access the superior figures (more legible than scaled figures) for footnotes, or the user can apply it to Mssr to get the classic form.</p>
+      <p>
+        <i>Recommended implementation: </i>The sups table maps figures and lowercase letters to the corresponding superior forms (GSUB lookup type 1).</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the sups coverage table, the application passes a GID to the feature and gets back a new GID. Note: This can include a change of semantic value. Besides the original character codes, the application should store the code for the new character.</p>
+      <p>
+        <i>UI suggestion: </i>This feature should be off by default.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Can apply to nearly any script.</p>
+      <p>
+        <i>Feature interaction: </i>This feature may be used in combination with other substitution (GSUB) features, whose results it may override.</p>
+      <h2>
+        <a name="swsh" id="swsh">
+        </a>Tag: 'swsh'</h2>
+      <p>
+        <i>Friendly name: </i>Swash</p>
+      <p>
+        <i>Registered by: </i>Microsoft/Adobe</p>
+      <p>
+        <i>Function: </i>This feature replaces default character glyphs with corresponding swash glyphs. Note that there may be more than one swash alternate for a given character.</p>
+      <p>
+        <i>Example: </i>The user inputs the ampersand character when setting text with Poetica with this feature active, and is presented with a choice of the 63 ampersand forms in that face.</p>
+      <p>
+        <i>Recommended implementation: </i>The swsh table maps GIDs for default forms to those for one or more corresponding swash forms. While many of these substitutions are one-to-one (GSUB lookup type 1), others require a selection from a set (GSUB lookup type 3). The manufacturer may choose to build two tables (one for each lookup type) or only one which uses lookup type 3 for all substitutions. If several styles of swash are present across the font, the set of forms for each character should be ordered consistently.</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the swsh coverage table, the application passes the GIDs to the swsh table and gets back one or more new GIDs. If more than one GID is returned, the application must provide a means for the user to select the one desired.</p>
+      <p>
+        <i>UI suggestion: </i>This feature should be inactive by default. When more than one GID is returned, an application could display the forms sequentially in context, or present a palette showing all the forms at once, or give the user a choice between these approaches. The application may assume that the first glyph in a set is the preferred form, so the font developer should order them accordingly.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Does not apply to ideographic scripts.</p>
+      <p>
+        <i>Feature interaction: </i>This feature may be used in combination with other substitution (GSUB) features, whose results it may override.</p>
+      <h2>
+        <a name="titl" id="titl">
+        </a>Tag: 'titl'</h2>
+      <p>
+        <i>Friendly name: </i>Titling</p>
+      <p>
+        <i>Registered by: </i>Adobe</p>
+      <p>
+        <i>Function: </i>This feature replaces the default glyphs with corresponding forms designed specifically for titling. These may be all-capital and/or larger on the body, and adjusted for viewing at larger sizes.</p>
+      <p>
+        <i>Example: </i>The user applies this feature in Adobe Garamond to get the titling caps.</p>
+      <p>
+        <i>Recommended implementation: </i>The titl table maps default forms to corresponding titling forms (GSUB lookup type 1).</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the titl coverage table, the application passes the GIDs to the titl table and gets back new GIDs.</p>
+      <p>
+        <i>UI suggestion: </i>This feature should be off by default.</p>
+      <p>
+        <i>Script/language sensitivity: </i>None.</p>
+      <p>
+        <i>Feature interaction: </i>This feature may be used in combination with other substitution (GSUB) features, whose results it may override.</p>
+      <h2>
+        <a name="tjmo">
+        </a>Tag: 'tjmo'</h2>
+      <p>
+        <i>Friendly name: </i>Trailing Jamo Forms</p>
+      <p>
+        <i>Registered by: </i>Microsoft</p>
+      <p>
+        <i>Function: </i>Substitutes the trailing jamo form of a cluster.</p>
+      <p>
+        <i>Example: </i>In Hangul script, the jamo cluster is composed of three parts (leading consonant, vowel, and trailing consonant). When a sequence of trailing class jamos are found, their combined trailing jamo form is substituted.</p>
+      <p>
+        <i>Recommended implementation: </i>The <b>tjmo</b> table maps the sequence required to convert a series of jamos into its trailing jamo form (GSUB lookup type 4).</p>
+      <p>
+        <i>Application interface: </i>For substitutions defined in the <b>tjmo</b> table, the application passes the sequence of GIDs to the feature, and gets back the GID for the trailing jamo form.</p>
+      <p>
+        <i>UI suggestion: </i>This feature should be on by default.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Required for Hangul script when Ancient Hangul writing system is supported.</p>
+      <p>
+        <i>Feature interaction: </i>This feature overrides the results of all other features.</p>
+      <h2>
+        <a name="tnam" id="tnam">
+        </a>Tag: 'tnam'</h2>
+      <p>
+        <i>Friendly name: </i>Traditional Name Forms</p>
+      <p>
+        <i>Registered by: </i>Adobe</p>
+      <p>
+        <i>Function: </i>Replaces 'simplified' Japanese kanji forms with the corresponding 'traditional' forms. This is equivalent to the Traditional Forms feature, but explicitly limited to the traditional forms considered proper for use in personal names (as many as 205 glyphs in some fonts).</p>
+      <p>
+        <i>Example: </i>The user inputs U+4E9C and gets U+4E9E.</p>
+      <p>
+        <i>Recommended implementation: </i>The tnam table maps simplified forms in a font to corresponding traditional forms which can be used in personal names (GSUB lookup type 1). The application stores a record of any simplified forms which resulted from substitutions (the smpl feature); for such forms, applying the tnam feature undoes the previous substitution.</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the tnam coverage table, the application passes the GIDs to the table and gets back new GIDs. Note: This is a change of character code. Besides the original character code, the application should store the code for the new character.</p>
+      <p>
+        <i>UI suggestion: </i>This feature should be off by default.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Applies only to Japanese.</p>
+      <p>
+        <i>Feature interaction: </i>May include some characters affected by the Proportional Alternate Widths feature (<a href="#palt">palt</a>); <a href="#trad"> trad</a> and tnam are mutually exclusive, and override the results of <a href="#smpl">smpl</a>.</p>
+      <h2>
+        <a name="tnum" id="tnum">
+        </a>Tag: 'tnum'</h2>
+      <p>
+        <i>Friendly name: </i>Tabular Figures</p>
+      <p>
+        <i>Registered by: </i>Adobe</p>
+      <p>
+        <i>Function: </i>Replaces figure glyphs set on proportional widths with corresponding glyphs set on uniform (tabular) widths. Tabular widths will generally be the default, but this cannot be safely assumed. Of course this feature would not be present in monospaced designs.</p>
+      <p>
+        <i>Example: </i>The user may apply this feature to get oldstyle figures to align vertically in a column.</p>
+      <p>
+        <i>Recommended implementation: </i>In order to simplify associated kerning and get the best glyph design for a given width, this feature should use new glyphs for the figures, rather than only adjusting the fit of the proportional glyphs (although some may be simple copies); i.e. not a GPOS feature. The tnum table maps proportional versions of lining &amp;/or oldstyle figures to corresponding tabular glyphs (GSUB lookup type 1).</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the tnum coverage table, the application passes GIDs to the tnum table and gets back new GIDs.</p>
+      <p>
+        <i>UI suggestion: </i>This feature should be off by default. The application may want to query the user about this feature when the user changes figure style (<a href="features_ko.htm#onum">onum</a> or <a href="features_ko.htm#lnum">lnum</a>).</p>
+      <p>
+        <i>Script/language sensitivity: </i>None.</p>
+      <p>
+        <i>Feature interaction: </i>This feature overrides the results of the Proportional Figures feature ( <a href="#pnum">pnum</a>).</p>
+      <h2>
+        <a name="trad" id="trad">
+        </a>Tag: 'trad'</h2>
+      <p>
+        <i>Friendly name: </i>Traditional Forms</p>
+      <p>
+        <i>Registered by: </i>Adobe</p>
+      <p>
+        <i>Function: </i>Replaces 'simplified' Chinese hanzi or Japanese kanji forms with the corresponding 'traditional' forms.</p>
+      <p>
+        <i>Example: </i>The user inputs U+53F0 and is offered a choice of U+6AAF, U+81FA, or U+98B1.</p>
+      <p>
+        <i>Recommended implementation: </i>The trad table maps each simplified form in a font to one or more traditional forms. While many of these substitutions are one-to-one (GSUB lookup type 1), others require a selection from a set (GSUB lookup type 3). The manufacturer may choose to build two tables (one for each lookup type) or only one which uses lookup type 3 for all substitutions. As in any one-from-many substitution, alternates present in more than one face should be ordered consistently across a family, so that those alternates can work correctly when switching between family members.</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the trad coverage table, the application passes the GIDs to the table and gets back one or more new GIDs. If more than one GID is returned, the application must provide a means for the user to select the one desired. The application stores a record of any simplified forms which resulted from substitutions (the <a href="#smpl">smpl</a> feature); for such forms, applying the trad feature undoes the previous substitution. Note: This is a change of character code. Besides the original character code, the application should store the code for the new character.</p>
+      <p>
+        <i>UI suggestion: </i>This feature should be inactive by default. If there's no record of a conversion from traditional to simplified, the user must be offered a set of possibilities from which to select. The application may note the user's choice, and offer it as a default the next time the source simplified character is encountered. In the absence of such prior information, the application may assume that the first glyph in a set is the preferred form, so the font developer should order them accordingly.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Applies only to Chinese and Japanese.</p>
+      <p>
+        <i>Feature interaction: </i>May include some characters affected by the Proportional Alternate Widths feature (<a href="#palt">palt</a>); trad and <a href="#tnam"> tnam</a> are mutually exclusive, and override the results of <a href="#smpl">smpl</a>.</p>
+      <h2>
+        <a name="twid" id="twid">
+        </a>Tag: 'twid'</h2>
+      <p>
+        <i>Friendly name: </i>Third Widths</p>
+      <p>
+        <i>Registered by: </i>Adobe</p>
+      <p>
+        <i>Function: </i>Replaces glyphs on other widths with glyphs set on widths of one third of an em. The characters involved are normally figures and some forms of punctuation.</p>
+      <p>
+        <i>Example: </i>The user may apply twid to place a three-digit figure in a single slot in a column of vertical text.</p>
+      <p>
+        <i>Recommended implementation: </i>The font may contain alternate glyphs designed to be set on third-em widths (GSUB lookup type 1), or it may specify alternate metrics for the original glyphs (GPOS lookup type 1) which adjust their spacing to fit in third-em widths.</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the twid coverage table, the application passes the GIDs to the table and gets back either new GIDs or positional adjustments (XPlacement and XAdvance).</p>
+      <p>
+        <i>UI suggestion: </i>This feature would normally be off by default.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Generally used only in CJKV fonts.</p>
+      <p>
+        <i>Feature interaction: </i>This feature is mutually exclusive with all other glyph-width features (e.g. <a href="features_fj.htm#fwid">fwid</a>, <a href="features_fj.htm#halt">halt</a>, <a href="features_fj.htm#hwid"> hwid</a> and <a href="#qwid">qwid</a>), which should be turned off when it's applied. It deactivates the <a href="features_ko.htm#kern">kern</a> feature.</p>
+      <hr class="separator">
+      <p class="fineprint">This page was last updated 19 November 2008.</p>
+      <p class="fineprint">&copy; 2008 Microsoft Corporation. All rights reserved. <a href="/info/cpyright.htm">Terms of use</a>.</p>
+      <p class="fineprint">Comments to the MST group: <a href="/typography/AboutMST.mspx">how to contact us</a></p>
+    </div>
+    <div class="middlerule">
+    </div>
+    <p class="menu">
+      <a href="/typography/default.mspx">Microsoft Typography</a> | <a href="/typography/creators.htm">Developer information</a> | <a href="/typography/specs/default.htm">Specifications</a> | <a href="ttoreg.htm">OpenType Layout tag registry</a></p>
+    <div class="bottomrule">
+    </div>
+  </body>
+</html>

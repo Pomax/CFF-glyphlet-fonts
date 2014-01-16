@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+  <head>
+    <title>The Control Value Program</title>
+    <link rel="STYLESHEET" href="otspec.css" type="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  </head>
+  <body>
+    <div class="toprule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType tables</a> | The prep table</p>
+    <div class="middlerule">
+    </div>
+    <div class="contents">
+      <h1>prep - Control Value Program</h1>
+      <p>The Control Value Program consists of a set of TrueType instructions that will be executed whenever the font or point size or transformation matrix change and before each glyph is interpreted. Any instruction is legal in the CV Program but since no glyph is associated with it, instructions intended to move points within a particular glyph outline cannot be used in the CV Program. The name 'prep' is anachronistic (the table used to be known as the Pre Program table.)</p>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 80%;">Description</th>
+        </tr>
+        <tr>
+          <td>BYTE[ <i>n</i> ]</td>
+          <td>Set of instructions executed whenever point size or font or transformation change. <i>n</i> is the number of BYTE items that fit in the size of the table.</td>
+        </tr>
+      </table>
+      <hr class="separator">
+      <p class="fineprint">This page was last updated 18 November 2008.</p>
+      <p class="fineprint">&copy; 2008 Microsoft Corporation. All rights reserved. <a href="http://www.microsoft.com/Misc/cpyright.htm">Terms of use</a>.</p>
+      <p class="fineprint">Comments to the MST group: <a href="/typography/AboutMST.mspx">how to contact us</a>.</p>
+    </div>
+    <div class="middlerule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType tables</a> | The prep table</p>
+    <div class="bottomrule">
+    </div>
+  </body>
+</html>

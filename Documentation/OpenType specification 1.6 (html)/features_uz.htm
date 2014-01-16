@@ -1,0 +1,273 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+  <head>
+    <title>OpenType Layout tag registry</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="STYLESHEET" href="otspec.css" type="text/css">
+  </head>
+  <body>
+    <div class="toprule">
+    </div>
+    <p class="menu">
+      <a href="/typography/default.mspx">Microsoft Typography</a> | <a href="/typography/creators.htm">Developer Info</a> | <a href="default.htm">OpenType specification</a> | <a href="ttoreg.htm">OpenType Layout tag registry</a></p>
+    <div class="middlerule">
+    </div>
+    <div class="contents">
+      <h1>Registered features - <i>definitions and implementations</i></h1>
+      <p>
+        <a href="features_ae.htm">a - e</a> | <a href="features_fj.htm">f - j</a> | <a href="features_ko.htm">k - o</a> | <a href="features_pt.htm">p - t</a> | u - z</p>
+      <h2>
+        <a name="unic">
+        </a>Tag: 'unic'</h2>
+      <p>
+        <i>Friendly name:</i> Unicase</p>
+      <p>
+        <i>Registered by:</i> Tiro Typeworks / Emigre</p>
+      <p>
+        <i>Function:</i> This feature maps upper- and lowercase letters to a mixed set of lowercase and small capital forms, resulting in a single case alphabet (for an example of unicase, see the Emigre type family Filosofia). The letters substituted may vary from font to font, as appropriate to the design. If aligning to the x-height, smallcap glyphs may be substituted, or specially designed unicase forms might be used. Substitutions might also include specially designed figures.</p>
+      <table class="image">
+        <tr>
+          <td>
+            <img src="unicprop.gif" alt="unicprop.gif">
+          </td>
+        </tr>
+      </table>
+      <p>
+        <i>Example:</i> The user enters text as uppercase, lowercase or mixed case, and gets unicase text.</p>
+      <p>
+        <i>Recommended implementation:</i> The unic table maps some uppercase and lowercase glyphs to corresponding unicase forms (GSUB lookup type 1).</p>
+      <p>
+        <i>Application interface:</i> For GIDs found in the unic coverage table, the application passes GIDs to the unic table, and gets back new GIDs.</p>
+      <p>
+        <i>UI suggestion:</i> This feature should be off by default.</p>
+      <p>
+        <i>Script/language sensitivity:</i> Applies only to scripts with both upper- and lowercase forms (e.g. Latin, Cyrillic, Greek).</p>
+      <p>
+        <i>Feature interaction:</i> This feature may be used in combination with other substitution (GSUB) features, whose results it may override.</p>
+      <h2>
+        <a name="valt" id="valt">
+        </a>Tag: 'valt'</h2>
+      <p>
+        <i>Friendly name: </i>Alternate Vertical Metrics</p>
+      <p>
+        <i>Registered by: </i>Adobe (Modified by Adobe, this is the newer description)</p>
+      <p>
+        <i>Function: </i>Repositions glyphs to visually center them within full-height metrics, for use in vertical setting. Typically applies to full-width Latin glyphs, which are aligned on a common horizontal baseline and not rotated when set vertically in CJKV fonts.</p>
+      <p>
+        <i>Example: </i>Applying this feature would shift a Roman h down, or y up, from their default full-width positions.</p>
+      <p>
+        <i>Recommended implementation: </i>The font specifies alternate metrics for the original glyphs (GPOS lookup type 1).</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the valt coverage table, the application passes the GIDs to the table and gets back positional adjustments (YPlacement).</p>
+      <p>
+        <i>UI suggestion: </i>This feature should be active by default in vertical-setting contexts.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Applies only to scripts with vertical writing modes.</p>
+      <p>
+        <i>Feature interaction: </i>This feature is mutually exclusive with all other glyph-height features (e.g. vhal and vpal), which should be turned off when it's applied. It deactivates the <a href="features_ko.htm#kern">kern</a> feature.</p>
+      <h2>
+        <a name="vatu">
+        </a>Tag:  &ldquo;vatu&rdquo;</h2>
+      <p>
+        <i>Friendly name: </i> Vattu Variants</p>
+      <p>
+        <i>Registered by: </i> Microsoft</p>
+      <p>
+        <i>Function: </i>: In an Indic consonant conjunct, substitutes a ligature glyph for a base consonant and a following vattu (below-base) form of a conjoining consonant, or for a half form of a consonant and a following vattu form.</p>
+      <p>
+        <i>Example: </i> In the Devanagari (Indic) script, the consonant Ra takes a vattu form, when it is not the syllable initial consonant in a conjunct. This vattu form ligates with the base consonant as well as half forms of consonants.</p>
+      <p>
+        <i>Recommended implementation: </i>The <b>vatu</b> table maps consonant and vattu form combinations to their respective ligatures (GSUB lookup type 4).</p>
+      <p>Lookups associated with the Vattu Variants feature apply to glyphs derived using the Below-base Forms feature and (for half-form plus vattu ligatures) the Half Forms features. The Below-base Forms feature should be used to derive the nominal vattu form of a consonant; the Vattu Variants feature should only be used to substitute the nominal vattu form and a base consonant or half form with a ligature glyph. If the Rakar Forms feature is used, the Vattu Variants feature is not required.</p>
+      <p>
+        <i>Application interface: </i>For substitutions defined in the <b>vatu</b> table, the application passes the sequence of GIDs to the table, and gets back the GID for the vattu variant ligature.</p>
+      <p>
+        <i>UI suggestion: </i>In recommended usage, this feature triggers substitutions that are required for correct display of the given script. It should be applied in the appropriate contexts, as determined by script-specific processing. Control of the feature should not generally be exposed to the user.</p>
+      <p>
+        <i>Script/language sensitivity: </i> Used for Indic scripts. eg: Devanagari.</p>
+      <p>
+        <i>Feature interaction: </i>This feature may be used in conjunction with certain other features to derive required forms of Indic scripts. For Indic script implementations that use the Vattu Variants feature, the application is expected to process this feature and certain other features in an appropriate order to obtain the correct set of basic forms: <a href="features_ko.htm#nukt">nukt</a>, <a href="features_ae.htm#akhn">akhn</a>, <a href="features_pt.htm#rphf">rphf</a>, <a href="features_pt.htm#rkrf">rkrf</a>, <a href="features_pt.htm#pref">pref</a>, <a href="features_ae.htm#blwf">blwf</a>, <a href="features_fj.htm#half">half</a>, <a href="features_pt.htm#pstf">pstf</a>, <a href="features_ae.htm#cjct">cjct</a>. Other discretionary features for optional typographic effects may also be applied. Lookups for such discretionary features should be processed after lookups for this feature have been processed.</p>
+      <h2>
+        <a name="vert" id="vert">
+        </a>Tag: 'vert'</h2>
+      <p>
+        <i>Friendly name: </i>Vertical Alternates</p>
+      <p>
+        <i>Registered by: </i>Microsoft/Adobe</p>
+      <p>
+        <i>Function: </i>Replaces default forms with variants adjusted for vertical writing when in vertical writing mode. While most CJKV glyphs remain vertical when set in vertical writing mode, some take a different form (usually rotated and repositioned) for this purpose. Glyphs covered by this feature correspond to the set normally rotated in low-end DTP applications.</p>
+      <p>
+        <i>Example: </i>In vertical writing mode, the opening parenthesis (U+FF08) is replaced by the rotated form (U+FE35).</p>
+      <p>
+        <i>Recommended implementation: </i>The font includes rotated versions of the glyphs covered by this feature. The vert table maps the standard forms to the corresponding rotated forms (GSUB lookup type 1). This feature should be the last substitution in the font, and take input from other features.</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the vert coverage table, the application passes GIDs to the feature, and gets back new GIDs. See the <a href="#vrt2"> vrt2</a> feature description for more details.</p>
+      <p>
+        <i>UI suggestion: </i>This feature should be active by default when vertical writing mode is on if the <a href="#vrt2">vrt2</a> feature is not present. See the vrt2 feature description for more details, and a discussion of vertical writing in OpenType.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Applies only to scripts with vertical writing capability.</p>
+      <p>
+        <i>Feature interaction: </i>This is a subset of the <a href="#vrt2">vrt2</a> feature; vrt2 is preferred. May be used in addition to any other feature.</p>
+      <h2>
+        <a name="vhal" id="vhal">
+        </a>Tag: 'vhal'</h2>
+      <p>
+        <i>Friendly name: </i>Alternate Vertical Half Metrics</p>
+      <p>
+        <i>Registered by: </i>Adobe</p>
+      <p>
+        <i>Function: </i>Respaces glyphs designed to be set on full-em heights, fitting them onto half-em heights. This differs from valt in that it does not substitute new glyphs.</p>
+      <p>
+        <i>Example: </i>The user may invoke this feature in a CJKV font to get better fit for punctuation or symbol glyphs without disrupting the monospaced alignment.</p>
+      <p>
+        <i>Recommended implementation: </i>The font specifies alternate metrics for the full-height glyphs (GPOS lookup type 1).</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the vhal coverage table, the application passes the GIDs to the table and gets back positional adjustments (XPlacement, XAdvance, YPlacement and YAdvance).</p>
+      <p>
+        <i>UI suggestion: </i>This feature would be off by default.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Used only in CJKV fonts.</p>
+      <p>
+        <i>Feature interaction: </i>This feature is mutually exclusive with all other glyph-height features (e.g. <a href="#valt">valt</a> and <a href="#vpal">vpal</a>), which should be turned off when it's applied. It deactivates the kern feature. See also <a href="features_fj.htm#halt">halt</a>.</p>
+      <h2>
+        <a name="vjmo">
+        </a>Tag: &ldquo;vjmo&rdquo;</h2>
+      <p>
+        <i>Friendly name: </i>Vowel Jamo Forms</p>
+      <p>
+        <i>Registered by: </i>Microsoft</p>
+      <p>
+        <i>Function: </i>Substitutes the vowel jamo form of a cluster.</p>
+      <p>
+        <i>Example: </i>In Hangul script, the jamo cluster is composed of three parts (leading consonant, vowel, and trailing consonant). When a sequence of vowel class jamos are found, their combined vowel jamo form is substituted.</p>
+      <p>
+        <i>Recommended implementation: </i>The <b>vjmo</b> table maps the sequence required to convert a series of jamos into its vowel jamo form (GSUB lookup type 4).</p>
+      <p>
+        <i>Application interface: </i>For substitutions defined in the <b>vjmo</b> table, the application passes the sequence of GIDs to the feature, and gets back the GID for the vowel jamo form.</p>
+      <p>
+        <i>UI suggestion: </i>This feature should be on by default.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Required for Hangul script when Ancient Hangul writing system is supported.</p>
+      <p>
+        <i>Feature interaction: </i>This feature overrides the results of all other features.</p>
+      <h2>
+        <a name="vkna" id="vkna">
+        </a>Tag: 'vkna'</h2>
+      <p>
+        <i>Friendly name: </i>Vertical Kana Alternates</p>
+      <p>
+        <i>Registered by: </i>Adobe</p>
+      <p>
+        <i>Function: </i>Replaces standard kana with forms that have been specially designed for only vertical writing. This is a typographic optimization for improved fit and more even color. Also see <a href="features_fj.htm#hkna">hkna</a>.</p>
+      <p>
+        <i>Example: </i>Standard full-width kana (hiragana and katakana) are replaced by forms that are designed for vertical use.</p>
+      <p>
+        <i>Recommended implementation: </i>The font includes a set of specially-designed glyphs, listed in the vkna coverage table. The vkna feature maps the standard full-width forms to the corresponding special vertical forms (GSUB lookup type 1).</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the vkna coverage table, the application passes GIDs to the feature, and gets back new GIDs.</p>
+      <p>
+        <i>UI suggestion: </i>This feature would be off by default.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Applies only to fonts that support kana (hiragana and katakana).</p>
+      <p>
+        <i>Feature interaction: </i>Since this feature is only for vertical use, features applying to horizontal behaviors (e.g. <a href="features_ko.htm#kern">kern</a>) do not apply.</p>
+      <h2>
+        <a name="vkrn" id="vkrn">
+        </a>Tag: 'vkrn'</h2>
+      <p>
+        <i>Friendly name: </i>Vertical Kerning</p>
+      <p>
+        <i>Registered by: </i>Adobe</p>
+      <p>
+        <i>Function: </i>Adjusts amount of space between glyphs, generally to provide optically consistent spacing between glyphs. Although a well-designed typeface has consistent inter-glyph spacing overall, some glyph combinations require adjustment for improved legibility. Besides standard adjustment in the vertical direction, this feature can supply size-dependent kerning data via device tables, &ldquo;cross-stream&rdquo; kerning in the X text direction, and adjustment of glyph placement independent of the advance adjustment. Note that this feature may apply to runs of more than two glyphs, and would not be used in monospaced fonts. Also note that this feature applies only to text set vertically.</p>
+      <p>
+        <i>Example: </i>When the katakana character U+30B9 or U+30D8 is followed by U+30C8 in a vertical setting, U+30C8 is shifted up to fit more evenly.</p>
+      <p>
+        <i>Recommended implementation: </i>The font stores a set of adjustments for pairs of glyphs (GPOS lookup type 2 or 8). These may be stored as one or more tables matching left and right classes, &amp;/or as individual pairs. Additional adjustments may be provided for larger sets of glyphs (e.g. triplets, quadruplets, etc.) to overwrite the results of pair kerns in particular combinations.</p>
+      <p>
+        <i>Application interface: </i>The application passes a sequence of GIDs to the kern table, and gets back adjusted positions (XPlacement, XAdvance, YPlacement and YAdvance) for those GIDs. When using the type 2 lookup on a run of glyphs, it's critical to remember to not consume the last glyph, but to keep it available as the first glyph in a subsequent run (this is a departure from normal lookup behavior).</p>
+      <p>
+        <i>UI suggestion: </i>This feature should be active by default for vertical text setting. Applications may wish to allow users to add further manually-specified adjustments to suit specific needs and tastes.</p>
+      <p>
+        <i>Script/language sensitivity: </i>None</p>
+      <p>
+        <i>Feature interaction: </i>If <a href="#vkrn">vkrn</a> is activated, <a href="#vpal">vpal</a> must also be activated if it exists. If <a href="#vpal">vpal</a> is activated, there is no requirement that <a href="#vkrn">vkrn</a> must also be activated. May be used in addition to any other feature except those which result in fixed (uniform) advance heights.</p>
+      <h2>
+        <a name="vpal" id="vpal">
+        </a>Tag: 'vpal'</h2>
+      <p>
+        <i>Friendly name: </i>Proportional Alternate Vertical Metrics</p>
+      <p>
+        <i>Registered by: </i>Adobe</p>
+      <p>
+        <i>Function: </i>Respaces glyphs designed to be set on full-em heights, fitting them onto individual (more or less proportional) vertical heights. This differs from valt in that it does not substitute new glyphs (GPOS, not GSUB feature). The user may prefer the monospaced form, or may simply want to ensure that the glyph is well-fit.</p>
+      <p>
+        <i>Example: </i>The user may invoke this feature in a Japanese font to get Latin, Kanji, Kana or Symbol glyphs with the full-height design but individual metrics.</p>
+      <p>
+        <i>Recommended implementation: </i>The font specifies alternate heights for the full-height glyphs (GPOS lookup type 1).</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the vpal coverage table, the application passes the GIDs to the table and gets back positional adjustments (XPlacement, XAdvance, YPlacement and YAdvance).</p>
+      <p>
+        <i>UI suggestion: </i>This feature would be off by default.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Used mostly in CJKV fonts.</p>
+      <p>
+        <i>Feature interaction: </i>This feature is mutually exclusive with all other glyph-height features (e.g. <a href="#valt">valt</a> and <a href="#vhal">vhal</a>), which should be turned off when it's applied. If <a href="#vpal">vpal</a> is activated, there is no requirement that <a href="#vkrn">vkrn</a> must also be activated. If <a href="#vkrn">vkrn</a> is activated, <a href="#vpal">vpal</a> must also be activated if it exists. See also <a href="features_pt.htm#palt">palt</a>.</p>
+      <h2>
+        <a name="vrt2" id="vrt2">
+        </a>Tag: 'vrt2'</h2>
+      <p>
+        <i>Friendly name: </i>Vertical Alternates and Rotation</p>
+      <p>
+        <i>Registered by: </i>Adobe</p>
+      <p>
+        <i>Function: </i>Replaces some fixed-width (half-, third- or quarter-width) or proportional-width glyphs (mostly Latin or katakana) with forms suitable for vertical writing (that is, rotated 90 degrees clockwise). Note that these are a superset of the glyphs covered in the vert table.</p>
+      <p>ATM/NT 4.1 and the Windows 2000 OTF driver impose the following requirements for an OpenType font with CFF outlines to be used for vertical writing: the vrt2 feature must be present in the GSUB table, it must comprises a single lookup of LookupType 1 and LookupFlag 0, and the lookup must have a single subtable. The predecessor feature, <a href="#vert">vert</a>, is ignored.<br></p>
+      <p>A rotated glyph must be designed such that its top side bearing and vertical advance as recorded in the <a href="vmtx.htm">Vertical Metrics ('vmtx') table</a> are identical to the left side bearing and horizontal advance, respectively, of the corresponding upright glyph as recorded in the <a href="hmtx.htm">Horizontal Metrics ('hmtx') table</a>. (The horizontal advance of the rotated glyph may be set to any value, since the glyph is intended only for vertical writing use. The vendor may however set it to head.unitsPerEm, to prevent overlap during font proofing tests, for example.)<br></p>
+      <p>Thus, proportional-width glyphs with rotated forms in the vrt2 feature will appear identically spaced in both vertical and horizontal writing. In order for kerning to produce identical results as well, developers must ensure that the Vertical Kerning (<a href="#vkrn">vkrn</a>) feature record kern values between the rotated glyphs that are the same as kern values between their corresponding upright glyphs in the Kerning (<a href="features_ko.htm#kern">kern</a>) feature.</p>
+      <p>
+        <i>Example: </i>Proportional- or half-width Latin and half-width katakana characters are rotated 90 degrees clockwise for vertical writing.</p>
+      <p>
+        <i>Recommended implementation: </i>The font includes rotated versions of the glyphs covered by this feature. The vrt2 table maps the standard (horizontal) forms to the corresponding vertical (rotated) forms (GSUB lookup type 1). This feature should be the last substitution in the font, and take input from other features.</p>
+      <p>
+        <i>Application interface: </i>For GIDs found in the vrt2 coverage table, the application passes GIDs to the feature, and gets back new GIDs.</p>
+      <p>
+        <i>UI suggestion: </i>This feature should be active by default when vertical writing mode is on, although the user must be able to override it.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Applies only to scripts with vertical writing capability.</p>
+      <p>
+        <i>Feature interaction: </i>Overrides the <a href="#vert">vert</a> (Vertical Writing) feature, which is a subset of this one. May be used in addition to any other feature.</p>
+      <h2>
+        <a name="zero" id="zero">
+        </a>Tag: 'zero'</h2>
+      <p>
+        <i>Friendly name: </i>Slashed Zero</p>
+      <p>
+        <i>Registered by: </i>Adobe</p>
+      <p>
+        <i>Function: </i>Some fonts contain both a default form of zero, and an alternative form which uses a diagonal slash through the counter. Especially in condensed designs, it can be difficult to distinguish between 0 and O (zero and capital O) in any situation where capitals and lining figures may be arbitrarily mixed. This feature allows the user to change from the default 0 to a slashed form.</p>
+      <p>
+        <i>Example: </i>When setting labels, the user applies this feature to get the slashed 0.</p>
+      <p>
+        <i>Recommended implementation: </i>The zero table maps the GIDs for the lining forms of zero to corresponding slashed forms (GSUB lookup type 1).</p>
+      <p>
+        <i>Application interface: </i>For GIDs in the zero coverage table, the application passes a GID to the zero table and gets back a new GID.</p>
+      <p>
+        <i>UI suggestion: </i>Optimally, the application would store this as a preference setting, and the user could use the feature to toggle back and forth between the two forms. Most applications will want the default setting to disable this feature.</p>
+      <p>
+        <i>Script/language sensitivity: </i>Does not apply to scripts which use forms other than 0 for zero.</p>
+      <p>
+        <i>Feature interaction: </i>Applies only to lining figures, so is inactivated by oldstyle figure features (e.g. <a href="features_ko.htm#onum">onum</a>).</p>
+      <hr class="separator">
+      <p class="fineprint">This page was last updated 29 January 2008.</p>
+      <p class="fineprint">&copy; 2008 Microsoft Corporation. All rights reserved. <a href="/info/cpyright.htm">Terms of use</a>.</p>
+      <p class="fineprint">Comments to the MST group: <a href="/typography/AboutMST.mspx">how to contact us</a></p>
+    </div>
+    <div class="middlerule">
+    </div>
+    <p class="menu">
+      <a href="/typography/default.mspx">Microsoft Typography</a> | <a href="/typography/creators.htm">Developer information</a> | <a href="/typography/specs/default.htm">Specifications</a> | <a href="ttoreg.htm">OpenType Layout tag registry</a></p>
+    <div class="bottomrule">
+    </div>
+  </body>
+</html>

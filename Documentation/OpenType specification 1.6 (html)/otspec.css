@@ -1,0 +1,142 @@
+BODY {
+  margin: 3pt;
+  background: white;
+  font: normal 10pt Georgia, "Times New Roman", Times, serif;
+  }
+P {
+  font-size: 10pt;
+  margin: 3pt 0pt 3pt 0pt;
+  }
+BLOCKQUOTE {
+  margin-left: 20pt;
+  }
+P.menu {
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 10pt;
+  text-align: center;
+  margin: 0pt;
+  }
+P.fineprint {
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 8pt;
+  margin: 0pt;
+  }
+H1 {
+  font: normal 18pt Verdana, Arial, Helvetica, sans-serif;
+  }
+H2 {
+  font-weight: bold;
+  font-size: 11pt;
+  }
+H3 {
+  font-weight: normal;
+  font-style: italic;
+  font-size: 11pt;
+  }
+
+DIV.contents {
+  margin: 10pt;
+  }
+DIV.toprule {
+  margin: 5pt;
+  height: 3pt;
+  border-top: 1pt; border-left: 1pt; border-right: 1pt; border-bottom: 0pt;
+  border-color: gray;
+  border-style: solid;
+  }
+DIV.middlerule {
+  margin: 5pt;
+  height: 1pt;
+  border-top: 0pt; border-left: 0pt; border-right: 0pt; border-bottom: 1pt;
+  border-color: gray;
+  border-style: solid;
+  }
+DIV.bottomrule {
+  margin: 5pt;
+  height: 3pt;
+  border-top: 0pt; border-left: 1pt; border-right: 1pt; border-bottom: 1pt;
+  border-color: gray;
+  border-style: solid;
+  }
+
+TABLE {
+  font-family: normal 9pt Verdana, Arial, Helvetica, sans-serif;
+  }
+TD {
+  vertical-align: top;
+  }
+
+TABLE.gray {
+  width: 70%;
+  font: normal 9pt Verdana, Arial, Helvetica, sans-serif;
+  background-color: #F0F0F0;
+  font-size: 9pt;
+  margin: 0pt 3pt 0pt 3pt;
+  border-collapse: separate;
+  border-spacing: 1pt;
+  caption-side: bottom;
+  }
+TABLE.gray TH {
+  background-color: #C0C0C0;
+  font-weight: normal;
+  font-style: italic;
+  text-align: center;
+  }
+TABLE.gray TD {
+  vertical-align: top;
+  border-bottom: 1px solid #E0E0E0;
+  }
+
+TABLE.image {
+  width: 70%;
+  background-color: #F0F0F0;
+  text-align: center;
+  caption-side: bottom;
+  }
+
+TABLE.variable {
+  border-collapse: separate;
+  border-spacing: 2pt;
+  }
+TABLE.variable TD {
+  vertical-align: top;
+  }
+
+CAPTION {
+  font: normal 9pt Verdana, Arial, Helvetica, sans-serif; 
+  color: #888888;
+  text-align: center;
+  margin-top: 5pt;
+  }
+
+HR {
+  border: 0.5pt solid #666666;
+  }
+HR.separator {
+  width: 33%;
+  text-align: left;
+  border: 0.5pt solid #666666;
+  margin: 15pt 0pt 5pt 0pt;
+  }
+
+PRE {
+  font: normal 10pt Consolas, "Courier New", Courier, monospace;
+  }
+
+A {
+  text-decoration: none;
+  }
+A:link {
+  color: #FF5200; 
+  }
+A:visited {
+  color: #CC3300; 
+  }
+A:active {
+  color: #FF0000; 
+  background-color: #FFDDDD; 
+  }
+
+.center {
+  text-align: center;
+  }

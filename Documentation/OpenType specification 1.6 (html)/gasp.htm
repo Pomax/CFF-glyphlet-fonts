@@ -1,0 +1,184 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+  <head>
+    <title>The gasp Table</title>
+    <link rel="STYLESHEET" href="otspec.css" type="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  </head>
+  <body>
+    <div class="toprule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType tables</a> | The gasp table</p>
+    <div class="middlerule">
+    </div>
+    <div class="contents">
+      <h1>gasp - Grid-fitting And Scan-conversion Procedure</h1>
+      <p>This table contains information which describes the preferred rasterization techniques for the typeface when it is rendered on grayscale-capable devices. This table also has some use for monochrome devices, which may use the table to turn off hinting at very large or small sizes, to improve performance.</p>
+      <p>At very small sizes, the best appearance on grayscale devices can usually be achieved by rendering the glyphs in grayscale without using hints. At intermediate sizes, hinting and monochrome rendering will usually produce the best appearance. At large sizes, the combination of hinting and grayscale rendering will typically produce the best appearance.</p>
+      <p>If the 'gasp' table is not present in a typeface, the rasterizer may apply default rules to decide how to render the glyphs on grayscale devices.</p>
+      <p>The 'gasp' table consists of a header followed by groupings of 'gasp' records:</p>
+      <h2>gasp Table</h2>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 30%;">Name</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>version</td>
+          <td>Version number (set to 1)</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>numRanges</td>
+          <td>Number of records to follow</td>
+        </tr>
+        <tr>
+          <td>GASPRANGE</td>
+          <td>gaspRange[numRanges]</td>
+          <td>Sorted by ppem</td>
+        </tr>
+      </table>
+      <p>Each GASPRANGE record looks like this:</p>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 30%;">Name</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>rangeMaxPPEM</td>
+          <td>Upper limit of range, in PPEM</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>rangeGaspBehavior</td>
+          <td>Flags describing desired rasterizer behavior.</td>
+        </tr>
+      </table>
+      <p>There are four flags for the rangeGaspBehavior flags:</p>
+      <table class="gray">
+        <tr>
+          <th style="width: 40%;">Flag</th>
+          <th style="width: 60%;">Meaning</th>
+        </tr>
+        <tr>
+          <td>GASP_DOGRAY</td>
+          <td>Use grayscale rendering</td>
+        </tr>
+        <tr>
+          <td>GASP_GRIDFIT</td>
+          <td>Use gridfitting</td>
+        </tr>
+        <tr>
+          <td>GASP_SYMMETRIC_SMOOTHING</td>
+          <td>Use smoothing along multiple axes with ClearType® <br>Only supported in version 1 gasp</td>
+        </tr>
+        <tr>
+          <td>GASP_SYMMETRIC_GRIDFIT</td>
+          <td>Use gridfitting with ClearType symmetric smoothing <br>Only supported in version 1 gasp</td>
+        </tr>
+      </table>
+      <p>The set of bit flags may be extended in the future. The first two bit flags operate independently of the following two bit flags. If font smoothing is enabled, then the first two bit flags are used. If ClearType is enabled, then the following two bit flags are used. The seven currently defined values of rangeGaspBehavior would have the following uses:</p>
+      <table class="gray">
+        <tr>
+          <th style="width: 40%;">Flag</th>
+          <th style="width: 20%;">Value</th>
+          <th style="width: 40%;">Meaning</th>
+        </tr>
+        <tr>
+          <td>GASP_DOGRAY</td>
+          <td>0x0002</td>
+          <td>small sizes, typically ppem&lt;9</td>
+        </tr>
+        <tr>
+          <td>GASP_GRIDFIT</td>
+          <td>0x0001</td>
+          <td>medium sizes, typically 9&lt;=ppem&lt;=16</td>
+        </tr>
+        <tr>
+          <td>GASP_DOGRAY|GASP_GRIDFIT</td>
+          <td>0x0003</td>
+          <td>large sizes, typically ppem&gt;16</td>
+        </tr>
+        <tr>
+          <td>(neither)</td>
+          <td>0x0000</td>
+          <td>optional for very large sizes, typically ppem&gt;2048</td>
+        </tr>
+        <tr>
+          <td>GASP_SYMMETRIC_GRIDFIT</td>
+          <td>0x0004</td>
+          <td>typically always enabled</td>
+        </tr>
+        <tr>
+          <td>GASP_SYMMETRIC_SMOOTHING</td>
+          <td>0x0008</td>
+          <td>larger screen sizes, typically ppem&gt;15, most commonly used with the gridfit flag.</td>
+        </tr>
+        <tr>
+          <td>GASP_SYMMETRIC_SMOOTHING| GASP_SYMMETRIC_GRIDFIT</td>
+          <td>0x000C</td>
+          <td>larger screen sizes, typically ppem&gt;15</td>
+        </tr>
+      </table>
+      <p>The records in the gaspRange[] array must be sorted in order of increasing rangeMaxPPEM value. The last record should use 0xFFFF as a sentinel value for rangeMaxPPEM and should describe the behavior desired at all sizes larger than the previous record's upper limit. If the only entry in 'gasp' is the 0xFFFF sentinel value, the behavior described will be used for <i>all</i> sizes.</p>
+      <h2>Sample 'gasp' table</h2>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Flag</th>
+          <th style="width: 20%;">Value</th>
+          <th style="width: 30%;">Font Smoothing Meaning</th>
+          <th style="width: 40%;">ClearType with Symmetric Smoothing Meaning</th>
+        </tr>
+        <tr>
+          <td>version</td>
+          <td>0x0001</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>numRanges</td>
+          <td>0x0004</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>Range[0], Flag</td>
+          <td>0x0008<br>0x000A</td>
+          <td>ppem&lt;=8, grayscale only</td>
+          <td>ppem&lt;=8, symmetric ClearType only</td>
+        </tr>
+        <tr>
+          <td>Range[1], Flag</td>
+          <td>0x0010<br>0x0005</td>
+          <td>9&lt;=ppem&lt;=16, gridfit only</td>
+          <td>9&lt;=ppem&lt;=16, symmetric gridfit only</td>
+        </tr>
+        <tr>
+          <td>Range[2], Flag</td>
+          <td>0x0013<br>0x0007</td>
+          <td>17&lt;=ppem&lt;=19, gridfit and grayscale</td>
+          <td>17&lt;=ppem&lt;=19, symmetric gridfit</td>
+        </tr>
+        <tr>
+          <td>Range[3], Flag</td>
+          <td>0xFFFF<br>0x000F</td>
+          <td>20&lt;=ppem, gridfit and grayscale</td>
+          <td>20&lt;=ppem, symmetric gridfit and symmetric smoothing</td>
+        </tr>
+      </table>
+      <hr class="separator">
+      <p class="fineprint">This page was last updated 29 January 2008.</p>
+      <p class="fineprint">&copy; 2008 Microsoft Corporation. All rights reserved. <a href="http://www.microsoft.com/Misc/cpyright.htm">Terms of use</a>.</p>
+      <p class="fineprint">Comments to the MST group: <a href="/typography/AboutMST.mspx">how to contact us</a>.</p>
+    </div>
+    <div class="middlerule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType tables</a> | The gasp table</p>
+    <div class="bottomrule">
+    </div>
+  </body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+  <head>
+    <title>The Embedded Bitmap Data Table</title>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <link href="otspec.css" rel="STYLESHEET" type="text/css">
+    <meta content="MSHTML 5.00.2920.0" name="GENERATOR">
+  </head>
+  <body>
+    <div class="toprule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType tables</a> | The EBDT table</p>
+    <div class="middlerule">
+    </div>
+    <div class="contents">
+      <h1>EBDT - Embedded Bitmap Data Table</h1>
+      <p>Three tables are used to embed bitmaps in OpenType&trade; fonts. They are the 'EBLC' table for embedded bitmap locators, the 'EBDT' table for embedded bitmap data, and the 'EBSC' table for embedded bitmap scaling information.</p>
+      <p>OpenType embedded bitmaps are also called 'sbits' (for &ldquo;scaler bitmaps&rdquo;). A set of bitmaps for a face at a given size is called a strike.</p>
+      <p>The 'EBLC' table identifies the sizes and glyph ranges of the sbits, and keeps offsets to glyph bitmap data in indexSubTables. The 'EBDT' table then stores the glyph bitmap data, in a number of different possible formats. Glyph metrics information may be stored in either the 'EBLC' or 'EBDT' table, depending upon the indexSubTable and glyph bitmap data formats. The 'EBSC' table identifies sizes that will be handled by scaling up or scaling down other sbit sizes.</p>
+      <p>The 'EBDT' table is a super set of Apple's Apple Advanced Typography (AAT) 'bdat' table.</p>
+      <p>The 'EBDT' table begins with a header containing simply the table version number.</p>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 30%;">Name</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+        <tr>
+          <td>FIXED</td>
+          <td>version</td>
+          <td>Initially defined as 0x00020000</td>
+        </tr>
+      </table>
+      <p>The rest of the 'EBDT' table is a collection of bitmap data. The data can be in a number of possible formats, indicated by information in the 'EBLC' table. Some of the formats contain metric information plus image data, and other formats contain only the image data. Long word alignment is not required for these sub tables; byte alignment is sufficient.</p>
+      <p>There are also two different formats for glyph metrics: big glyph metrics and small glyph metrics. Big glyph metrics define metrics information for both horizontal and vertical layouts. This is important in fonts (such as Kanji) where both types of layout may be used. Small glyph metrics define metrics information for one layout direction only. Which direction applies, horizontal or vertical, is determined by the 'flags' field in the bitmapSizeTable field of the 'EBLC' table.</p>
+      <h2>bigGlyphMetrics</h2>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 80%;">Name</th>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>height</td>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>width</td>
+        </tr>
+        <tr>
+          <td>CHAR</td>
+          <td>horiBearingX</td>
+        </tr>
+        <tr>
+          <td>CHAR</td>
+          <td>horiBearingY</td>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>horiAdvance</td>
+        </tr>
+        <tr>
+          <td>CHAR</td>
+          <td>vertBearingX</td>
+        </tr>
+        <tr>
+          <td>CHAR</td>
+          <td>vertBearingY</td>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>vertAdvance</td>
+        </tr>
+      </table>
+      <h2>smallGlyphMetrics</h2>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 80%;">Name</th>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>height</td>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>width</td>
+        </tr>
+        <tr>
+          <td>CHAR</td>
+          <td>BearingX</td>
+        </tr>
+        <tr>
+          <td>CHAR</td>
+          <td>BearingY</td>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>Advance</td>
+        </tr>
+      </table>
+      <p>The nine different formats currently defined for glyph bitmap data are listed and described below. Different formats are better for different purposes. Apple 'bdat' tables support only formats 1 through 7.</p>
+      <p>In all formats, if the bitDepth is greater than 1, all of a pixel's bits are stored consecutively in memory, and all of a row's pixels are stored consecutively.</p>
+      <p>
+        <i>Note:</i> Each of these formats can contain black/white or grayscale bitmaps depending on the setting of the bitDepth field in the 'EBLC' table. For performance reasons, we recommend using a byte-aligned format for embedded bitmaps with bitDepth of 8.</p>
+      <h2>Format 1: small metrics, byte-aligned data</h2>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 30%;">Name</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+        <tr>
+          <td>smallGlyphMetrics</td>
+          <td>smallMetrics</td>
+          <td>Metrics information for the glyph</td>
+        </tr>
+        <tr>
+          <td>VARIABLE</td>
+          <td>image data</td>
+          <td>Byte-aligned bitmap data</td>
+        </tr>
+      </table>
+      <p>Glyph bitmap format 1 consists of small metrics records (either horizontal or vertical depending on the bitmapSizeTable 'flag' value in the 'EBLC' table) followed by byte aligned bitmap data. The bitmap data begins with the most significant bit of the first byte corresponding to the top-left pixel of the bounding box, proceeding through succeeding bits moving left to right. The data for each row is padded to a byte boundary, so the next row begins with the most significant bit of a new byte. 1 bits correspond to black, and 0 bits to white.</p>
+      <h2>Format 2: small metrics, bit-aligned data</h2>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 30%;">Name</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+        <tr>
+          <td>smallGlyphMetrics</td>
+          <td>small Metrics</td>
+          <td>Metrics information for the glyph</td>
+        </tr>
+        <tr>
+          <td>VARIABLE</td>
+          <td>image data</td>
+          <td>Bit-aligned bitmap data</td>
+        </tr>
+      </table>
+      <p>Glyph bitmap format 2 is the same as format 1 except that the bitmap data is bit aligned. This means that the data for a new row will begin with the bit immediately following the last bit of the previous row. The start of each glyph must be byte aligned, so the last row of a glyph may require padding. This format takes a little more time to parse, but saves file space compared to format 1.</p>
+      <h2>Format 3: (obsolete)</h2>
+      <p>
+        <b>Format 4: (not supported) metrics in EBLC, compressed data</b>
+      </p>
+      <p>Glyph bitmap format 4 is a compressed format used by Apple in some of their East Asian fonts. Microsoft has not implemented it in their rasterizer.</p>
+      <p>
+        <br>
+        <b>Format 5: metrics in EBLC, bit-aligned image data only</b>
+      </p>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 30%;">Name</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+        <tr>
+          <td>VARIABLE</td>
+          <td>image data</td>
+          <td>Bit-aligned bitmap data</td>
+        </tr>
+      </table>
+      <p>Glyph bitmap format 5 is similar to format 2 except that no metrics information is included, just the bit aligned data. This format is for use with 'EBLC' indexSubTable format 2 or format 5, which will contain the metrics information for all glyphs. It works well for Kanji fonts.</p>
+      <p>The rasterizer recalculates sbit metrics for Format 5 bitmap data, allowing Windows to report correct ABC widths, even if the bitmaps have white space on either side of the bitmap image. This allows fonts to store monospaced bitmap glyphs in the efficient Format 5 without breaking Windows GetABCWidths call.</p>
+      <h2>Format 6: big metrics, byte-aligned data</h2>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 30%;">Name</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+        <tr>
+          <td>bigGlyphMetrics</td>
+          <td>bigMetrics</td>
+          <td>Metrics information for the glyph</td>
+        </tr>
+        <tr>
+          <td>VARIABLE</td>
+          <td>image data</td>
+          <td>Byte-aligned bitmap data</td>
+        </tr>
+      </table>
+      <p>Glyph bitmap format 6 is the same as format 1 except that is uses big glyph metrics instead of small.</p>
+      <h2>Format7: big metrics, bit-aligned data</h2>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 30%;">Name</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+        <tr>
+          <td>bigGlyphMetrics</td>
+          <td>bigMetrics</td>
+          <td>Metrics information for the glyph</td>
+        </tr>
+        <tr>
+          <td>VARIABLE</td>
+          <td>image data</td>
+          <td>Bit-aligned bitmap data</td>
+        </tr>
+      </table>
+      <p>Glyph bitmap format 7 is the same as format 2 except that is uses big glyph metrics instead of small.<br></p>
+      <h2>ebdtComponent; array used by Formats 8 and 9</h2>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 30%;">Name</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>glyphCode</td>
+          <td>Component glyph code</td>
+        </tr>
+        <tr>
+          <td>CHAR</td>
+          <td>xOffset</td>
+          <td>Position of component left</td>
+        </tr>
+        <tr>
+          <td>CHAR</td>
+          <td>yOffset</td>
+          <td>Position of component top</td>
+        </tr>
+      </table>
+      <p>The component array, used by Formats 8 and 9, contains the glyph code of the component, which can be looked up in the 'EBLC' table, as well as xOffset and yOffset values which tell where to position the top-left corner of the component in the composite. Nested composites (a composite of composites) are allowed, and the number of nesting levels is determined by implementation stack space.</p>
+      <h2>Format 8: small metrics, component data</h2>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 30%;">Name</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+        <tr>
+          <td>smallGlyphMetrics</td>
+          <td>smallMetrics</td>
+          <td>Metrics information for the glyph</td>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>pad</td>
+          <td>Pad to short boundary</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>numComponents</td>
+          <td>Number of components</td>
+        </tr>
+        <tr>
+          <td>ebdtComponent</td>
+          <td>componentArray[n]</td>
+          <td>Glyph code, offset array</td>
+        </tr>
+      </table>
+      <h2>Format 9: big metrics, component data</h2>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 30%;">Name</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+        <tr>
+          <td>bigGlyphMetrics</td>
+          <td>bigMetrics</td>
+          <td>Metrics information for the glyph</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>numComponents</td>
+          <td>Number of components</td>
+        </tr>
+        <tr>
+          <td>ebdtComponent</td>
+          <td>componentArray[n]</td>
+          <td>Glyph code, offset array</td>
+        </tr>
+      </table>
+      <p>Glyph bitmap formats 8 and 9 are used for composite bitmaps. For accented characters and other composite glyphs it may be more efficient to store a copy of each component separately, and then use a composite description to construct the finished glyph. The composite formats allow for any number of components, and allow the components to be positioned anywhere in the finished glyph. Format 8 uses small metrics, and format 9 uses big metrics. </p>
+      <hr class="separator">
+      <p class="fineprint">This page was last updated 1 March 2002.</p>
+      <p class="fineprint">© 1998 Microsoft Corporation. All rights reserved. <a href="http://www.microsoft.com/Misc/cpyright.htm">Terms of use</a>.</p>
+      <p class="fineprint">Comments to the MST group: <a href="/typography/AboutMST.mspx">how to contact us</a>.</p>
+    </div>
+    <div class="middlerule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType tables</a> | The EBDT table</p>
+    <div class="bottomrule">
+    </div>
+  </body>
+</html>

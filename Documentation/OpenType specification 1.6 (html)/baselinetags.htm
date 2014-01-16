@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+  <head>
+    <title>OpenType Layout tag registry</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="STYLESHEET" href="otspec.css" type="text/css">
+  </head>
+  <body>
+    <div class="toprule">
+    </div>
+    <p class="menu">
+      <a href="/typography/default.mspx">Microsoft Typography</a> | <a href="/typography/creators.htm">Developer information</a> | <a href="/typography/SpecificationsOverview.mspx">Specifications</a> | <a href="ttoreg.htm">OpenType Layout tag registry</a></p>
+    <div class="bottomrule">
+    </div>
+    <div class="contents">
+      <h2>
+        <a name="base" id="base">Baseline tags</a>
+      </h2>
+      <p>This section defines the standard OpenType Layout baseline tags that Microsoft supports. A registered baseline tag has a specific meaning when used in the horizontal writing direction (used in the 'BASE' table's HorizAxis table), vertical writing direction (used in the 'BASE' table's VertAxis table), or both, and conveys information to font users about a baseline's use. For example, the &ldquo;romn&rdquo; baseline tag is commonly used to identify the baseline to layout Latin text in the horizontal, vertical, or both directions for Latin text layout. For compatibility and ease of use, Microsoft encourages font developers to use registered baseline tags.</p>
+      <p>This version of the Tag Registry identifies the baselines that Microsoft has implemented to date. All baseline tags are 4-byte character strings composed of a limited set of ASCII characters in the 0x20-0x7E range. Baseline tags consist of four lowercase letters.</p>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Baseline Tag</th>
+          <th style="width: 40%;">Baseline for HorizAxis</th>
+          <th style="width: 40%;">Baseline for VertAxis</th>
+        </tr>
+        <tr>
+          <td>&ldquo;hang&rdquo;</td>
+          <td>The hanging baseline. This is the horizontal line from which syllables seem to hang in Tibetan script.</td>
+          <td>The hanging baseline, (which now appears vertical) for Tibetan characters rotated 90 degrees clockwise, for vertical writing mode.</td>
+        </tr>
+        <tr>
+          <td>&ldquo;icfb&rdquo;</td>
+          <td>Ideographic character face bottom edge baseline. <br>(See section <a href="#icfbox"> Ideographic Character Face </a> below for usage.)</td>
+          <td>Ideographic character face left edge baseline. <br> (See section <a href="#icfbox">Ideographic Character Face </a> below for usage.)</td>
+        </tr>
+        <tr>
+          <td>&ldquo;icft&rdquo;</td>
+          <td>Ideographic character face top edge baseline. <br> (See section <a href="#icfbox">Ideographic Character Face</a> below for usage.)</td>
+          <td>Ideographic character face right edge baseline. <br> (See section <a href="#icfbox">Ideographic Character Face </a>below for usage.)</td>
+        </tr>
+        <tr>
+          <td>&ldquo;ideo&rdquo;</td>
+          <td>Ideographic em-box bottom edge baseline. <br>(See section <a href="#ideoembox">Ideographic Em-Box </a> below for usage.)</td>
+          <td>Ideographic em-box left edge baseline. If this tag is present in the VertAxis, the value must be set to 0. <br> (See section <a href="#ideoembox">Ideographic Em-Box</a> below for usage.)</td>
+        </tr>
+        <tr valign="top">
+          <td>&ldquo;idtp&rdquo;</td>
+          <td>Ideographic em-box top edge baseline. (See section <a href="#ideoembox">Ideographic Em-Box</a> below for usage.)</td>
+          <td>Ideographic em-box right edge baseline. If this tag is present in the VertAxis, the value is strongly recommended to be set to head.unitsPerEm. (See section <a href="#ideoembox">Ideographic Em-Box</a> below for usage.)</td>
+        </tr>
+        <tr>
+          <td>&ldquo;math&rdquo;</td>
+          <td>The baseline about which mathematical characters are centered.</td>
+          <td>The baseline about which mathematical characters, when rotated 90 degrees clockwise for vertical writing mode, are centered.</td>
+        </tr>
+        <tr>
+          <td>&ldquo;romn&rdquo;</td>
+          <td>The baseline used by simple alphabetic scripts such as Latin, Cyrillic and Greek.</td>
+          <td>The alphabetic baseline for characters rotated 90 degrees clockwise for vertical writing mode. (This would not apply to alphabetic characters that remain upright in vertical writing mode, since these characters are not rotated.)</td>
+        </tr>
+      </table>
+      <h2>Ideographic Em-Box</h2>
+      <p>
+        <i>[ The notation <b>&lt;Axis&gt;.&lt;Baseline Tag&gt;</b> is used in the following description to mean the baseline tag as defined in the specified axis. For example, <b>HorizAxis.ideo</b> means the <b>ideo</b> baseline tag as defined in the HorizAxis of the BASE table. See above for a list of registered baseline tags. ]</i>
+      </p>
+      <p>A font's ideographic em-box is the rectangle that defines a standard escapement around the full-width ideographic glyphs of the font, for both the horizontal and vertical writing directions. It is usually a square, but may be non-square as in the case of fonts used in Japanese newspaper layout that have a vertically condensed design.</p>
+      <p>The left, right, top and bottom edges of the ideographic em-box are to be determined as follows:</p>
+      <dl>
+        <dd> ideoEmboxLeft = 0
+                <p>If <b>HorizAxis.ideo</b> defined:<br></p><dl><dd> ideoEmboxBottom = <b>HorizAxis.ideo</b><br><p>If <b>HorizAxis.idtp</b> defined:<br></p><dl><dd> ideoEmboxTop = <b>HorizAxis.idtp</b><br></dd></dl> Else:<br><dl><dd> ideoEmboxTop = <b>HorizAxis.ideo</b> + head.unitsPerEm<br></dd></dl><p>If <b>VertAxis.idtp</b> defined:<br></p><dl><dd> ideoEmboxRight = <b>VertAxis.idtp</b><br></dd></dl> Else:<br><dl><dd> ideoEmboxRight = head.unitsPerEm<br></dd></dl><p>If <b>VertAxis.ideo</b> defined and non-zero:<br></p><dl><dd> Warning: Bad <b>VertAxis.ideo</b> value<br></dd></dl></dd></dl><p>Else If this is a CJK font:<br></p><dl><dd> ideoEmboxBottom = OS/2.sTypoDescender<br> ideoEmboxTop = OS/2.sTypoAscender<br> ideoEmboxRight = head.unitsPerEm<br></dd></dl> Else:<br><dl><dd> ideoEmbox cannot be determined for this font<br></dd></dl></dd>
+      </dl>
+      <p>Determining whether a font is CJK (Chinese, Japanese, or Korean) or not, as in the second-last &ldquo;Else&rdquo; clause above, can be done by checking the CJK-related bits of the OS/2.ulUnicodeRange fields.</p>
+      <p>Note that font designers can specify a <b>HorizAxis.ideo</b> baseline in their non-CJK fonts; this can be used by applications when aligning the font with an ideographic font used on the same line of text, when the user has specified ideographic em-box alignment.</p>
+      <p>The ideographic em-box center baseline is defined as halfway between the ideographic em-box top and bottom baselines in the horizontal axis, and halfway between the ideographic em-box left and right baselines in the vertical axis. These center baselines are defined in whole character units. The division used in the calculation must round to the character unit nearest 0 if needed. Thus, for maximal precision of center baseline placement, vendors should ensure that opposite edges of the ideographic em-box box are an even number of character units apart.</p>
+      <h3>Example:</h3>
+      <p>The values of the ideographic baseline tags for the Kozuka Mincho font family (designed on a 1000-unit em) are:</p>
+      <dl>
+        <dd>
+          <b>HorizAxis.ideo</b> = -120; <b>HorizAxis.idtp</b> = 880. <br>Since this describes a square ideographic em-box, it is sufficient to record only the following:<br><b>HorizAxis.ideo</b> = -120.<br> If <b>HorizAxis.ideo</b> is not present, then the following will be used for the ideographic em-box bottom and top, since this is a CJK font:<br> OS/2.sTypoDescender = -120; OS/2.sTypoAscender = 880.</dd>
+      </dl>
+      <h3>Compatibility notes:</h3>
+      <ol style="list-style-type: lower-alpha;">
+        <li>Most applications expect the width of full-width ideographs in a CJK font to be exactly one em, thus it is strongly recommended that <b>VertAxis.idtp</b>, if present, be set to head.unitsPerEm. (The <b>idtp</b> baseline tag was introduced in OpenType 1.3.)</li>
+        <li>While the OpenType specification allows for CJK fonts' OS/2.sTypoDescender and OS/2.sTypoAscender fields to specify metrics different from the <b>HorizAxis.ideo</b> and <b>HorizAxis.idtp</b> in the 'BASE' table, CJK font developers should be aware that existing applications may not read the 'BASE' table at all but simply use the OS/2.sTypoDescender and OS/2.sTypoAscender fields to describe the bottom and top edges of the ideographic em-box. If developers want their fonts to work correctly with such applications, they should ensure that any ideographic em-box values in the 'BASE' table of their CJK fonts describe the same bottom and top edges as the OS/2.sTypoDescender and OS/2.sTypoAscender fields.</li>
+        <li>Applications on platforms other than Windows that don't parse the 'OS/2' table won't have access to the OS/2.sTypoDescender and OS/2.sTypoAscender fields, since these metrics are exposed only through Windows APIs currently. Thus, CJK fonts will typically have the same descender value recorded in hhea.Descender, OS/2.sTypoDescender, and <b>HorizAxis.ideo</b> (if present), and the same Ascender value recorded in hhea.Ascender, OS/2.sTypoAscender, and <b>HorizAxis.idtp</b> (if present).</li>
+      </ol>
+      <p>See the section &ldquo;<a href="recom.htm#cjk">OpenType CJK Font Guidelines</a>&ldquo; for more information about constructing CJK fonts.</p>
+      <h2>Ideographic Character Face</h2>
+      <p>
+        <i>[ The notation <b>&lt;Axis&gt;.&lt;Baseline Tag&gt;</b> is used in the following description to mean the baseline tag as defined in the specified axis. For example, <b>HorizAxis.icfb</b> means the <b>icfb</b> baseline tag as defined in the HorizAxis of the BASE table. See above for a list of registered baseline tags. ]</i>
+      </p>
+      <p>The ideographic character face (ICF), also known as the average character face (ACF), specifies the approximate bounding box of the full-width ideographic and kana glyphs in a CJK font. (This is different from the FontBBox, as described in the PostScript programming language, which is the bounding box of all glyphs in the font.) In Japanese, the term for ICF is <i>heikin jizura</i>.</p>
+      <p>It is typically expressed as a percentage that represents the ratio of the length of an ICF box edge to the length of an ideographic em-box edge, and is conceptualized as a square centered within the ideographic em-box. However, in OpenType, the ICF box's left, bottom, right, and top edges are specified as the <b>VertAxis.icfb</b>, <b>HorizAxis.icfb</b>, <b>VertAxis.icft</b>, and <b>HorizAxis.icft</b> baselines, respectively, thus giving font designers the flexibility to specify a non-square and/or non-centered ICF box.</p>
+      <p>Font designers should set the value of the ICF box edges based on how tight or loose they want the font to appear when text is set with no tracking or kerning (<i>beta gumi</i> in Japanese). Therefore, the left-over boundary of the ideographic em-box around the ICF box is the default escapement of the font.</p>
+      <p>Applications can use the ICF box as an alignment tool, to ensure that glyphs touch the edges of the text frame and page objects are visually aligned to text edges. It is also useful for aligning glyphs of different sizes on the same line. In Japanese traditional paper-based workflow, the ICF box was often used for these purposes. It provides optically aligned results that are superior to using the ideographic em-box.</p>
+      <p>
+        <b>HorizAxis.icfb</b> is the mininum piece of information required to define the ICF, in a CJK font. First, the ideographic em-box dimensions must be calculated as in the section &ldquo;Ideographic Em-Box&rdquo; above. The ICF edges are then calculated in the following order:</p>
+      <dl>
+        <dd> If <b>HorizAxis.icfb</b> defined:
+                <dl><dd> icfBottom = <b>HorizAxis.icfb</b><br><p>margin = <b>HorizAxis.icfb</b> - ideoEmboxBottom<br></p><p>If <b>HorizAxis.icft</b> defined:</p><dl><dd> icfTop = <b>HorizAxis.icft</b></dd></dl> Else:
+                    <dl><dd> icfTop = ideoEmboxTop - margin</dd></dl><p>If <b>VertAxis.icfb</b> defined:</p><dl><dd> icfLeft = <b>VertAxis.icfb</b></dd></dl> Else:
+                    <dl><dd> icfLeft = margin</dd></dl><p>If <b>VertAxis.icft</b> defined:</p><dl><dd> icfRight = <b>VertAxis.icft</b></dd></dl> Else:
+                    <dl><dd> icfRight = ideoEmBoxRight - icfLeft</dd></dl></dd></dl> Else:
+                <dl><dd> ICF cannot be determined for this font</dd></dl></dd>
+      </dl>
+      <p>For the last case above, i.e. fonts that don't have ICF information in their 'BASE' table, an application may choose to apply a heuristic such as calculating the bounding box of some or all of the ideographic and kana glyphs, and then averaging its margin with the ideographic em-box.</p>
+      <p>The ICF center baseline is defined as halfway between the ICF top and bottom baselines in the horizontal axis, and halfway between the ICF left and right baselines in the vertical axis. These center baselines are defined in whole character units. The division used in the calculation must round to the character unit nearest 0 if needed. Thus, for maximal precision of center baseline placement, vendors should ensure that opposite edges of the ICF box are an even number of character units apart.</p>
+      <h3>Example:</h3>
+      <p>The values of the ICF baselines for the Extra Light and Heavy weights of the Kozuka Mincho font family (designed on a 1000-unit em, with ideographic em-box as given in the example in the previous section) are:</p>
+      <dl>
+        <dd> Kozuka Mincho Extra Light:<br><b>VertAxis.icfb</b> = 41; <b>HorizAxis.icfb</b> = -79;<br><b>VertAxis.icft</b> = 959; <b>HorizAxis.icft</b> = 839. <br>Since this describes a square ICF centered in a square ideographic em-box, it is sufficient to record only the following: <br><b>HorizAxis.icfb</b> = -79.
+                <p>Kozuka Mincho Heavy:<br><b>VertAxis.icfb</b> = 26; <b>HorizAxis.icfb</b> = -94;<br><b>VertAxis.icft</b> = 974; <b>HorizAxis.icft</b> = 854. <br> It is sufficient to record only:<br><b>HorizAxis.icfb</b> = -94.</p></dd>
+      </dl>
+      <p>It is strongly recommended that each of the edges of the ICF box be equidistant from the corresponding edge of the ideographic em-box. Following this will result in more predictable results in applications that use these values. That is, for fonts based on a square ideographic em-box, the ICF box should be a centered square.</p>
+      <p>See the section &ldquo;<a href="recom.htm#cjk">OpenType CJK Font Guidelines</a>&ldquo; for more information about constructing CJK fonts.</p>
+      <hr class="separator">
+      <p class="fineprint">This page was last updated 14 October 2002.</p>
+      <p class="fineprint">&copy; 2002 Microsoft Corporation. All rights reserved. <a href="/info/cpyright.htm">Terms of use</a>.</p>
+      <p class="fineprint">Comments to the MST group: <a href="/typography/AboutMST.mspx">how to contact us</a>.</p>
+    </div>
+    <div class="toprule">
+    </div>
+    <p class="menu">
+      <a href="/typography/default.mspx">Microsoft Typography</a> | <a href="/typography/creators.htm">Developer information</a> | <a href="/typography/specs/default.htm">Specifications</a> | <a href="ttoreg.htm">OpenType Layout tag registry</a></p>
+    <div class="bottomrule">
+    </div>
+  </body>
+</html>

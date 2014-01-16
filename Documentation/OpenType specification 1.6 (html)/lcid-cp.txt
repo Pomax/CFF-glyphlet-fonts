@@ -1,0 +1,137 @@
+Num	LCID	ANSI	OEM	Lang	Language - Country/Region
+---	----	----	---	----	-------------------------
+  1	0401	1256	720	ARA	Arabic - Saudi Arabia
+  2	0801	1256	720	ARI	Arabic - Iraq
+  3	0c01	1256	720	ARE	Arabic - Egypt
+  4	1001	1256	720	ARL	Arabic - Libya
+  5	1401	1256	720	ARG	Arabic - Algeria
+  6	1801	1256	720	ARM	Arabic - Morocco
+  7	1c01	1256	720	ART	Arabic - Tunisia
+  8	2001	1256	720	ARO	Arabic - Oman
+  9	2401	1256	720	ARY	Arabic - Yemen
+ 10	2801	1256	720	ARS	Arabic - Syria
+ 11	2c01	1256	720	ARJ	Arabic - Jordan
+ 12	3001	1256	720	ARB	Arabic - Lebanon
+ 13	3401	1256	720	ARK	Arabic - Kuwait
+ 14	3801	1256	720	ARU	Arabic - U.A.E.
+ 15	3c01	1256	720	ARH	Arabic - Bahrain
+ 16	4001	1256	720	ARQ	Arabic - Qatar
+ 17	0402	1251	866	BGR	Bulgarian - Bulgaria
+ 18	0403	1252	850	CAT	Catalan - Spain
+ 19	0404	950	950	CHT	Chinese - Taiwan
+ 20	0804	936	936	CHS	Chinese - PRC
+ 21	0c04	950	950	ZHH	Chinese - Hong Kong
+ 22	1004	936	936	ZHI	Chinese - Singapore
+ 23	1404	950	950	ZHM	Chinese - Macau
+ 24	0405	1250	852	CSY	Czech - Czech Republic
+ 25	0406	1252	850	DAN	Danish - Denmark
+ 26	0407	1252	850	DEU	German - Germany
+ 27	0807	1252	850	DES	German - Switzerland
+ 28	0c07	1252	850	DEA	German - Austria
+ 29	1007	1252	850	DEL	German - Luxembourg
+ 30	1407	1252	850	DEC	German - Liechtenstein
+ 31	0408	1253	737	ELL	Greek - Greece
+ 32	0409	1252	437	ENU	English - United States
+ 33	0809	1252	850	ENG	English - United Kingdom
+ 34	0c09	1252	850	ENA	English - Australia
+ 35	1009	1252	850	ENC	English - Canada
+ 36	1409	1252	850	ENZ	English - New Zealand
+ 37	1809	1252	850	ENI	English - Ireland
+ 38	1c09	1252	437	ENS	English - South Africa
+ 39	2009	1252	850	ENJ	English - Jamaica
+ 40	2409	1252	850	ENB	English - Caribbean
+ 41	2809	1252	850	ENL	English - Belize
+ 42	2c09	1252	850	ENT	English - Trinidad
+ 43	3009	1252	437	ENW	English - Zimbabwe
+ 44	3409	1252	437	ENP	English - Philippines
+ 45	040a	1252	850	ESP	Spanish - Spain (Traditional Sort)
+ 46	080a	1252	850	ESM	Spanish - Mexico
+ 47	0c0a	1252	850	ESN	Spanish - Spain (International Sort)
+ 48	100a	1252	850	ESG	Spanish - Guatemala
+ 49	140a	1252	850	ESC	Spanish - Costa Rica
+ 50	180a	1252	850	ESA	Spanish - Panama
+ 51	1c0a	1252	850	ESD	Spanish - Dominican Republic
+ 52	200a	1252	850	ESV	Spanish - Venezuela
+ 53	240a	1252	850	ESO	Spanish - Colombia
+ 54	280a	1252	850	ESR	Spanish - Peru
+ 55	2c0a	1252	850	ESS	Spanish - Argentina
+ 56	300a	1252	850	ESF	Spanish - Ecuador
+ 57	340a	1252	850	ESL	Spanish - Chile
+ 58	380a	1252	850	ESY	Spanish - Uruguay
+ 59	3c0a	1252	850	ESZ	Spanish - Paraguay
+ 60	400a	1252	850	ESB	Spanish - Bolivia
+ 61	440a	1252	850	ESE	Spanish - El Salvador
+ 62	480a	1252	850	ESH	Spanish - Honduras
+ 63	4c0a	1252	850	ESI	Spanish - Nicaragua
+ 64	500a	1252	850	ESU	Spanish - Puerto Rico
+ 65	040b	1252	850	FIN	Finnish - Finland
+ 66	040c	1252	850	FRA	French - France
+ 67	080c	1252	850	FRB	French - Belgium
+ 68	0c0c	1252	850	FRC	French - Canada
+ 69	100c	1252	850	FRS	French - Switzerland
+ 70	140c	1252	850	FRL	French - Luxembourg
+ 71	180c	1252	850	FRM	French - Monaco
+ 72	040d	1255	862	HEB	Hebrew - Israel
+ 73	040e	1250	852	HUN	Hungarian - Hungary
+ 74	040f	1252	850	ISL	Icelandic - Iceland
+ 75	0410	1252	850	ITA	Italian - Italy
+ 76	0810	1252	850	ITS	Italian - Switzerland
+ 77	0411	932	932	JPN	Japanese - Japan
+ 78	0412	949	949	KOR	Korean(Extended Wansung) - Korea
+ 79	0413	1252	850	NLD	Dutch - Netherlands
+ 80	0813	1252	850	NLB	Dutch - Belgium
+ 81	0414	1252	850	NOR	Norwegian - Norway (Bokmål)
+ 82	0814	1252	850	NON	Norwegian - Norway (Nynorsk)
+ 83	0415	1250	852	PLK	Polish - Poland
+ 84	0416	1252	850	PTB	Portuguese - Brazil
+ 85	0816	1252	850	PTG	Portuguese - Portugal
+ 86	0418	1250	852	ROM	Romanian - Romania
+ 87	0419	1251	866	RUS	Russian - Russia
+ 88	041a	1250	852	HRV	Croatian - Croatia
+ 89	081a	1250	852	SRL	Serbian - Serbia (Latin)
+ 90	0c1a	1251	855	SRB	Serbian - Serbia (Cyrillic)
+ 91	041b	1250	852	SKY	Slovak - Slovakia
+ 92	041c	1250	852	SQI	Albanian - Albania
+ 93	041d	1252	850	SVE	Swedish - Sweden
+ 94	081d	1252	850	SVF	Swedish - Finland
+ 95	041e	874	874	THA	Thai - Thailand
+ 96	041f	1254	857	TRK	Turkish - Turkey
+ 97	0420	1256	720	URD	Urdu - Pakistan
+ 98	0421	1252	850	IND	Indonesian - Indonesia
+ 99	0422	1251	866	UKR	Ukrainian - Ukraine
+100	0423	1251	866	BEL	Belarusian - Belarus
+101	0424	1250	852	SLV	Slovenian - Slovenia
+102	0425	1257	775	ETI	Estonian - Estonia
+103	0426	1257	775	LVI	Latvian - Latvia
+104	0427	1257	775	LTH	Lithuanian - Lithuania
+105	0429	1256	720	FAR	Farsi - Iran
+106	042a	1258	1258	VIT	Vietnamese - Viet Nam
+107	042b	N/A	N/A	HYE	Armenian - Armenia
+108	042c	1254	857	AZE	Azeri - Azerbaijan (Latin)
+109	082c	1251	866	AZE	Azeri - Azerbaijan (Cyrillic)
+110	042d	1252	850	EUQ	Basque - Spain
+111	042f	1251	866	MKI	Macedonian - Macedonia
+112	0436	1252	850	AFK	Afrikaans - South Africa
+113	0437	N/A	N/A	KAT	Georgian - Georgia
+114	0438	1252	850	FOS	Faeroese - Faeroe Islands
+115	0439	N/A	N/A	HIN	Hindi - India
+116	043e	1252	850	MSL	Malay - Malaysia
+117	083e	1252	850	MSB	Malay - Brunei Darussalam
+118	043f	1251	866	KKZ	Kazakh - Kazakstan
+119	0441	1252	437	SWK	Swahili - Kenya
+120	0443	1254	857	UZB	Uzbek - Uzbekistan (Latin)
+121	0843	1251	866	UZB	Uzbek - Uzbekistan (Cyrillic)
+122	0444	1251	866	TTT	Tatar - Tatarstan
+123	0446	N/A	N/A	PAN	Punjabi - India
+124	0447	N/A	N/A	GUJ	Gujarati - India
+125	0449	N/A	N/A	TAM	Tamil - India
+126	044a	N/A	N/A	TEL	Telugu - India
+127	044b	N/A	N/A	KAN	Kannada - India
+128	044e	N/A	N/A	MAR	Marathi - India
+129	044f	N/A	N/A	SAN	Sanskrit - India
+130	0457	N/A	N/A	KNK	Konkani - India
+131	0440	1251	866	KYR	Kyrgyz - Kyrgyzstan
+132	0450	1251	866	MON	Mongolian (Cyrillic) - Mongolia
+133	0456	1252	850	GLC	Galician - Spain 
+134	045A	N/A	N/A	SYR	Syriac - Syria 
+135	0465	N/A	N/A	DIV	Divehi - Maldives

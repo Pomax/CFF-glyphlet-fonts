@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+  <head>
+    <title>The Linear Threshold Table</title>
+    <link rel="STYLESHEET" href="otspec.css" type="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  </head>
+  <body>
+    <div class="toprule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType tables</a> | The LTSH table</p>
+    <div class="middlerule">
+    </div>
+    <div class="contents">
+      <h1>LTSH - Linear Threshold</h1>
+      <p>The LTSH table relates to OpenType&trade; fonts containing TrueType outlines. There are noticeable improvements to fonts on the screen when instructions are carefully applied to the sidebearings. The gain in readability is offset by the necessity for the OS to grid fit the glyphs in order to find the actual advance width for the glyphs (since instructions may be moving the sidebearing points). The TrueType outline format already has two mechanisms to side step the speed issues: the 'hdmx' table, where precomputed advance widths may be saved for selected ppem sizes, and the 'vdmx' table, where precomputed vertical advance widths may be saved for selected ppem sizes. The 'LTSH' table (Linear ThreSHold) is a second, complementary method.</p>
+      <p>The LTSH table defines the point at which it is reasonable to assume linearly scaled advance widths on a glyph-by-glyph basis. This table should <i>not</i> be included unless bit 4 of the &ldquo;flags&rdquo; field in the 'head' table is set. The criteria for linear scaling is:</p>
+      <p>a. (ppem size is ³<tt></tt>50) AND (difference between the rounded linear width and the rounded instructed width £ 2% of the rounded linear width)</p>
+      <p>or b. Linear width == Instructed width</p>
+      <p>The LTSH table records the ppem for each glyph at which the scaling becomes linear again, despite instructions effecting the advance width. It is a requirement that, at and above the recorded threshold size, the glyph remain linear in its scaling (i.e., not legal to set threshold at 55 ppem if glyph becomes nonlinear again at 90 ppem). The format for the table is:</p>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 30%;">Name</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>version</td>
+          <td>Version number (starts at 0).</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>numGlyphs</td>
+          <td>Number of glyphs (from &ldquo;numGlyphs&rdquo; in 'maxp' table).</td>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>yPels[numGlyphs]</td>
+          <td>The vertical pel height at which the glyph can be assumed to scale linearly. On a per glyph basis.</td>
+        </tr>
+      </table>
+      <p>Note that glyphs which do not have instructions on their sidebearings should have yPels = 1; i.e., always scales linearly. </p>
+      <hr class="separator">
+      <p class="fineprint">This page was last updated 27 March 1998.</p>
+      <p class="fineprint">&copy; 1998 Microsoft Corporation. All rights reserved. <a href="http://www.microsoft.com/Misc/cpyright.htm">Terms of use</a>.</p>
+      <p class="fineprint">Comments to the MST group: <a href="/typography/AboutMST.mspx">how to contact us</a>.</p>
+    </div>
+    <div class="middlerule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType tables</a> | The LTSH table</p>
+    <div class="bottomrule">
+    </div>
+  </body>
+</html>

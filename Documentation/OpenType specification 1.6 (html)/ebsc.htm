@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+  <head>
+    <title>The Embedded Bitmap Scaling Table</title>
+    <link rel="STYLESHEET" href="otspec.css" type="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  </head>
+  <body>
+    <div class="toprule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType tables</a> | The EBSC table</p>
+    <div class="middlerule">
+    </div>
+    <div class="contents">
+      <h1>EBSC - Embedded Bitmap Scaling Table</h1>
+      <p>The 'EBSC' table provides a mechanism for describing embedded bitmaps which are created by scaling other embedded bitmaps. While this is the sort of thing that outline font technologies were invented to avoid, there are cases (small sizes of Kanji, for example) where scaling a bitmap produces a more legible font than scan-converting an outline. For this reason the 'EBSC' table allows a font to define a bitmap strike as a scaled version of another strike.</p>
+      <p>The 'EBSC' table begins with a header containing the table version and number of strikes.</p>
+      <h2>ebscHeader</h2>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 30%;">Name</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+        <tr>
+          <td>FIXED</td>
+          <td>version</td>
+          <td>initially defined as 0x00020000</td>
+        </tr>
+        <tr>
+          <td>ULONG</td>
+          <td>numSizes</td>
+          <td>&nbsp;</td>
+        </tr>
+      </table>
+      <p>The ebscHeader is followed immediately by the bitmapScaleTable array. The numSizes in the ebscHeader indicates the number of bitmapScaleTables in the array. Each strike is defined by one bitmapScaleTable.</p>
+      <h2>bitmapScaleTable</h2>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 30%;">Name</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+        <tr>
+          <td>sbitLineMetrics</td>
+          <td>hori</td>
+          <td>line metrics</td>
+        </tr>
+        <tr>
+          <td>sbitLineMetrics</td>
+          <td>vert</td>
+          <td>line metrics</td>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>ppemX</td>
+          <td>target horizontal pixels per Em</td>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>ppemY</td>
+          <td>target vertical pixels per Em</td>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>substitutePpemX</td>
+          <td>use bitmaps of this size</td>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>substitutePpemY</td>
+          <td>use bitmaps of this size</td>
+        </tr>
+      </table>
+      <p>The line metrics have the same meaning as those in the bitmapSizeTable, and refer to font wide metrics after scaling. The ppemX and ppemY values describe the size of the font after scaling. The substitutePpemX and substitutePpemY values describe the size of a strike that exists as an sbit in the 'EBLC' and 'EBDT', and that will be scaled up or down to generate the new strike.</p>
+      <p>Notice that scaling in the x direction is independent of scaling in the y direction, and their scaling values may differ. A square aspect-ratio strike could be scaled to a non-square aspect ratio. Glyph metrics are scaled by the same factor as the pixels per Em (in the appropriate direction), and are rounded to the nearest integer pixel. </p>
+      <hr class="separator">
+      <p class="fineprint">This page was last updated 27 March 1998.</p>
+      <p class="fineprint">&copy; 1998 Microsoft Corporation. All rights reserved. <a href="http://www.microsoft.com/Misc/cpyright.htm">Terms of use</a>.</p>
+      <p class="fineprint">Comments to the MST group: <a href="/typography/AboutMST.mspx">how to contact us</a>.</p>
+    </div>
+    <div class="middlerule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType tables</a> | The EBSC table</p>
+    <div class="bottomrule">
+    </div>
+  </body>
+</html>

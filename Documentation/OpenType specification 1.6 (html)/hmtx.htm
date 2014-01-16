@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+  <head>
+    <title>The Horizontal Metrics Table</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="STYLESHEET" href="otspec.css" type="text/css">
+  </head>
+  <body>
+    <div class="toprule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType tables</a> | The hmtx table</p>
+    <div class="middlerule">
+    </div>
+    <div class="contents">
+      <h1>hmtx - Horizontal Metrics</h1>
+      <p>The type longHorMetric is defined as an array where each element has two parts: the advance width, which is of type USHORT, and the left side bearing, which is of type SHORT. These fields are in font design units.</p>
+      <pre>
+typedef struct 	_longHorMetric {
+	USHORT	advanceWidth;
+	SHORT		lsb;
+}  longHorMetric;<br>
+</pre>
+      <table class="gray">
+        <tr>
+          <th style="width: 25%;">Field</th>
+          <th style="width: 25%;">Type</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+        <tr>
+          <td>hMetrics</td>
+          <td>longHorMetric <br> [numberOfHMetrics]</td>
+          <td>Paired advance width and left side bearing values for each glyph. The value numOfHMetrics comes from the 'hhea' table. If the font is monospaced, only one entry need be in the array, but that entry is required. The last entry applies to all subsequent glyphs.</td>
+        </tr>
+        <tr>
+          <td>leftSideBearing</td>
+          <td>SHORT[ ]</td>
+          <td>Here the advanceWidth is assumed to be the same as the advanceWidth for the last entry above. The number of entries in this array is derived from numGlyphs (from 'maxp' table) minus numberOfHMetrics. This generally is used with a run of monospaced glyphs (e.g., Kanji fonts or Courier fonts). Only one run is allowed and it must be at the end. This allows a monospaced font to vary the left side bearing values for each glyph.</td>
+        </tr>
+      </table>
+      <p>In CFF OpenType fonts, every glyph's advanceWidth as recorded in the 'hmtx' table must be identical to its x width in the 'CFF ' table.</p>
+      <p>For any glyph, xmax and xmin are given in 'glyf' table, lsb and aw are given in 'hmtx' table. rsb is calculated as follows:</p>
+      <pre>
+rsb = aw - (lsb + xmax - xmin)
+</pre>
+      <p>If pp1 and pp2 are phantom points used to control lsb and rsb, their initial position in x is calculated as follows:</p>
+      <pre>
+pp1 = xmin - lsb
+pp2 = pp1 + aw
+</pre>
+      <hr class="separator">
+      <p class="fineprint">This page was last updated 22 March 2001.</p>
+      <p class="fineprint">&copy; 2001 Microsoft Corporation. All rights reserved. <a href="http://www.microsoft.com/Misc/cpyright.htm">Terms of use</a>.</p>
+      <p class="fineprint">Comments to the MST group: <a href="/typography/AboutMST.mspx">how to contact us</a>.</p>
+    </div>
+    <div class="middlerule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType tables</a> | The hmtx table</p>
+    <div class="bottomrule">
+    </div>
+  </body>
+</html>

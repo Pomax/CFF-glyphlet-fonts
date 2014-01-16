@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+  <head>
+    <title>Font Header</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="STYLESHEET" href="otspec.css" type="text/css">
+  </head>
+  <body>
+    <div class="toprule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType tables</a> | The head table</p>
+    <div class="middlerule">
+    </div>
+    <div class="contents">
+      <h1>head - Font Header</h1>
+      <p>This table gives global information about the font. The bounding box values should be computed using <i>only</i> glyphs that have contours. Glyphs with no contours should be ignored for the purposes of these calculations.</p>
+      <table class="gray">
+        <tr>
+          <th style="width: 18%;">Type</th>
+          <th style="width: 26%;">Name</th>
+          <th style="width: 56%;">Description</th>
+        </tr>
+        <tr>
+          <td>Fixed</td>
+          <td>Table version number</td>
+          <td>0x00010000 for version 1.0.</td>
+        </tr>
+        <tr>
+          <td>Fixed</td>
+          <td>fontRevision</td>
+          <td>Set by font manufacturer.</td>
+        </tr>
+        <tr>
+          <td>ULONG</td>
+          <td>checkSumAdjustment</td>
+          <td>To compute: set it to 0, sum the entire font as ULONG, then store 0xB1B0AFBA - sum.</td>
+        </tr>
+        <tr>
+          <td>ULONG</td>
+          <td>magicNumber</td>
+          <td>Set to 0x5F0F3CF5.</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>flags</td>
+          <td>Bit 0: Baseline for font at y=0;<br> Bit 1: Left sidebearing point at x=0;<br> Bit 2: Instructions may depend on point size; <br> Bit 3: Force ppem to integer values for all internal scaler math; may use fractional ppem sizes if this bit is clear; <br> Bit 4: Instructions may alter advance width (the advance widths might not scale linearly); <br> Bits 5-10: These should be set according to <a href="http://developer.apple.com/fonts/TTRefMan/RM06/Chap6head.html"> Apple's specification </a>. However, they are not implemented in OpenType. <br> Bit 11: Font data is 'lossless,' as a result of having been compressed and decompressed with the Agfa MicroType Express engine.<br> Bit 12: Font converted (produce compatible metrics)<br> Bit 13: Font optimized for ClearType™. Note, fonts that rely on embedded bitmaps (EBDT) for rendering should not be considered optimized for ClearType, and therefore should keep this bit cleared.<br> Bit 14: Reserved, set to 0<br> Bit 15: Reserved, set to 0 <br></td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>unitsPerEm</td>
+          <td>Valid range is from 16 to 16384. This value should be a power of 2 for fonts that have TrueType outlines.</td>
+        </tr>
+        <tr>
+          <td>LONGDATETIME</td>
+          <td>created</td>
+          <td>Number of seconds since 12:00 midnight, January 1, 1904. 64-bit integer</td>
+        </tr>
+        <tr>
+          <td>LONGDATETIME</td>
+          <td>modified</td>
+          <td>Number of seconds since 12:00 midnight, January 1, 1904. 64-bit integer</td>
+        </tr>
+        <tr>
+          <td>SHORT</td>
+          <td>xMin</td>
+          <td>For all glyph bounding boxes.</td>
+        </tr>
+        <tr>
+          <td>SHORT</td>
+          <td>yMin</td>
+          <td>For all glyph bounding boxes.</td>
+        </tr>
+        <tr>
+          <td>SHORT</td>
+          <td>xMax</td>
+          <td>For all glyph bounding boxes.</td>
+        </tr>
+        <tr>
+          <td>SHORT</td>
+          <td>yMax</td>
+          <td>For all glyph bounding boxes.</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>macStyle</td>
+          <td>Bit 0: Bold (if set to 1); <br>Bit 1: Italic (if set to 1) <br> Bit 2: Underline (if set to 1) <br> Bit 3: Outline (if set to 1) <br> Bit 4: Shadow (if set to 1) <br> Bit 5: Condensed (if set to 1) <br> Bit 6: Extended (if set to 1) <br> Bits 7-15: Reserved (set to 0).</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>lowestRecPPEM</td>
+          <td>Smallest readable size in pixels.</td>
+        </tr>
+        <tr>
+          <td>SHORT</td>
+          <td>fontDirectionHint</td>
+          <td> Deprecated (Set to 2). <br>0: Fully mixed directional glyphs; <br> 1: Only strongly left to right; <br> 2: Like 1 but also contains neutrals; <br> -1: Only strongly right to left; <br> -2: Like -1 but also contains neutrals. <sup>1</sup></td>
+        </tr>
+        <tr>
+          <td>SHORT</td>
+          <td>indexToLocFormat</td>
+          <td>0 for short offsets, 1 for long.</td>
+        </tr>
+        <tr>
+          <td>SHORT</td>
+          <td>glyphDataFormat</td>
+          <td>0 for current format.</td>
+        </tr>
+      </table>
+      <hr>
+      <p>
+        <sup>1</sup> A neutral character has no inherent directionality; it is not a character with zero (0) width. Spaces and punctuation are examples of neutral characters. Non-neutral characters are those with inherent directionality. For example, Roman letters (left-to-right) and Arabic letters(right-to-left) have directionality. In a &ldquo;normal&rdquo; Roman font where spaces and punctuation are present, the font direction hints should be set to two (2).</p>
+      <hr>
+      <p>Note that the macStyle bits must agree with the <a href="os2.htm#fss"> 'OS/2' table fsSelection </a> bits. The fsSelection bits are used over the macStyle bits in Microsoft Windows. The PANOSE values and 'post' table values are ignored for determining bold or italic fonts.</p>
+      <p>For historical reasons, the fontRevision value contained in this table is not used by Windows to determine the version of a font. Instead, Windows evaluates the version string (id 5) in the 'name' table. </p>
+      <hr class="separator">
+      <p class="fineprint">This page was last updated 5 May 2008.</p>
+      <p class="fineprint">&copy; 2008 Microsoft Corporation. All rights reserved. <a href="http://www.microsoft.com/Misc/cpyright.htm">Terms of use</a>.</p>
+      <p class="fineprint">Comments to the MST group: <a href="/typography/AboutMST.mspx">how to contact us</a>.</p>
+    </div>
+    <div class="middlerule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType tables</a> | The head table</p>
+    <div class="bottomrule">
+    </div>
+  </body>
+</html>

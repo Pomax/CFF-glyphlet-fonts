@@ -1,0 +1,1666 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+  <head>
+    <title>The 'OS/2' &amp; Windows Metrics Table (Version 0)</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="STYLESHEET" href="otspec.css" type="text/css">
+  </head>
+  <body>
+    <div class="contents">
+      <h1>OS/2 - OS/2 and Windows Metrics (Version 0)</h1>
+      <p>NOTE: This is maintained for purposes of being able to validate version 0 OS/2 tables.</p>
+      <p>The OS/2 table consists of a set of metrics that are required in OpenType fonts. The layout of version 0 of this table is as follows:</p>
+      <table class="gray">
+        <tr>
+          <th style="width: 25%;">Type</th>
+          <th style="width: 25%;">Name of Entry</th>
+          <th style="width: 50%;">Comments</th>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>
+            <a href="#ver">version</a>
+          </td>
+          <td>0x0000</td>
+        </tr>
+        <tr>
+          <td>SHORT</td>
+          <td>
+            <a href="#acw">xAvgCharWidth</a>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>
+            <a href="#wtc">usWeightClass</a>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>
+            <a href="#wdc">usWidthClass</a>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>
+            USHORT</td>
+          <td>
+            <a href="#fst">fsType</a>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>SHORT</td>
+          <td>
+            <a href="#subxs">ySubscriptXSize</a>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>SHORT</td>
+          <td>
+            <a href="#subys">ySubscriptYSize</a>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>SHORT</td>
+          <td>
+            <a href="#subxo">ySubscriptXOffset</a>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>SHORT</td>
+          <td>
+            <a href="#subyo">ySubscriptYOffset</a>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>SHORT</td>
+          <td>
+            <a href="#supxs">ySuperscriptXSize</a>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>SHORT</td>
+          <td>
+            <a href="#supys">ySuperscriptYSize</a>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>SHORT</td>
+          <td>
+            <a href="#supxo">ySuperscriptXOffset</a>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>SHORT</td>
+          <td>
+            <a href="#supyo">ySuperscriptYOffset</a>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>SHORT</td>
+          <td>
+            <a href="#ss">yStrikeoutSize</a>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>SHORT</td>
+          <td>
+            <a href="#sp">yStrikeoutPosition</a>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>SHORT</td>
+          <td>
+            <a href="#fc">sFamilyClass</a>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>
+            <a href="#pan">panose[10]</a>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>ULONG</td>
+          <td>
+            <a href="#ur">ulCharRange[4]</a>
+          </td>
+          <td>Bits 0-31</td>
+        </tr>
+        <tr>
+          <td>CHAR</td>
+          <td>
+            <a href="#vendid">achVendID[4]</a>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>
+            <a href="#fss">fsSelection</a>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>
+            <a href="#fci">usFirstCharIndex</a>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>
+            <a href="#lci">usLastCharIndex</a>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>SHORT</td>
+          <td>
+            <a href="#sta">sTypoAscender</a>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>SHORT</td>
+          <td>
+            <a href="#std">sTypoDescender</a>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>SHORT</td>
+          <td>
+            <a href="#tlg">sTypoLineGap</a>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>
+            <a href="#wa">usWinAscent</a>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>
+            <a href="#wd">usWinDescent</a>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="ver" id="ver">version</a>
+      </h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>2-byte unsigned short</td>
+        </tr>
+        <tr>
+          <td>Units:</td>
+          <td>n/a</td>
+        </tr>
+        <tr>
+          <td>Title:</td>
+          <td>OS/2 table version number.</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>The version number for this OS/2 table.</td>
+        </tr>
+        <tr>
+          <td>Comments:</td>
+          <td>The version number allows for identification of the precise contents and layout for the OS/2 table. The version number for this layout is zero (0).</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="acw" id="acw">xAvgCharWidth</a>
+      </h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>2-byte signed short</td>
+        </tr>
+        <tr>
+          <td>Units:</td>
+          <td>Pels / em units</td>
+        </tr>
+        <tr>
+          <td>Title:</td>
+          <td>Average weighted escapement.</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>The Average Character Width parameter specifies the arithmetic average of the escapement (width) of all of the 26 lowercase letters a through z of the Latin alphabet and the space character. If any of the 26 lowercase letters are not present, this parameter should equal the weighted average of <i>all</i> glyphs in the font. For non-UGL (platform 3, encoding 0) fonts, use the unweighted average.</td>
+        </tr>
+        <tr>
+          <td>Comments:</td>
+          <td> This parameter is a descriptive attribute of the font that specifies the spacing of characters for comparing one font to another for selection or substitution. For proportionally spaced fonts, this value is useful in estimating the length for lines of text. The weighting factors provided with this example are only valid for Latin lowercase letters. If other character sets, or capital letters are used, the corresponding frequency of use values should be used. One needs to be careful when comparing fonts that use different frequency of use values for font mapping. The average character width for the following set of upper and lowercase letters only, is calculated according to this formula: Sum the individual character widths multiplied by the following weighting factors and then divide by 1000. For example:</td>
+        </tr>
+      </table>
+      <table class="gray">
+        <tr>
+          <th style="width: 25%;">Letter</th>
+          <th style="width: 25%;">Weight Factor</th>
+          <th style="width: 25%;">Letter</th>
+          <th style="width: 25%;">Weight Factor</th>
+        </tr>
+        <tr>
+          <td>a</td>
+          <td>64</td>
+          <td>o</td>
+          <td>56</td>
+        </tr>
+        <tr>
+          <td>b</td>
+          <td>14</td>
+          <td>p</td>
+          <td>17</td>
+        </tr>
+        <tr>
+          <td>c</td>
+          <td>27</td>
+          <td>q</td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <td>d</td>
+          <td>35</td>
+          <td>r</td>
+          <td>49</td>
+        </tr>
+        <tr>
+          <td>e</td>
+          <td>100</td>
+          <td>s</td>
+          <td>56</td>
+        </tr>
+        <tr>
+          <td>f</td>
+          <td>20</td>
+          <td>t</td>
+          <td>71</td>
+        </tr>
+        <tr>
+          <td>g</td>
+          <td>14</td>
+          <td>u</td>
+          <td>31</td>
+        </tr>
+        <tr>
+          <td>h</td>
+          <td>42</td>
+          <td>v</td>
+          <td>10</td>
+        </tr>
+        <tr>
+          <td>i</td>
+          <td>63</td>
+          <td>w</td>
+          <td>18</td>
+        </tr>
+        <tr>
+          <td>j</td>
+          <td>3</td>
+          <td>x</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>k</td>
+          <td>6</td>
+          <td>y</td>
+          <td>18</td>
+        </tr>
+        <tr>
+          <td>l</td>
+          <td>35</td>
+          <td>z</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <td>m</td>
+          <td>20</td>
+          <td>space</td>
+          <td>166</td>
+        </tr>
+        <tr>
+          <td>n</td>
+          <td>56</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="wtc" id="wtc">usWeightClass</a>
+      </h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>2-byte unsigned short</td>
+        </tr>
+        <tr>
+          <td>Title:</td>
+          <td>Weight class.</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>Indicates the visual weight (degree of blackness or thickness of strokes) of the characters in the font.</td>
+        </tr>
+        <tr>
+          <td>Comments:</td>
+        </tr>
+      </table>
+      <table class="gray">
+        <tr>
+          <th style="width: 15%;">Value</th>
+          <th style="width: 35%;">Description</th>
+          <th style="width: 50%;">C Definition (from windows.h)</th>
+        </tr>
+        <tr>
+          <td>100</td>
+          <td>Thin</td>
+          <td>FW_THIN</td>
+        </tr>
+        <tr>
+          <td>200</td>
+          <td>Extra-light (Ultra-light)</td>
+          <td>FW_EXTRALIGHT</td>
+        </tr>
+        <tr>
+          <td>300</td>
+          <td>Light</td>
+          <td>FW_LIGHT</td>
+        </tr>
+        <tr>
+          <td>400</td>
+          <td>Normal (Regular)</td>
+          <td>FW_NORMAL</td>
+        </tr>
+        <tr>
+          <td>500</td>
+          <td>Medium</td>
+          <td>FW_MEDIUM</td>
+        </tr>
+        <tr>
+          <td>600</td>
+          <td>Semi-bold (Demi-bold)</td>
+          <td>FW_SEMIBOLD</td>
+        </tr>
+        <tr>
+          <td>700</td>
+          <td>Bold</td>
+          <td>FW_BOLD</td>
+        </tr>
+        <tr>
+          <td>800</td>
+          <td>Extra-bold (Ultra-bold)</td>
+          <td>FW_EXTRABOLD</td>
+        </tr>
+        <tr>
+          <td>900</td>
+          <td>Black (Heavy)</td>
+          <td>FW_BLACK</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="wdc" id="wdc">usWidthClass</a>
+      </h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>2-byte unsigned short</td>
+        </tr>
+        <tr>
+          <td>Title:</td>
+          <td>Width class.</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>Indicates a relative change from the normal aspect ratio (width to height ratio) as specified by a font designer for the glyphs in a font.</td>
+        </tr>
+        <tr>
+          <td>Comments:</td>
+          <td>Although every character in a font may have a different numeric aspect ratio, each character in a font of normal width has a relative aspect ratio of one. When a new type style is created of a different width class (either by a font designer or by some automated means) the relative aspect ratio of the characters in the new font is some percentage greater or less than those same characters in the normal font -- it is this difference that this parameter specifies.</td>
+        </tr>
+      </table>
+      <table class="gray">
+        <tr>
+          <th>Value</th>
+          <th>Description</th>
+          <th>C Definition</th>
+          <th>% of normal</th>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>Ultra-condensed</td>
+          <td>FWIDTH_ULTRA_CONDENSED</td>
+          <td>50</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Extra-condensed</td>
+          <td>FWIDTH_EXTRA_CONDENSED</td>
+          <td>62.5</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Condensed</td>
+          <td>FWIDTH_CONDENSED</td>
+          <td>75</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Semi-condensed</td>
+          <td>FWIDTH_SEMI_CONDENSED</td>
+          <td>87.5</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Medium (normal)</td>
+          <td>FWIDTH_NORMAL</td>
+          <td>100</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>Semi-expanded</td>
+          <td>FWIDTH_SEMI_EXPANDED</td>
+          <td>112.5</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>Expanded</td>
+          <td>FWIDTH_EXPANDED</td>
+          <td>125</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td>Extra-expanded</td>
+          <td>FWIDTH_EXTRA_EXPANDED</td>
+          <td>150</td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td>Ultra-expanded</td>
+          <td>FWIDTH_ULTRA_EXPANDED</td>
+          <td>200</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="fst" id="fst">fsType</a>
+      </h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>2-byte unsigned short</td>
+        </tr>
+        <tr>
+          <td>Title:</td>
+          <td>Type flags.</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>Indicates font embedding licensing rights for the font. Embeddable fonts may be stored in a document. When a document with embedded fonts is opened on a system that does not have the font installed (the remote system), the embedded font may be loaded for temporary (and in some cases, permanent) use on that system by an embedding-aware application. Embedding licensing rights are granted by the vendor of the font. <br><br> The <b>OpenType Font Embedding DLL Specification</b> and DLL release notes describe the APIs used to implement support for OpenType font embedding and loading. <i>Applications that implement support for font embedding, either through use of the Font Embedding DLL or through other means, must not embed fonts which are not licensed to permit embedding. Further, applications loading embedded fonts for temporary use (see Preview &amp; Print and Editable embedding below) <b>must</b> delete the fonts when the document containing the embedded font is closed. </i></td>
+        </tr>
+      </table>
+      <table class="gray">
+        <tr>
+          <th style="width: 10%;">Bit</th>
+          <th style="width: 20%;">Bit Mask</th>
+          <th style="width: 70%;">Description</th>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>0x0000</td>
+          <td>Installable Embedding: No fsType bit is set. Thus fsType is zero. <br> Fonts with this setting indicate that they may be embedded and permanently installed on the remote system by an application. The user of the remote system acquires the identical rights, obligations and licenses for that font as the original purchaser of the font, and is subject to the same end-user license agreement, copyright, design patent, and/or trademark as was the original purchaser.</td>
+        </tr>
+        <tr>
+          <td>0</td>
+          <td>0x0001</td>
+          <td>Reserved, must be zero.</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>0x0002</td>
+          <td>Restricted License embedding: <br> Fonts that have <b> only </b> this bit set <b>must not be modified, embedded or exchanged in any manner</b> without first obtaining permission of the legal owner. <br><i>Caution: </i>For Restricted License embedding to take effect, it must be the only level of embedding selected.</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>0x0004</td>
+          <td>Preview &amp; Print embedding: When this bit is set, the font may be embedded, and temporarily loaded on the remote system. Documents containing Preview &amp; Print fonts must be opened &ldquo;read-only;&rdquo; no edits can be applied to the document.</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>0x0008</td>
+          <td>Editable embedding: When this bit is set, the font may be embedded but must only be installed <b> temporarily </b> on other systems. In contrast to Preview &amp; Print fonts, documents containing Editable fonts <i>may</i> be opened for reading, editing is permitted, and changes may be saved.</td>
+        </tr>
+        <tr>
+          <td>4-15</td>
+          <td>&nbsp;</td>
+          <td>Reserved, must be zero.</td>
+        </tr>
+      </table>
+      <table class="variable">
+        <tr>
+          <td>Comments:</td>
+          <td>If multiple embedding bits are set, the <i>least</i> restrictive license granted takes precedence. For example, if bits 1 and 3 are set, bit 3 takes precedence over bit 1and the font may be embedded with Editable rights. For compatibility purposes, most vendors granting Editable embedding rights are also setting the Preview &amp; Print bit (0x000C). This will permit an application that only supports Preview &amp; Print embedding to detect that font embedding is allowed.</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>
+            <b>Restricted License embedding (0x0002):</b> Fonts that have this bit set <b>must not be modified, embedded or exchanged in any manner</b> without first obtaining permission of the legal owner. Caution: note that for Restricted License embedding to take effect, it must be the only level of embedding selected (as noted in the previous paragraph).</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>
+            <b>Preview &amp; Print embedding (0x0004):</b> Fonts with this bit set indicate that they may be embedded within documents but must only be installed temporarily on the remote system. Any document which includes a Preview &amp; Print embedded font must be opened &ldquo;read-only;&rdquo; the application must not allow the user to edit the document; it can only be viewed and/or printed.</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>
+            <b>Editable embedding (0x0008):</b> Fonts with this bit set indicate that they may be embedded in documents, but must only be installed temporarily on the remote system. In contrast to Preview &amp; Print fonts, documents containing Editable fonts may be opened &ldquo;read-write;&rdquo; editing is permitted, and changes may be saved.</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>
+            <b>Installable embedding (0x0000):</b> Fonts with this setting indicate that they may be embedded and permanently installed on the remote system by an application. The user of the remote system acquires the identical rights, obligations and licenses for that font as the original purchaser of the font, and is subject to the same end-user license agreement, copyright, design patent, and/or trademark as was the original purchaser.</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="subxs" id="subxs">ySubscriptXSize</a>
+      </h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>2-byte signed short</td>
+        </tr>
+        <tr>
+          <td>Units:</td>
+          <td>Font design units</td>
+        </tr>
+        <tr>
+          <td>Title:</td>
+          <td> Subscript horizontal font size.</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>The recommended horizontal size in font design units for subscripts for this font.</td>
+        </tr>
+        <tr>
+          <td>Comments:</td>
+          <td>If a font has two recommended sizes for subscripts, e.g., numerics and other, the numeric sizes should be stressed. This size field maps to the em square size of the font being used for a subscript. The horizontal font size specifies a font designer's recommended horizontal font size for subscript characters associated with this font. If a font does not include all of the required subscript characters for an application, and the application can substitute characters by scaling the character of a font or by substituting characters from another font, this parameter specifies the recommended em square for those subscript characters.<br><br>For example, if the em square for a font is 2048 and ySubScriptXSize is set to 205, then the horizontal size for a simulated subscript character would be 1/10th the size of the normal character.</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="subys" id="subys">ySubscriptYSize</a>
+      </h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>2-byte signed short</td>
+        </tr>
+        <tr>
+          <td>Units:</td>
+          <td>Font design units</td>
+        </tr>
+        <tr>
+          <td>Title:</td>
+          <td>Subscript vertical font size.</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>The recommended vertical size in font design units for subscripts for this font.</td>
+        </tr>
+        <tr>
+          <td>Comments:</td>
+          <td>If a font has two recommended sizes for subscripts, e.g. numerics and other, the numeric sizes should be stressed. This size field maps to the emHeight of the font being used for a subscript. The horizontal font size specifies a font designer's recommendation for horizontal font size of subscript characters associated with this font. If a font does not include all of the required subscript characters for an application, and the application can substitute characters by scaling the characters in a font or by substituting characters from another font, this parameter specifies the recommended horizontal EmInc for those subscript characters. <br><br> For example, if the em square for a font is 2048 and ySubScriptYSize is set to 205, then the vertical size for a simulated subscript character would be 1/10th the size of the normal character.</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="subxo" id="subxo">ySubscriptXOffset</a>
+      </h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>2-byte signed short</td>
+        </tr>
+        <tr>
+          <td>Units:</td>
+          <td>Font design units</td>
+        </tr>
+        <tr>
+          <td>Title:</td>
+          <td>Subscript x offset.</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>The recommended horizontal offset in font design untis for subscripts for this font.</td>
+        </tr>
+        <tr>
+          <td>Comments:</td>
+          <td>The Subscript X Offset parameter specifies a font designer's recommended horizontal offset -- from the character origin of the font to the character origin of the subscript's character -- for subscript characters associated with this font. If a font does not include all of the required subscript characters for an application, and the application can substitute characters, this parameter specifies the recommended horizontal position from the character escapement point of the last character before the first subscript character. For upright characters, this value is usually zero; however, if the characters of a font have an incline (italic characters) the reference point for subscript characters is usually adjusted to compensate for the angle of incline.</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="subyo" id="subyo">ySubscriptYOffset</a>
+      </h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>2-byte signed short</td>
+        </tr>
+        <tr>
+          <td>Units:</td>
+          <td>Font design units</td>
+        </tr>
+        <tr>
+          <td>Title:</td>
+          <td>Subscript y offset.</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>The recommended vertical offset in font design units from the baseline for subscripts for this font.</td>
+        </tr>
+        <tr>
+          <td>Comments:</td>
+          <td>The Subscript Y Offset parameter specifies a font designer's recommended vertical offset from the character baseline to the character baseline for subscript characters associated with this font. Values are expressed as a positive offset below the character baseline. If a font does not include all of the required subscript for an application, this parameter specifies the recommended vertical distance below the character baseline for those subscript characters.</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="supxs" id="supxs">ySuperscriptXSize</a>
+      </h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>2-byte signed short</td>
+        </tr>
+        <tr>
+          <td>Units:</td>
+          <td>Font design units</td>
+        </tr>
+        <tr>
+          <td>Title:</td>
+          <td>Superscript horizontal font size.</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>The recommended horizontal size in font design units for superscripts for this font.</td>
+        </tr>
+        <tr>
+          <td>Comments:</td>
+          <td>If a font has two recommended sizes for subscripts, e.g., numerics and other, the numeric sizes should be stressed. This size field maps to the em square size of the font being used for a subscript. The horizontal font size specifies a font designer's recommended horizontal font size for superscript characters associated with this font. If a font does not include all of the required superscript characters for an application, and the application can substitute characters by scaling the character of a font or by substituting characters from another font, this parameter specifies the recommended em square for those superscript characters. <br><br> For example, if the em square for a font is 2048 and ySuperScriptXSize is set to 205, then the horizontal size for a simulated superscript character would be 1/10th the size of the normal character.</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="supys" id="supys">ySuperscriptYSize</a>
+      </h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>2-byte signed short</td>
+        </tr>
+        <tr>
+          <td>Units:</td>
+          <td>Font design units</td>
+        </tr>
+        <tr>
+          <td>Title:</td>
+          <td>Superscript vertical font size.</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>The recommended vertical size in font design units for superscripts for this font.</td>
+        </tr>
+        <tr>
+          <td>Comments:</td>
+          <td>If a font has two recommended sizes for subscripts, e.g., numerics and other, the numeric sizes should be stressed. This size field maps to the emHeight of the font being used for a subscript. The vertical font size specifies a font designer's recommended vertical font size for superscript characters associated with this font. If a font does not include all of the required superscript characters for an application, and the application can substitute characters by scaling the character of a font or by substituting characters from another font, this parameter specifies the recommended EmHeight for those superscript characters. <br><br> For example, if the em square for a font is 2048 and ySuperScriptYSize is set to 205, then the vertical size for a simulated superscript character would be 1/10th the size of the normal character.</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="supxo" id="supxo">ySuperscriptXOffset</a>
+      </h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>2-byte signed short</td>
+        </tr>
+        <tr>
+          <td>Units:</td>
+          <td>Font design units</td>
+        </tr>
+        <tr>
+          <td>Title:</td>
+          <td>Superscript x offset.</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>The recommended horizontal offset in font design units for superscripts for this font.</td>
+        </tr>
+        <tr>
+          <td>Comments:</td>
+          <td>The Superscript X Offset parameter specifies a font designer's recommended horizontal offset -- from the character origin to the superscript character's origin for the superscript characters associated with this font. If a font does not include all of the required superscript characters for an application, this parameter specifies the recommended horizontal position from the escapement point of the character before the first superscript character. For upright characters, this value is usually zero; however, if the characters of a font have an incline (italic characters) the reference point for superscript characters is usually adjusted to compensate for the angle of incline.</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="supyo" id="supyo">ySuperscriptYOffset</a>
+      </h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>2-byte signed short</td>
+        </tr>
+        <tr>
+          <td>Units:</td>
+          <td>Font design units</td>
+        </tr>
+        <tr>
+          <td>Title:</td>
+          <td>Superscript y offset.</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>The recommended vertical offset in font design units from the baseline for superscripts for this font.</td>
+        </tr>
+        <tr>
+          <td>Comments:</td>
+          <td>The Superscript Y Offset parameter specifies a font designer's recommended vertical offset -- from the character baseline to the superscript character's baseline associated with this font. Values for this parameter are expressed as a positive offset above the character baseline. If a font does not include all of the required superscript characters for an application, this parameter specifies the recommended vertical distance above the character baseline for those superscript characters.</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="ss" id="ss">yStrikeoutSize</a>
+      </h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>2-byte signed short</td>
+        </tr>
+        <tr>
+          <td>Units:</td>
+          <td>Font design units</td>
+        </tr>
+        <tr>
+          <td>Title:</td>
+          <td>Strikeout size.</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>Width of the strikeout stroke in font design units.</td>
+        </tr>
+        <tr>
+          <td>Comments:</td>
+          <td>This field should normally be the width of the em dash for the current font. If the size is one, the strikeout line will be the line represented by the strikeout position field. If the value is two, the strikeout line will be the line represented by the strikeout position and the line immediately <i>above</i> the strikeout position. For a Roman font with a 2048 em square, 102 is suggested.</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="sp" id="sp">yStrikeoutPosition</a>
+      </h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>2-byte signed short</td>
+        </tr>
+        <tr>
+          <td>Units:</td>
+          <td>Font design units</td>
+        </tr>
+        <tr>
+          <td>Title:</td>
+          <td> Strikeout position.</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>The position of the top of the strikeout stroke relative to the baseline in font design units.</td>
+        </tr>
+        <tr>
+          <td>Comments:</td>
+          <td>Positive values represent distances above the baseline, while negative values represent distances below the baseline. A value of zero falls directly on the baseline, while a value of one falls one pel above the baseline. The value of strikeout position should not interfere with the recognition of standard characters, and therefore should not line up with crossbars in the font. For a Roman font with a 2048 em square, 460 is suggested.</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="fc" id="fc">sFamilyClass</a>
+      </h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>2-byte signed short</td>
+        </tr>
+        <tr>
+          <td>Title:</td>
+          <td>Font-family class and subclass.</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>This parameter is a classification of font-family design.</td>
+        </tr>
+        <tr>
+          <td>Comments:</td>
+          <td>The font class and font subclass are registered values assigned by IBM to each font family. This parameter is intended for use in selecting an alternate font when the requested font is not available. The font class is the most general and the font subclass is the most specific. The high byte of this field contains the family class, while the low byte contains the family subclass.</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="pan" id="pan">Panose</a>
+      </h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>10 byte array</td>
+        </tr>
+        <tr>
+          <td>Title:</td>
+          <td>PANOSE classification number</td>
+        </tr>
+        <tr>
+          <td>International:</td>
+          <td>Additional specifications are required for PANOSE to classify non-Latin character sets.</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>This 10 byte series of numbers is used to describe the visual characteristics of a given typeface. These characteristics are then used to associate the font with other fonts of similar appearance having different names. The variables for each digit are listed below. The Panose values are fully described in the Panose &ldquo;greybook&rdquo; reference, currently owned by Agfa-Monotype.</td>
+        </tr>
+        <tr>
+          <td>Comments:</td>
+          <td>The PANOSE definition contains ten digits each of which currently describes up to sixteen variations. Windows uses bFamilyType, bSerifStyle and bProportion in the font mapper to determine family type. It also uses bProportion to determine if the font is monospaced. If the font is a symbol font, the first byte of the PANOSE number (bFamilyType) must be set to &ldquo;pictorial.&rdquo; Good PANOSE values in fonts are very valuable to users of the Windows fonts folder. The specification for assigning PANOSE values is located at http://www.fonts.com/hp/panose/greybook/</td>
+        </tr>
+      </table>
+      <table class="gray">
+        <caption>PANOSE</caption>
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 30%;">Name</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>bFamilyType;</td>
+          <td>Family Type</td>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>bSerifStyle;</td>
+          <td>Serif Style</td>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>bWeight;</td>
+          <td>Weight</td>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>bProportion;</td>
+          <td>Proportion</td>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>bContrast;</td>
+          <td>Contrast</td>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>bStrokeVariation;</td>
+          <td>Stroke Variation</td>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>bArmStyle;</td>
+          <td>Arm Style</td>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>bLetterform;</td>
+          <td>Letterform</td>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>bMidline;</td>
+          <td>Midline</td>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>bXHeight;</td>
+          <td>X Height</td>
+        </tr>
+      </table>
+      <table class="gray">
+        <caption>Family Type</caption>
+        <tr>
+          <th style="width: 20%;">Value</th>
+          <th style="width: 80%;">Description</th>
+        </tr>
+        <tr>
+          <td>0</td>
+          <td>Any</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>No Fit</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Text and Display</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Script</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Decorative</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Pictorial</td>
+        </tr>
+      </table>
+      <table class="gray">
+        <caption>Serif Style</caption>
+        <tr>
+          <th style="width: 20%;">Value</th>
+          <th style="width: 80%;">Description</th>
+        </tr>
+        <tr>
+          <td>0</td>
+          <td>Any</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>No Fit</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Cove</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Obtuse Cove</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Square Cove</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Obtuse Square Cove</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>Square</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>Thin</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td>Bone</td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td>Exaggerated</td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td>Triangle</td>
+        </tr>
+        <tr>
+          <td>11</td>
+          <td>Normal Sans</td>
+        </tr>
+        <tr>
+          <td>12</td>
+          <td>Obtuse Sans</td>
+        </tr>
+        <tr>
+          <td>13</td>
+          <td>Perp Sans</td>
+        </tr>
+        <tr>
+          <td>14</td>
+          <td>Flared</td>
+        </tr>
+        <tr>
+          <td>15</td>
+          <td>Rounded</td>
+        </tr>
+      </table>
+      <table class="gray">
+        <caption>Weight</caption>
+        <tr>
+          <th style="width: 20%;">Value</th>
+          <th style="width: 80%;">Description</th>
+        </tr>
+        <tr>
+          <td>0</td>
+          <td>Any</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>No Fit</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Very Light</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Light</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Thin</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Book</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>Medium</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>Demi</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td>Bold</td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td>Heavy</td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td>Black</td>
+        </tr>
+        <tr>
+          <td>11</td>
+          <td>Nord</td>
+        </tr>
+      </table>
+      <table class="gray">
+        <caption>Proportion</caption>
+        <tr>
+          <th style="width: 20%;">Value</th>
+          <th style="width: 80%;">Description</th>
+        </tr>
+        <tr>
+          <td>0</td>
+          <td>Any</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>No Fit</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Old Style</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Modern</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Even Width</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Expanded</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>Condensed</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>Very Expanded</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td>Very Condensed</td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td>Monospaced</td>
+        </tr>
+      </table>
+      <table class="gray">
+        <caption>Contrast</caption>
+        <tr>
+          <th style="width: 20%;">Value</th>
+          <th style="width: 80%;">Description</th>
+        </tr>
+        <tr>
+          <td>0</td>
+          <td>Any</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>No Fit</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>None</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Very Low</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Low</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Medium Low</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>Medium</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>Medium High</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td>High</td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td>Very High</td>
+        </tr>
+      </table>
+      <table class="gray">
+        <caption>Stroke Variation</caption>
+        <tr>
+          <th style="width: 20%;">Value</th>
+          <th style="width: 80%;">Description</th>
+        </tr>
+        <tr>
+          <td>0</td>
+          <td>Any</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>No Fit</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Gradual/Diagonal</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Gradual/Transitional</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Gradual/Vertical</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Gradual/Horizontal</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>Rapid/Vertical</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>Rapid/Horizontal</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td>Instant/Vertical</td>
+        </tr>
+      </table>
+      <table class="gray">
+        <caption>Arm Style</caption>
+        <tr>
+          <th style="width: 20%;">Value</th>
+          <th style="width: 80%;">Description</th>
+        </tr>
+        <tr>
+          <td>0</td>
+          <td>Any</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>No Fit</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Straight Arms/Horizontal</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Straight Arms/Wedge</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Straight Arms/Vertical</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Straight Arms/Single Serif</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>Straight Arms/Double Serif</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>Non-Straight Arms/Horizontal</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td>Non-Straight Arms/Wedge</td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td>Non-Straight Arms/Vertical</td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td>Non-Straight Arms/Single Serif</td>
+        </tr>
+        <tr>
+          <td>11</td>
+          <td>Non-Straight Arms/Double Serif</td>
+        </tr>
+      </table>
+      <table class="gray">
+        <caption>Letterform</caption>
+        <tr>
+          <th style="width: 20%;">Value</th>
+          <th style="width: 80%;">Description</th>
+        </tr>
+        <tr>
+          <td>0</td>
+          <td>Any</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>No Fit</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Normal/Contact</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Normal/Weighted</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Normal/Boxed</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Normal/Flattened</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>Normal/Rounded</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>Normal/Off Center</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td>Normal/Square</td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td>Oblique/Contact</td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td>Oblique/Weighted</td>
+        </tr>
+        <tr>
+          <td>11</td>
+          <td>Oblique/Boxed</td>
+        </tr>
+        <tr>
+          <td>12</td>
+          <td>Oblique/Flattened</td>
+        </tr>
+        <tr>
+          <td>13</td>
+          <td>Oblique/Rounded</td>
+        </tr>
+        <tr>
+          <td>14</td>
+          <td>Oblique/Off Center</td>
+        </tr>
+        <tr>
+          <td>15</td>
+          <td>Oblique/Square</td>
+        </tr>
+      </table>
+      <table class="gray">
+        <caption>Midline</caption>
+        <tr>
+          <th style="width: 20%;">Value</th>
+          <th style="width: 80%;">Description</th>
+        </tr>
+        <tr>
+          <td>0</td>
+          <td>Any</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>No Fit</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Standard/Trimmed</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Standard/Pointed</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Standard/Serifed</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>High/Trimmed</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>High/Pointed</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>High/Serifed</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td>Constant/Trimmed</td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td>Constant/Pointed</td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td>Constant/Serifed</td>
+        </tr>
+        <tr>
+          <td>11</td>
+          <td>Low/Trimmed</td>
+        </tr>
+        <tr>
+          <td>12</td>
+          <td>Low/Pointed</td>
+        </tr>
+        <tr>
+          <td>13</td>
+          <td>Low/Serifed</td>
+        </tr>
+      </table>
+      <table class="gray">
+        <caption>X-height</caption>
+        <tr>
+          <th style="width: 20%;">Value</th>
+          <th style="width: 80%;">Description</th>
+        </tr>
+        <tr>
+          <td>0</td>
+          <td>Any</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>No Fit</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Constant/Small</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Constant/Standard</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Constant/Large</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Ducking/Small</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>Ducking/Standard</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>Ducking/Large</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="ur" id="ur">
+        </a>ulCharRange</h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>16-byte unsigned long array (4 elements)</td>
+        </tr>
+        <tr>
+          <td>Title:</td>
+          <td>Character Range</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>This field is split conceptually into two bit fields of 96 and 32 bits each. The low 96 bits are used to specify the Unicode blocks encompassed by the font file. The high 32 bits are used to specify the character or script sets that are covered by the font file. The actual bit assignments are not yet completed; <b>presently, all bits must be set to zero (0).</b></td>
+        </tr>
+      </table>
+      <br>
+      <h2>achVendID</h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>4-byte character array</td>
+        </tr>
+        <tr>
+          <td>Title:</td>
+          <td>Font Vendor Identification</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>The four character identifier for the vendor of the given type face.</td>
+        </tr>
+        <tr>
+          <td>Comments:</td>
+          <td>This is not the royalty owner of the original artwork. This is the company responsible for the marketing and distribution of the typeface that is being classified. It is reasonable to assume that there will be 6 vendors of ITC Zapf Dingbats for use on desktop platforms in the near future (if not already). It is also likely that the vendors will have other inherent benefits in their fonts (more kern pairs, unregularized data, hand hinted, etc.). This identifier will allow for the correct vendor's type to be used over another, possibly inferior, font file. The Vendor ID value is not required. <br><br> Microsoft has assigned values for some font suppliers as listed below. Uppercase vendor ID's are reserved by Microsoft. Other suppliers can choose their own mixed case or lowercase ID's, or leave the field blank.</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="fss" id="fss">fsSelection</a>
+      </h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>2-byte bit field.</td>
+        </tr>
+        <tr>
+          <td>Title:</td>
+          <td>Font selection flags.</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>Contains information concerning the nature of the font patterns, as follows:</td>
+        </tr>
+      </table>
+      <table class="gray">
+        <tr>
+          <th style="width: 10%;">Bit #</th>
+          <th style="width: 20%;">macStyle bit</th>
+          <th style="width: 20%;">C definition</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+        <tr>
+          <td>0</td>
+          <td>bit 1</td>
+          <td>ITALIC</td>
+          <td>Font contains Italic characters, otherwise they are upright.</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>&nbsp;</td>
+          <td>UNDERSCORE</td>
+          <td>Characters are underscored.</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>&nbsp;</td>
+          <td>NEGATIVE</td>
+          <td>Characters have their foreground and background reversed.</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>&nbsp;</td>
+          <td>OUTLINED</td>
+          <td>Outline (hollow) characters, otherwise they are solid.</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>&nbsp;</td>
+          <td>STRIKEOUT</td>
+          <td>Characters are overstruck.</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>bit 0</td>
+          <td>BOLD</td>
+          <td>Characters are emboldened.</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>&nbsp;</td>
+          <td>REGULAR</td>
+          <td>Characters are in the standard weight/style for the font.</td>
+        </tr>
+      </table>
+      <table class="variable">
+        <tr>
+          <td>Comments:</td>
+          <td>All undefined bits must be zero. <br><br> This field contains information on the original design of the font. Bits 0 &amp; 5 can be used to determine if the font was designed with these features or whether some type of machine simulation was performed on the font to achieve this appearance. Bits 1-4 are rarely used bits that indicate the font is primarily a decorative or special purpose font. <br><br> If bit 6 is set, then bits 0 and 5 must be clear, else the behavior is undefined. As noted above, the settings of bits 0 and 1 must be reflected in the macStyle bits in the 'head' table. While bit 6 on implies that bits 0 and 1 of macStyle are clear (along with bits 0 and 5 of fsSelection), the reverse is not true. Bits 0 and 1 of macStyle (and 0 and 5 of fsSelection) may be clear and that does not give any indication of whether or not bit 6 of fsSelection is clear (e.g., Arial Light would have all bits cleared; it is not the regular version of Arial).</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="fci" id="fci">usFirstCharIndex</a>
+      </h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>2-byte USHORT</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>The minimum Unicode index (character code) in this font, according to the cmap subtable for platform ID 3 and platform- specific encoding ID 0 or 1. For most fonts supporting Win-ANSI or other character sets, this value would be 0x0020.</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="lci" id="lci">usLastCharIndex</a>
+      </h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>2-byte USHORT</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>The maximum Unicode index (character code) in this font, according to the cmap subtable for platform ID 3 and encoding ID 0 or 1. This value depends on which character sets the font supports.</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="sta" id="sta">sTypoAscender</a>
+      </h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>SHORT</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>The typographic ascender for this font. Remember that this is not the same as the Ascender value in the 'hhea' table, which Apple defines in a far different manner. One good source for sTypoAscender in Latin based fonts is the Ascender value from an AFM file. For CJK fonts see below. <br><br> The suggested usage for sTypoAscender is that it be used in conjunction with unitsPerEm to compute a typographically correct default line spacing. The goal is to free applications from Macintosh or Windows-specific metrics which are constrained by backward compatibility requirements. These new metrics, when combined with the character design widths, will allow applications to lay out documents in a typographically correct and portable fashion. These metrics will be exposed through Windows APIs. Macintosh applications will need to access the 'sfnt' resource and parse it to extract this data from the &ldquo;OS/2&rdquo; table. <br><br> For CJK (Chinese, Japanese, and Korean) fonts that are intended to be used for vertical writing (in addition to horizontal writing), the required value for sTypoAscender is that which describes the top of the of the ideographic em-box. For example, if the ideographic em-box of the font extends from coordinates 0,-120 to 1000,880 (that is, a 1000x1000 box set 120 design units below the Latin baseline), then the value of sTypoAscender must be set to 880. Failing to adhere to these requirements will result in incorrect vertical layout.</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="std" id="std">sTypoDescender</a>
+      </h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>SHORT</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>The typographic descender for this font. Remember that this is not the same as the Descender value in the 'hhea' table, which Apple defines in a far different manner. One good source for sTypoDescender in Latin based fonts is the Descender value from an AFM file. For CJK fonts see below. <br><br> The suggested usage for sTypoDescender is that it be used in conjunction with unitsPerEm to compute a typographically correct default line spacing. The goal is to free applications from Macintosh or Windows-specific metrics which are constrained by backward compatability requirements. These new metrics, when combined with the character design widths, will allow applications to lay out documents in a typographically correct and portable fashion. These metrics will be exposed through Windows APIs. Macintosh applications will need to access the 'sfnt' resource and parse it to extract this data from the &ldquo;OS/2&rdquo; table (unless Apple exposes the 'OS/2' table through a new API). <br><br> For CJK (Chinese, Japanese, and Korean) fonts that are intended to be used for vertical writing (in addition to horizontal writing), the required value for sTypoDescender is that which describes the bottom of the of the ideographic em-box. For example, if the ideographic em-box of the font extends from coordinates 0,-120 to 1000,880 (that is, a 1000x1000 box set 120 design units below the Latin baseline), then the value of sTypoDescender must be set to -120. Failing to adhere to these requirements will result in incorrect vertical layout.</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="tlg" id="tlg">sTypoLineGap</a>
+      </h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>2-byte SHORT</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>The typographic line gap for this font. Remember that this is not the same as the LineGap value in the 'hhea' table, which Apple defines in a far different manner. <br><br> The suggested usage for usTypoLineGap is that it be used in conjunction with unitsPerEm to compute a typographically correct default line spacing. Typical values average 7-10% of units per em. The goal is to free applications from Macintosh or Windows-specific metrics which are constrained by backward compatability requirements (see chapter, &ldquo;Recommendations for Windows Fonts). These new metrics, when combined with the character design widths, will allow applications to lay out documents in a typographically correct and portable fashion. These metrics will be exposed through Windows APIs. Macintosh applications will need to access the 'sfnt' resource and parse it to extract this data from the &rdquo;OS/2&ldquo; table (unless Apple exposes the 'OS/2' table through a new API)</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="wa" id="wa">usWinAscent</a>
+      </h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>2-byte USHORT</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>The ascender metric for Windows. This, too, is distinct from Apple's Ascender value and from the usTypoAscender values. usWinAscent is computed as the yMax for all characters in the Windows ANSI character set. usWinAscent is used to compute the Windows font height and default line spacing. For platform 3 encoding 0 fonts, it is the same as yMax. Windows will clip the bitmap of any portion of a glyph that appears above this value. Some applications use this value to determine default line spacing. This is strongly discouraged. The typographic ascender, descender and line gap fields in conjunction with unitsPerEm should be used for this purpose. Developers should set this field keeping the above factors in mind. <br> If any clipping is unacceptable, then the value should be set to yMax. <br> However, if a developer desires to provide appropriate default line spacing using this field, for those applications that continue to use this field for doing so (against OpenType recommendations), then the value should be set appropriately. In such a case, it may result in some glyph bitmaps being clipped.</td>
+        </tr>
+      </table>
+      <h2>
+        <a name="wd" id="wd">usWinDescent</a>
+      </h2>
+      <table class="variable">
+        <tr>
+          <td>Format:</td>
+          <td>2-byte USHORT</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>The descender metric for Windows. This, too, is distinct from Apple's Descender value and from the usTypoDescender values. usWinDescent is computed as the -yMin for all characters in the Windows ANSI character set. usWinDescent is used to compute the Windows font height and default line spacing. For platform 3 encoding 0 fonts, it is the same as -yMin. Windows will clip the bitmap of any portion of a glyph that appears below this value. Some applications use this value to determine default line spacing. This is strongly discouraged. The typographic ascender, descender and line gap fields in conjunction with unitsPerEm should be used for this purpose. Developers should set this field keeping the above factors in mind. <br> If any clipping is unacceptable, then the value should be set to yMin. <br> However, if a developer desires to provide appropriate default line spacing using this field, for those applications that continue to use this field for doing so (against OpenType recommendations), then the value should be set appropriately. In such a case, it may result in some glyph bitmaps being clipped.</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

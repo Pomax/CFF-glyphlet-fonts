@@ -1,0 +1,952 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+  <head>
+    <title>The Glyph Definition Table</title>
+    <link rel="STYLESHEET" href="otspec.css" type="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  </head>
+  <body>
+    <div class="toprule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType tables</a> | The GDEF table</p>
+    <div class="middlerule">
+    </div>
+    <div class="contents">
+      <h1>GDEF - The Glyph Definition Table</h1>
+      <p>The Glyph Definition (GDEF) table contains four types of information in four independent tables:</p>
+      <ul>
+        <li>The <i>GlyphClassDef</i> table classifies the different types of glyphs in the font.</li>
+        <li>The <i>AttachmentList</i> table identifies all attachment points on the glyphs, which streamlines data access and bitmap caching.</li>
+        <li>The <i>LigatureCaretList</i> table contains positioning data for ligature carets, which the text-processing client uses on screen to select and highlight the individual components of a ligature glyph.</li>
+        <li>The <i>MarkAttachClassDef</i> table classifies mark glyphs, to help group together marks that are positioned similarly.</li>
+        <li>The <i>MarkGlyphSetsTable</i> allows the enumeration of an arbitrary number of glyph sets that can be used as an extension of the mark attachment class definition to allow lookups to filter mark glyphs by arbitrary sets of marks.</li>
+      </ul>
+      <p>The GSUB and GPOS tables may reference certain GDEF table information. See, for example, the LookupFlag bit enumeration in &ldquo;OpenType Layout Common Table Formats&rdquo;.</p>
+      <h2>Overview</h2>
+      <p>A client may use any one or more of the five GDEF tables during text processing. This overview explains how each of the five tables are organized and used (See Figure 7a). The rest of this chapter describes the individual GDEF tables and the tables that they reference.</p>
+      <table class="image">
+        <caption>Figure 7a. High-level organization of GDEF table</caption>
+        <tr>
+          <td>
+            <img src="fig7a3.gif" alt="fig7a3.gif">
+          </td>
+        </tr>
+      </table>
+      <h2>Glyph Class Definition Table</h2>
+      <p>The Glyph Class Definition (GlyphClassDef) table identifies four types of glyphs in a font: base glyphs, ligature glyphs, combining mark glyphs, and glyph components (see Figure 7b). GSUB and GPOS lookups define and use these glyph classes to differentiate the types of glyphs in a string. For example, GPOS uses the glyph classes to distinguish between a simple base glyph and the mark glyph that follows it.</p>
+      <table class="image">
+        <caption>Figure 7b. A base glyph, ligature glyph, mark glyph, and glyph components</caption>
+        <tr>
+          <td>
+            <img src="fig7b.gif" alt="fig7b.gif">
+          </td>
+        </tr>
+      </table>
+      <p>In addition, a client uses class definitions to apply GSUB and GPOS LookupFlag data correctly. For example, a LookupFlag may specify ignoring ligatures and marks during a glyph operation. If the font does not include a GlyphClassDef table, the client must define and maintain this information when using the GSUB and GPOS tables.</p>
+      <h2>Attachment Point List Table</h2>
+      <p>The Attachment Point List table (AttachmentList) identifies all the attachment points defined in the GPOS table and their associated glyphs so a client can quickly access coordinates for each glyph's attachment points. As a result, the client can cache coordinates for attachment points along with glyph bitmaps and avoid recalculating the attachment points each time it displays a glyph. Without this table, processing speed would be slower because the client would have to decode the GPOS lookups that define attachment points and compile the points in a list.</p>
+      <h2>Ligature Caret List Table</h2>
+      <p>The Ligature Caret List table (LigatureCaretList), particularly useful in Arabic and other scripts with many ligatures, specifies coordinates for positioning carets on all ligatures in a font. The client uses this data to select and highlight ligature components in displayed text (see Figure 7c).</p>
+      <table class="image">
+        <caption>Figure 7c. Proper ligature caret postioning</caption>
+        <tr>
+          <td>
+            <img src="fig7c.gif" alt="fig7c.gif">
+          </td>
+        </tr>
+      </table>
+      <p>Each ligature can have more than one caret position, with each position defined as an X or Y value on the baseline according to the writing direction of the script or language system. The font developer can use any of three formats to represent a caret coordinate value. One format represents values in design units only, another fine-tunes a value based on a designated contour point, and the third uses a Device table to adjust values at specific font sizes.</p>
+      <p>Without a Ligature Caret List table, the client would have to define caret positions without knowing the positions of the ligature components. The resulting highlighting or hit-testing might be ambiguous. For example, suppose a client places a caret at the midpoint position along the width of a hyphothetical &ldquo;wi&rdquo; ligature. Because the &ldquo;w&rdquo; is wider than the &ldquo;i,&rdquo; that position would not clearly indicate which component is selected. Instead, for accurate selection, the caret should be moved to the right so that either the &ldquo;w&rdquo; or &ldquo;i&rdquo; could be clearly highlighted.</p>
+      <h2>GDEF Header</h2>
+      <p>The GDEF table begins with a header that consists of a version number (Version), currently set to 0x00010002, an offset to a table defining the types of glyphs in the font (GlyphClassDef), an offset to a list defining attachment points on the glyphs(AttachList), an offset to a ligature caret list (LigCaretList) and an offset to a list defining types of marks that can be attached (MarkAttachClassDef). The format used for the MarkAttachClassDef is the same as that for GlyphClassDef. Please refer the 'LookupFlag bit enumeration' section in the <a href="chapter2.htm">Common Table Formats</a> for more on using lookup flags with the information in these fields.</p>
+      <p>Example 1 at the end of this chapter shows a GDEF Header table.</p>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 20%;">Name</th>
+          <th style="width: 60%;">Description</th>
+        </tr>
+        <tr>
+          <td>ULONG</td>
+          <td>Version</td>
+          <td>Version of the GDEF table-currently 0x00010002</td>
+        </tr>
+        <tr>
+          <td>Offset</td>
+          <td>GlyphClassDef</td>
+          <td>Offset to class definition table for glyph type-from beginning of GDEF header (may be NULL)</td>
+        </tr>
+        <tr>
+          <td>Offset</td>
+          <td>AttachList</td>
+          <td>Offset to list of glyphs with attachment points-from beginning of GDEF header (may be NULL)</td>
+        </tr>
+        <tr>
+          <td>Offset</td>
+          <td>LigCaretList</td>
+          <td>Offset to list of positioning points for ligature carets-from beginning of GDEF header (may be NULL)</td>
+        </tr>
+        <tr>
+          <td>Offset</td>
+          <td>MarkAttachClassDef</td>
+          <td>Offset to class definition table for mark attachment type-from beginning of GDEF header (may be NULL)</td>
+        </tr>
+        <tr>
+          <td>Offset</td>
+          <td>MarkGlyphSetsDef</td>
+          <td>Offset to the table of mark set definitions - from beginning of GDEF header (may be NULL)</td>
+        </tr>
+      </table>
+      <h2>Glyph Class Definition Table</h2>
+      <p>The GSUB and GPOS tables use the Glyph Class Definition table (GlyphClassDef) to identify which glyph classes to adjust with lookups.</p>
+      <p>The table uses the same format as the Class Definition table (for details, see the chapter, <a href="chapter2.htm">Common Table Formats </a>). However, the GlyphClassDef table uses class values already defined in the GlyphClassDef Enumeration list:</p>
+      <h3>GlyphClassDef Enumeration List</h3>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Class</th>
+          <th style="width: 80%;">Description</th>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>Base glyph (single character, spacing glyph)</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Ligature glyph (multiple character, spacing glyph)</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Mark glyph (non-spacing combining glyph)</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Component glyph (part of single character, spacing glyph)</td>
+        </tr>
+      </table>
+      <p>The font developer does not have to classify every glyph in the font, but any glyph not assigned a class value falls into Class zero (0). For instance, class values might be useful for the Arabic glyphs in a font, but not for the Latin glyphs. Then the GlyphClassDef table will list only Arabic glyphs, and-by default-the Latin glyphs will be assigned to Class 0. Component glyphs can be put together to generate ligatures. A ligature can be generated by creating a glyph in the font that references the component glyphs, or outputting the component glyphs in the desired sequence. Component glyphs are not used in defining any GSUB or GPOS formats.</p>
+      <p>Example 2 at the end of this chapter defines a GlyphClassDef table with a sample glyph for each of the assigned classes.</p>
+      <h2>Attachment List Table</h2>
+      <p>The Attachment List table (AttachList) may be used to cache attachment point coordinates along with glyph bitmaps.</p>
+      <p>The table consists of an offset to a Coverage table (Coverage) listing all glyphs that define attachment points in the GPOS table, a count of the glyphs with attachment points (GlyphCount), and an array of offsets to AttachPoint tables (AttachPoint). The array lists the AttachPoint tables, one for each glyph in the Coverage table, in the same order as the Coverage Index.</p>
+      <h3>AttachList table</h3>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 20%;">Name</th>
+          <th style="width: 60%;">Description</th>
+        </tr>
+        <tr>
+          <td>Offset</td>
+          <td>Coverage</td>
+          <td>Offset to Coverage table - from beginning of AttachList table</td>
+        </tr>
+        <tr>
+          <td>uint16</td>
+          <td>GlyphCount</td>
+          <td>Number of glyphs with attachment points</td>
+        </tr>
+        <tr>
+          <td>Offset</td>
+          <td>AttachPoint[GlyphCount]</td>
+          <td>Array of offsets to AttachPoint tables-from beginning of AttachList table-in Coverage Index order</td>
+        </tr>
+      </table>
+      <p>An AttachPoint table consists of a count of the attachment points on a single glyph (PointCount) and an array of contour indices of those points (PointIndex), listed in increasing numerical order.</p>
+      <p>Example 3 at the end of the chapter demonstrates an AttachList table that defines attachment points for two glyphs.</p>
+      <h3>AttachPoint table</h3>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 20%;">Name</th>
+          <th style="width: 60%;">Description</th>
+        </tr>
+        <tr>
+          <td>uint16</td>
+          <td>PointCount</td>
+          <td>Number of attachment points on this glyph</td>
+        </tr>
+        <tr>
+          <td>uint16</td>
+          <td>PointIndex[PointCount]</td>
+          <td>Array of contour point indices -in increasing numerical order</td>
+        </tr>
+      </table>
+      <h2>Ligature Caret List Table</h2>
+      <p>The Ligature Caret List table (LigCaretList) defines caret positions for all the ligatures in a font. The table consists of an offset to a Coverage table that lists all the ligature glyphs (Coverage), a count of the defined ligatures (LigGlyphCount), and an array of offsets to LigGlyph tables (LigGlyph). The array lists the LigGlyph tables, one for each ligature in the Coverage table, in the same order as the Coverage Index.</p>
+      <p>Example 4 at the end of this chapter shows a LigCaretList table.</p>
+      <h3>LigCaretList table</h3>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 20%;">Name</th>
+          <th style="width: 60%;">Description</th>
+        </tr>
+        <tr>
+          <td>Offset</td>
+          <td>Coverage</td>
+          <td>Offset to Coverage table - from beginning of LigCaretList table</td>
+        </tr>
+        <tr>
+          <td>uint16</td>
+          <td>LigGlyphCount</td>
+          <td>Number of ligature glyphs</td>
+        </tr>
+        <tr>
+          <td>Offset</td>
+          <td>LigGlyph[LigGlyphCount]</td>
+          <td>Array of offsets to LigGlyph tables-from beginning of LigCaretList table-in Coverage Index order</td>
+        </tr>
+      </table>
+      <h2>Ligature Glyph Table</h2>
+      <p>A Ligature Glyph table (LigGlyph) contains the caret coordinates for a single ligature glyph. The number of coordinate values, each defined in a separate CaretValue table, equals the number of components in the ligature minus one (1).</p>
+      <p>The LigGlyph table consists of a count of the number of CaretValue tables defined for the ligature (CaretCount) and an array of offsets to CaretValue tables (CaretValue).</p>
+      <p>Example 4 at the end of the chapter shows a LigGlyph table.</p>
+      <h3>LigGlyph table</h3>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 20%;">Name</th>
+          <th style="width: 60%;">Description</th>
+        </tr>
+        <tr>
+          <td>uint16</td>
+          <td>CaretCount</td>
+          <td>Number of CaretValues for this ligature (components - 1)</td>
+        </tr>
+        <tr>
+          <td>Offset</td>
+          <td>CaretValue[CaretCount]</td>
+          <td>Array of offsets to CaretValue tables-from beginning of LigGlyph table-in increasing coordinate order</td>
+        </tr>
+      </table>
+      <h2>Caret Values Table</h2>
+      <p>A Caret Values table (CaretValues), which defines caret positions for a ligature, can be any of three possible formats. One format uses design units to define the caret position. The other two formats use a contour point or Device table to fine-tune a caret's position at specific font sizes and device resolutions. Caret coordinates are either X or Y values, depending upon the text direction.</p>
+      <h2>CaretValue Format 1</h2>
+      <p>The first format (CaretValueFormat1) consists of a format identifier (CaretValueFormat), followed by a single coordinate for the caret position (Coordinate). The Coordinate is in design units.</p>
+      <p>This format has the benefits of small size and simplicity, but the Coordinate value cannot be hinted for fine adjustments at different device resolutions.</p>
+      <p>Example 4 at the end of this chapter shows a CaretValueFormat1 table.</p>
+      <h3>CaretValueFormat1 table: Design units only</h3>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 20%;">Name</th>
+          <th style="width: 60%;">Description</th>
+        </tr>
+        <tr>
+          <td>uint16</td>
+          <td>CaretValueFormat</td>
+          <td>Format identifier-format = 1</td>
+        </tr>
+        <tr>
+          <td>int16</td>
+          <td>Coordinate</td>
+          <td>X or Y value, in design units</td>
+        </tr>
+      </table>
+      <h2>CaretValue Format 2</h2>
+      <p>The second format (CaretValueFormat2) specifies the caret coordinate in terms of a contour point index on a specific glyph. During font hinting, the contour point on the glyph outline may move. The point's final position after hinting provides the final value for rendering a given font size.</p>
+      <p>The table contains a format identifier (CaretValueFormat) and a contour point index (CaretValuePoint).</p>
+      <p>Example 5 at the end of this chapter demonstrates a CaretValueFormat2 table.</p>
+      <h3>CaretValueFormat2 table: Contour point</h3>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 20%;">Name</th>
+          <th style="width: 60%;">Description</th>
+        </tr>
+        <tr>
+          <td>uint16</td>
+          <td>CaretValueFormat</td>
+          <td>Format identifier-format = 2</td>
+        </tr>
+        <tr>
+          <td>uint16</td>
+          <td>CaretValuePoint</td>
+          <td>Contour point index on glyph</td>
+        </tr>
+      </table>
+      <h2>CaretValue Format 3</h2>
+      <p>The third format (CaretValueFormat3) also specifies the value in design units, but it uses a Device table rather than a contour point to adjust the value. This format offers the advantage of fine-tuning the Coordinate value for any device resolution. (For more information about Device tables, see the chapter, Common Table Formats.)</p>
+      <p>The format consists of a format identifier (CaretValueFormat), an X or Y value (Coordinate), and an offset to a Device table (DeviceTable).</p>
+      <p>Example 6 at the end of this chapter shows a CaretValueFormat3 table.</p>
+      <p>
+        <br>
+        <i>CaretValueFormat3 table: Design units plus Device table</i>
+      </p>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 20%;">Name</th>
+          <th style="width: 60%;">Description</th>
+        </tr>
+        <tr>
+          <td>uint16</td>
+          <td>CaretValueFormat</td>
+          <td>Format identifier-format = 3</td>
+        </tr>
+        <tr>
+          <td>int16</td>
+          <td>Coordinate</td>
+          <td>X or Y value, in design units</td>
+        </tr>
+        <tr>
+          <td>Offset</td>
+          <td>DeviceTable</td>
+          <td>Offset to Device table for X or Y value-from beginning of CaretValue table</td>
+        </tr>
+      </table>
+      <h2>Mark Attachment Class Definition Table</h2>
+      <p>A Mark Attachment Class Definition Table defines the class to which a mark glyph may belong. This table uses the same format as the Class Definition table (for details, see the chapter, <a href="chapter2.htm"> Common Table Formats </a>).</p>
+      <p>Example 7 in this document shows a MarkAttachClassDef table.</p>
+      <h2>Mark Glyph Sets Table</h2>
+      <p>Mark glyph sets are used in GSUB and GPOS lookups to filter which marks in a string are considered or ignored. Mark glyph sets are defined in a MarkGlyphSets table, which contains offsets to individual sets each represented by a standard Coverage table:</p>
+      <h3>MarkGlyphSetsTable</h3>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 20%;">Name</th>
+          <th style="width: 60%;">Description</th>
+        </tr>
+        <tr>
+          <td>uint16</td>
+          <td>MarkSetTableFormat</td>
+          <td>Format identifier == 1</td>
+        </tr>
+        <tr>
+          <td>uint16</td>
+          <td>MarkSetCount</td>
+          <td>Number of mark sets defined</td>
+        </tr>
+        <tr>
+          <td>ULONG</td>
+          <td>Coverage [MarkSetCount]</td>
+          <td>Array of offsets to mark set coverage tables.</td>
+        </tr>
+      </table>
+      <p>Mark glyph sets are used for the same purpose as mark attachment classes, which is as filters for GSUB and GPOS lookups. Mark glyph sets differ from mark attachment classes, however, in that mark glyph sets may intersect as needed by the font developer. As for mark attachment classes, only one mark glyph set can be referenced in any given lookup.</p>
+      <p>Note that the array of offsets for the Coverage tables uses ULONG, not Offset.</p>
+      <h2>GDEF Table Examples</h2>
+      <p>The rest of this chapter describes examples of all the GDEF table formats. All the examples reflect unique parameters described below, but the samples provide a useful reference for building tables specific to other situations.</p>
+      <p>The examples have three columns showing hex data, source, and comments.</p>
+      <h2>Example 1: GDEF Header</h2>
+      <p>Example 1 shows a GDEF Header definition with offsets to each of the main tables in GDEF.</p>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Hex Data</th>
+          <th style="width: 40%;">Source</th>
+          <th style="width: 40%;">Comments</th>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>
+            <b>GDEFHeader</b>
+            <br>
+            <br>
+            TheGDEFHeader</td>
+          <td>GDEFHeader table definition</td>
+        </tr>
+        <tr>
+          <td>00010000</td>
+          <td>0x00010000</td>
+          <td>Version</td>
+        </tr>
+        <tr>
+          <td>000A</td>
+          <td>GlyphClassDefTable</td>
+          <td>offset to GlyphClassDef table</td>
+        </tr>
+        <tr>
+          <td>0026</td>
+          <td>AttachListTable</td>
+          <td>offset to AttachList table</td>
+        </tr>
+        <tr>
+          <td>0040</td>
+          <td>LigCaretListTable</td>
+          <td>offset to LigCaretList table</td>
+        </tr>
+        <tr>
+          <td>005A</td>
+          <td>MarkAttachClassDefTable</td>
+          <td>offset to Mark Attachment Class Definition Table</td>
+        </tr>
+      </table>
+      <h2>Example 2: GlyphClassDef Table</h2>
+      <p>The GlyphClassDef table in Example 2 specifies a glyph for the each of the glyph classes predefined in the GlyphClassDef Enumeration List.</p>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Hex Data</th>
+          <th style="width: 40%;">Source</th>
+          <th style="width: 40%;">Comments</th>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>
+            <b>ClassDefFormat2</b>
+            <br>
+            GlyphClassDefTable</td>
+          <td>ClassDef table definition</td>
+        </tr>
+        <tr>
+          <td>0002</td>
+          <td>2</td>
+          <td>ClassFormat</td>
+        </tr>
+        <tr>
+          <td>0004</td>
+          <td>4</td>
+          <td>ClassRangeCount<br>ClassRangeRecord[0]</td>
+        </tr>
+        <tr>
+          <td>0024</td>
+          <td>iGlyphID</td>
+          <td>Start</td>
+        </tr>
+        <tr>
+          <td>0024</td>
+          <td>iGlyphID</td>
+          <td>End</td>
+        </tr>
+        <tr>
+          <td>0001</td>
+          <td>1</td>
+          <td>Class, 1 = base glyphs<br>ClassRangeRecord[1]</td>
+        </tr>
+        <tr>
+          <td>009F</td>
+          <td>ffiLigGlyphID</td>
+          <td>Start</td>
+        </tr>
+        <tr>
+          <td>009F</td>
+          <td>ffiLigGlyphID</td>
+          <td>End</td>
+        </tr>
+        <tr>
+          <td>0002</td>
+          <td>2</td>
+          <td>Class, 2 = ligature glyphs<br>ClassRangeRecord[2]</td>
+        </tr>
+        <tr>
+          <td>0058</td>
+          <td>umlautAccentGlyphID</td>
+          <td>Start</td>
+        </tr>
+        <tr>
+          <td>0058</td>
+          <td>umlautAccentGlyphID</td>
+          <td>End</td>
+        </tr>
+        <tr>
+          <td>0003</td>
+          <td>3</td>
+          <td>Class, 3 = mark glyphs<br>ClassRangeRecord[3]</td>
+        </tr>
+        <tr>
+          <td>018F</td>
+          <td>CurvedTailComponentGlyphID</td>
+          <td>Start</td>
+        </tr>
+        <tr>
+          <td>018F</td>
+          <td>CurvedTailComponentGlyphID</td>
+          <td>End</td>
+        </tr>
+        <tr>
+          <td>0004</td>
+          <td>4</td>
+          <td>Class, 4 = component glyphs</td>
+        </tr>
+      </table>
+      <h2>Example 3: AttachList Table</h2>
+      <p>In Example 3, the AttachList table enumerates the attachment points defined for two glyphs. The GlyphCoverage table identifies the glyphs: &ldquo;a&rdquo; and &ldquo;e.&rdquo; For each covered glyph, an AttachPoint table specifies the attachment point count and point indices: one point for the &ldquo;a&rdquo; glyph and two for the &ldquo;e&rdquo; glyph.</p>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Hex Data</th>
+          <th style="width: 40%;">Source</th>
+          <th style="width: 40%;">Comments</th>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>
+            <b>AttachList</b>
+            <br>
+            AttachListTable</td>
+          <td>AttachList table definition</td>
+        </tr>
+        <tr>
+          <td>0012</td>
+          <td>GlyphCoverage</td>
+          <td>offset to Coverage table</td>
+        </tr>
+        <tr>
+          <td>0002</td>
+          <td>2</td>
+          <td>GlyphCount</td>
+        </tr>
+        <tr>
+          <td>0008</td>
+          <td>aAttachPoint</td>
+          <td>AttachPoint[0]</td>
+        </tr>
+        <tr>
+          <td>000C</td>
+          <td>eAttachPoint</td>
+          <td>AttachPoint[1]
+                  <hr></td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>
+            <b>AttachPoint</b>
+            <br>
+            aAttachPoint</td>
+          <td>AttachPoint table definition</td>
+        </tr>
+        <tr>
+          <td>0001</td>
+          <td>1</td>
+          <td>PointCount</td>
+        </tr>
+        <tr>
+          <td>0012</td>
+          <td>18</td>
+          <td>PointIndex[0]
+                  <hr></td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>
+            <b>AttachPoint</b>
+            <br>
+            eAttachPoint</td>
+          <td>AttachPoint table definition</td>
+        </tr>
+        <tr>
+          <td>0002</td>
+          <td>2</td>
+          <td>PointCount</td>
+        </tr>
+        <tr>
+          <td>000E</td>
+          <td>14</td>
+          <td>PointIndex[0]</td>
+        </tr>
+        <tr>
+          <td>0017</td>
+          <td>23</td>
+          <td>PointIndex[1]
+                  <hr></td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>
+            <b>CoverageFormat1</b>
+            <br>
+            GlyphCoverage</td>
+          <td>Coverage table definition</td>
+        </tr>
+        <tr>
+          <td>0001</td>
+          <td>1</td>
+          <td>CoverageFormat</td>
+        </tr>
+        <tr>
+          <td>0002</td>
+          <td>2</td>
+          <td>GlyphCount</td>
+        </tr>
+        <tr>
+          <td>001C</td>
+          <td>aGlyphID</td>
+          <td>GlyphArray[0]</td>
+        </tr>
+        <tr>
+          <td>0020</td>
+          <td>eGlyphID</td>
+          <td>GlyphArray[1]</td>
+        </tr>
+      </table>
+      <p>
+        <br>
+        <b>Example 4: LigCaretList Table, LigGlyph Table and CaretValueFormat1 Table</b>
+      </p>
+      <p>Example 4 defines a list of ligature carets. The LigCoverage table lists all the ligature glyphs that define caret positions. In this example, two ligatures are covered, &ldquo;ffi&rdquo; and &ldquo;fi.&rdquo; For each covered glyph, a LigGlyph table specifies the number of carets for the ligature and their coordinate values. The &ldquo;fi&rdquo; ligature defines one caret, positioned between the &ldquo;f&rdquo; and &ldquo;i&rdquo; components; the &ldquo;ffi&rdquo; ligature defines two, one positioned between the two &ldquo;f&rdquo; components and the other positioned between the &ldquo;f&rdquo; and &ldquo;i.&rdquo; The CaretValue tables shown here use Format1, where values are specified in design units only.</p>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Hex Data</th>
+          <th style="width: 40%;">Source</th>
+          <th style="width: 40%;">Comments</th>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>
+            <b>LigCaretList</b>
+            <br>
+            LigCaretListTable</td>
+          <td>LigCaretList table definition</td>
+        </tr>
+        <tr>
+          <td>0008</td>
+          <td>LigCoverage</td>
+          <td>offset to Coverage table</td>
+        </tr>
+        <tr>
+          <td>0002</td>
+          <td>2</td>
+          <td>LigGlyphCount</td>
+        </tr>
+        <tr>
+          <td>0010</td>
+          <td>fiLigGlyph</td>
+          <td>offset to LigGlyph table[0]</td>
+        </tr>
+        <tr>
+          <td>0014</td>
+          <td>ffiLigGlyph</td>
+          <td>offset to LigGlyph table[1]
+                  <hr></td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>
+            <b>CoverageFormat1</b>
+            <br>
+            LigCoverage</td>
+          <td>Coverage table definition</td>
+        </tr>
+        <tr>
+          <td>0001</td>
+          <td>1</td>
+          <td>CoverageFormat</td>
+        </tr>
+        <tr>
+          <td>0002</td>
+          <td>2</td>
+          <td>GlyphCount</td>
+        </tr>
+        <tr>
+          <td>009F</td>
+          <td>ffiLigGlyphID</td>
+          <td>GlyphArray[0]</td>
+        </tr>
+        <tr>
+          <td>00A5</td>
+          <td>fiLigGlyphID</td>
+          <td>GlyphArray[1]
+                  <hr></td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>
+            <b>LigGlyph</b>
+            <br>
+            fiLigGlyph</td>
+          <td>LigGlyph table definition</td>
+        </tr>
+        <tr>
+          <td>0001</td>
+          <td>1</td>
+          <td>CaretCount, equals the number of components - 1</td>
+        </tr>
+        <tr>
+          <td>000E</td>
+          <td>CaretFI</td>
+          <td>CaretValue[0]
+                  <hr></td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>
+            <b>LigGlyph</b>
+            <br>
+            ffiLigGlyph</td>
+          <td>LigGlyph table definition</td>
+        </tr>
+        <tr>
+          <td>0002</td>
+          <td>2</td>
+          <td>CaretCount, equals the number of components - 1</td>
+        </tr>
+        <tr>
+          <td>0006</td>
+          <td>CaretFFI1</td>
+          <td>CaretValue[0]</td>
+        </tr>
+        <tr>
+          <td>000E</td>
+          <td>CaretFFI2</td>
+          <td>CaretValue[1]
+                  <hr></td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>
+            <b>CaretValueFormat1</b>
+            <br>
+            CaretFI</td>
+          <td>CaretValue table definition</td>
+        </tr>
+        <tr>
+          <td>0001</td>
+          <td>1</td>
+          <td>CaretValueFormat design units only</td>
+        </tr>
+        <tr>
+          <td>025B</td>
+          <td>603</td>
+          <td>Coordinate X or Y value
+                  <hr></td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>
+            <b>CaretValueFormat1</b>
+            <br>
+            CaretFFI1</td>
+          <td>CaretValue table definition</td>
+        </tr>
+        <tr>
+          <td>0001</td>
+          <td>1</td>
+          <td>CaretValueFormat design units only</td>
+        </tr>
+        <tr>
+          <td>025B</td>
+          <td>603</td>
+          <td>Coordinate X or Y value
+                  <hr></td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>
+            <b>CaretValueFormat1</b>
+            <br>
+            CaretFFI2</td>
+          <td>CaretValue table definition</td>
+        </tr>
+        <tr>
+          <td>0001</td>
+          <td>1</td>
+          <td>CaretValueFormat design units only</td>
+        </tr>
+        <tr>
+          <td>04B6</td>
+          <td>1206</td>
+          <td>Coordinate X or Y value</td>
+        </tr>
+      </table>
+      <h2>Example 5: CaretValueFormat2 Table</h2>
+      <p>Example 5 shows a CaretValueFormat2 table that specifies a ligature caret coordinate in terms of a contour point index on a specific glyph. The final position of the caret depends on the location of the contour point on the glyph after hinting.</p>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Hex Data</th>
+          <th style="width: 40%;">Source</th>
+          <th style="width: 40%;">Comments</th>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>
+            <b>CaretValueFormat2</b>
+            <br>
+            Caret1</td>
+          <td>CaretValue table definition</td>
+        </tr>
+        <tr>
+          <td>0002</td>
+          <td>2</td>
+          <td>CaretValueFormat contour point</td>
+        </tr>
+        <tr>
+          <td>000D</td>
+          <td>13</td>
+          <td>CaretValuePoint contour point index</td>
+        </tr>
+      </table>
+      <h2>Example 6: CaretValueFormat3 Table</h2>
+      <p>In Example 6, the CaretValueFormat3 table defines a caret position in design units, but includes a Device table to adjust the X or Y coordinate for the point size and resolution of the output font. Here, the Device table specifies pixel adjustments for font sizes from 12 ppem to 17 ppem.</p>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Hex Data</th>
+          <th style="width: 40%;">Source</th>
+          <th style="width: 40%;">Comments</th>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>
+            <b>CaretValueFormat3</b>
+            <br>
+            Caret3</td>
+          <td>CaretValue table definition</td>
+        </tr>
+        <tr>
+          <td>0003</td>
+          <td>3</td>
+          <td>CaretValueFormat design units plus Device table</td>
+        </tr>
+        <tr>
+          <td>04B6</td>
+          <td>1206</td>
+          <td>Coordinate X or Y value, design units</td>
+        </tr>
+        <tr>
+          <td>0006</td>
+          <td>CaretDevice</td>
+          <td>offset to Device table
+                  <hr></td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>
+            <b>DeviceTableFormat2</b>
+            <br>
+            CaretDevice</td>
+          <td>Device Table definition</td>
+        </tr>
+        <tr>
+          <td>000C</td>
+          <td>12</td>
+          <td>StartSize</td>
+        </tr>
+        <tr>
+          <td>0011</td>
+          <td>17</td>
+          <td>EndSize</td>
+        </tr>
+        <tr>
+          <td>0002</td>
+          <td>2</td>
+          <td>DeltaFormat</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>1</td>
+          <td>increase 12ppm by 1 pixel</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>1</td>
+          <td>increase 13ppm by 1 pixel</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>1</td>
+          <td>increase 14ppm by 1 pixel</td>
+        </tr>
+        <tr>
+          <td>1111</td>
+          <td>1</td>
+          <td>increase 15ppm by 1 pixel</td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>2</td>
+          <td>increase 16ppm by 2 pixels</td>
+        </tr>
+        <tr>
+          <td>2200</td>
+          <td>2</td>
+          <td>increase 17ppm by 2 pixels</td>
+        </tr>
+      </table>
+      <h2>Example 7: MarkAttachClassDef Table</h2>
+      <p>In Example 7, the MarkAttachClassDef table specifies an attachment class for the each of the glyph ranges predefined in the GlyphClassDef Enumeration List as marks.</p>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;"> Hex Data</th>
+          <th style="width: 40%;"> Source</th>
+          <th style="width: 40%;"> Comments</th>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>
+            <b> ClassDefFormat2</b>
+            <br>
+            theMarkAttachClassDefTable</td>
+          <td>ClassDef table definition</td>
+        </tr>
+        <tr>
+          <td>0002</td>
+          <td>2</td>
+          <td>ClassFormat</td>
+        </tr>
+        <tr>
+          <td>0004</td>
+          <td> 4</td>
+          <td> ClassRangeCount<br>ClassRangeRecord[0]</td>
+        </tr>
+        <tr>
+          <td> 0268</td>
+          <td> graveAccentGlyphID</td>
+          <td> Start</td>
+        </tr>
+        <tr>
+          <td> 026A</td>
+          <td> circumflexAccentGlyphID</td>
+          <td> End</td>
+        </tr>
+        <tr>
+          <td> 0001</td>
+          <td> 1</td>
+          <td> Class, 1 = top marks <br>ClassRangeRecord[1]</td>
+        </tr>
+        <tr>
+          <td> 0270</td>
+          <td> diaeresisAccentGlyphID</td>
+          <td> Start</td>
+        </tr>
+        <tr>
+          <td> 0272</td>
+          <td> acuteAccentGlyphID</td>
+          <td> End</td>
+        </tr>
+        <tr>
+          <td> 0001</td>
+          <td> 1</td>
+          <td> Class, 1 = top marks <br>ClassRangeRecord[2]</td>
+        </tr>
+        <tr>
+          <td> 028C</td>
+          <td> diaeresisBelowGlyphID</td>
+          <td> Start</td>
+        </tr>
+        <tr>
+          <td> 028F</td>
+          <td> cedillaGlyphID</td>
+          <td> End</td>
+        </tr>
+        <tr>
+          <td> 0002</td>
+          <td> 2</td>
+          <td> Class, 2 = bottom marks <br>ClassRangeRecord[3]</td>
+        </tr>
+        <tr>
+          <td> 0295</td>
+          <td> circumflexBelowGlyphID</td>
+          <td> Start</td>
+        </tr>
+        <tr>
+          <td> 0295</td>
+          <td> circumflexBelowGlyphID</td>
+          <td> End</td>
+        </tr>
+        <tr>
+          <td> 0002</td>
+          <td> 2</td>
+          <td> Class, 2 = bottom marks</td>
+        </tr>
+      </table>
+      <hr class="separator">
+      <p class="fineprint">This page was last updated 16 March 2009.</p>
+      <p class="fineprint">&copy; 2009 Microsoft Corporation. All rights reserved. <a href="http://www.microsoft.com/Misc/cpyright.htm">Terms of use</a>.</p>
+      <p class="fineprint">Comments to the MST group: <a href="/typography/AboutMST.mspx">how to contact us</a>.</p>
+    </div>
+    <div class="middlerule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType tables</a> | The GDEF table</p>
+    <div class="bottomrule">
+    </div>
+  </body>
+</html>

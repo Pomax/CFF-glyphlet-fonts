@@ -1,3 +1,7 @@
+/**
+ * OpenType data types
+ */
+
 function BYTE(v) { return [v]; }
 function CHAR(v) { return [v.charCodeAt(0)]; }
 function CHARARRAY(v) { return v.split('').map(function(v) { return v.charCodeAt(0); }); }
@@ -8,6 +12,7 @@ function SHORT(v)  {
   if(v >= limit) { v = -(2*limit - v); } // 2's complement
   return [(v >> 8) & 0xFF, v & 0xFF];
 }
+function UINT24(v) { return [(v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF]; }
 function ULONG(v) { return [(v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF]; }
 function LONG(v)  {
   var limit = 2147483648;
@@ -15,10 +20,147 @@ function LONG(v)  {
   return [(v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF];
 }
 
-// alias
+// aliased datatypes
 var FWORD = SHORT,
     UFWORD = USHORT,
     LONGDATETIME = ULONG;
+
+/**
+ * CFF data types
+ */
+
+function NUMBER(v) {
+  return [v];
+}
+
+// CFF-specific
+function OPERAND(v1, v2) {
+  var opcode = [v1];
+  if(v2 !== undefined) { opcode.push(v2); }
+  return opcode;
+}
+
+// aliased datatypes
+var GlyphID = USHORT,
+    Offset = USHORT,
+    Card8 = BYTE,
+    Card16 = USHORT,
+    SID = USHORT,
+    OffSize = BYTE,
+    Offset1 = BYTE,
+    Offset2 = USHORT,
+    Offset3 = UINT24,
+    Offset4 = ULONG;
+
+/**
+ * Font structure models
+ */
+
+// Type2 font as a CFF data block
+
+// this is the tricky bit: Let's byte-model an entire CFF font!
+// note: The CFF specification is described in Adobe's technical note 5176
+var createCFF = function(label, data) {
+  var asBytes = function(obj) {
+    // form single data block and return
+    var data = [],
+        fn = function(key) { data = data.concat(obj[key]); };
+    Object.keys(obj).forEach(fn);
+    return data;
+  }
+
+  // be mindful of the fact that there are 390 predefined strings (see appendix A, pp 29)
+  var strings = [
+      ["version", CHARARRAY, "font version string; string id 391", "001.000"]
+    , ["full name", CHARARRAY, "the font's full name  (id 392)", "custom font"]
+    , ["family name", CHARARRAY, "the official font family name (id 393)", "custom"]
+    , ["label", CHARARRAY, "the passed label for this font (id 394)", label]
+  ];
+
+  // the top dict contains "global" metadata
+  var top_dict_data = [
+      ["version", DICTINSTRUCTION, "", [SID(391), OPERAND(0)]]
+    , ["full name", DICTINSTRUCTION, "", [SID(392), OPERAND(2)]]
+    , ["family name", DICTINSTRUCTION, "", [SID(393), OPERAND(3)]]
+    , ["weight", DICTINSTRUCTION, "", [SID(389), OPERAND(4)]]
+    , ["uniqueID", DICTINSTRUCTION, "", [NUMBER(1), OPERAND(13)]]
+    , ["FontBBox", DICTINSTRUCTION, "", [NUMBER(data.xMin), NUMBER(data.yMin), NUMBER(data.xMax) NUMBER(data.yMax), OPERAND(5)]]
+    // these two instruction can't be properly asserted until after we pack up the CFF...
+    , ["charstrings", DICTINSTRUCTION, "offset to charstrings (from start of file)", [NUMBER(-1), OPERAND(17)]]
+    , ["private", DICTINSTRUCTION, "'size of', then 'offset to' (from start of file) the private dict", [NUMBER(-1), NUMBER(-1), OPERAND(18)]]
+  ];
+
+  var charstrings = [
+    // .notdef has an empty glyph outline
+      [ ".notdef", DICTINSTRUCTION, "the outline for .notdef", [OPERAND(14)]]
+    // our second glyph is non-empty, based on `data`
+    , [ "our letter", DICTINSTRUCTION, "the outline for our own glyph", data.toCharString(SID, NUMBER, OPERAND).concat([OPERAND(14)])
+  ];
+
+  var cff = {
+    "header": [
+          ["major", Card8, "major version", 1]
+        , ["minor", Card8, "minor version", 0]
+        , ["length", Card8, "header length in bytes", 4]
+        , ["offSize", OffSize, "how many bytes for an offset value?", 1]
+      ],
+
+      "name index": [
+          ["count", Card16, "number of stored names (We only have one)", 1]
+        , ["offSize", OffSize, "offsets use 1 byte", 1]
+        // there are (count+1) offsets: the first offset is always 1, and the last offset marks the end of the table
+        , ["offset", [
+            ["0", Offset1, "first offset, relative to the byte preceding the data block", 1]
+          , ["1", Offset1, "offset to end of the data block", (1 + "customfont".length)]]]
+        // object data
+        , ["data", CHARARRAY, "we only include one name, namely the compact font name", "customfont"]
+      ],
+
+      "top dict index": [
+          ["count", Card16, "number of stored indices (We have one)", 1]
+        , ["offSize", OffSize, "offsets use 2 bytes in this index", 2]
+        , ["offset", [
+            ["0", Offset2, "first offset, relative to the byte preceding the data block", 1]
+          , ["1", Offset2, "offset to end of the data block", 1 + top_dict_data.length]]]
+        // actual data is concatenated in:
+      ].concat(top_dict_data),
+
+      "string index": [
+          ["", Card16, "number of stored strings", "strings.length"]
+        , ["", OffSize(1, "offsets use 1 byte"]
+        // offset array
+        ["offset", [
+            ["0", Offset1, "first offset", 1]
+          , ["1", Offset1, "second offset", 1 + strings[0].length]
+          , ["2", Offset1, "third offset", 1 + strings[0].length + strings[1].length]
+          , ["3", Offset1, "end of data block", 1 + strings[0].length + strings[1].length + strings[2].length]]]
+        // data is concatenated in:
+      ].concat(strings),
+
+      "global subroutine index": [
+        ["count", Card16, "no global subroutines, so count is 0 and there are no further index values", 0]
+      ],
+
+      // this is the part that actually contains the characters outline data,
+      // encoded as Type 2 charstrings (one charstring per glyph).
+      "charstring index": [
+          ["count", Card16, "two charstrings; .notdef and our glyph", 2],
+        , ["offSize", OffSize, "offsets use 1 byte", 1]
+        , ["offset", [
+          , ["0", Offset1, "first offset", 1]
+          , ["1", Offset1, "second offset", 1 + charstrings[0].length]
+          , ["2", Offset1, "end of data block", 1 + charstrings[0].length + charstrings[1].length]]]
+      ].concat(charstrings),
+
+      "private dict": [
+          ["BlueValues", DICTINSTRUCTION, "empty array (see Type 1 font format, pp 37)", [OPERAND(6)]
+        , ["FamilyBlues", DICTINSTRUCTION, "idem dito", [OPERAND(8)]]
+        , ["StdHW", DICTINSTRUCTION, "dominant horizontal stem width. We set it to 10", [NUMBER(10), OPERAND(10)]]
+        , ["StdVW", DICTINSTRUCTION, "dominant vertical stem width. We set it to 10", [NUMBER(10), OPERAND(11)]]
+      ],
+  }
+  return asBytes(cff);
+};
 
 // OpenType tables
 var TableModels = {

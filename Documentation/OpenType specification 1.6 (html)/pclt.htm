@@ -1,0 +1,761 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+  <head>
+    <title>The PCL 5 Table</title>
+    <link rel="STYLESHEET" href="otspec.css" type="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  </head>
+  <body>
+    <div class="toprule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType tables</a> | The PCLT table</p>
+    <div class="middlerule">
+    </div>
+    <div class="contents">
+      <h1>PCLT - PCL 5 Table</h1>
+      <p>The 'PCLT' table is strongly discouraged for OpenType&trade; fonts with TrueType outlines. Extra information on many of these fields can be found in the <i>HP PCL 5 Printer Language Technical Reference Manual</i> available from Hewlett-Packard Boise Printer Division.</p>
+      <p>The format for the table is:</p>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 80%;">Name of Entry</th>
+        </tr>
+        <tr>
+          <td>FIXED</td>
+          <td>Version</td>
+        </tr>
+        <tr>
+          <td>ULONG</td>
+          <td>FontNumber</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>Pitch</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>xHeight</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>Style</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>TypeFamily</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>CapHeight</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>SymbolSet</td>
+        </tr>
+        <tr>
+          <td>CHAR</td>
+          <td>Typeface[16]</td>
+        </tr>
+        <tr>
+          <td>CHAR</td>
+          <td>CharacterComplement[8]</td>
+        </tr>
+        <tr>
+          <td>CHAR</td>
+          <td>FileName[6]</td>
+        </tr>
+        <tr>
+          <td>CHAR</td>
+          <td>StrokeWeight</td>
+        </tr>
+        <tr>
+          <td>CHAR</td>
+          <td>WidthType</td>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>SerifStyle</td>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>Reserved (pad)</td>
+        </tr>
+      </table>
+      <h2>Version</h2>
+      <p>Table version number 1.0 is represented as 0x00010000.</p>
+      <h2>FontNumber</h2>
+      <p>This 32-bit number is segmented in two parts. The most significant bit indicates native versus converted format. Only font vendors should create fonts with this bit zeroed. The 7 next most significant bits are assigned by Hewlett-Packard Boise Printer Division to major font vendors. The least significant 24 bits are assigned by the vendor. Font vendors should attempt to insure that each of their fonts are marked with unique values.</p>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Code</th>
+          <th style="width: 80%;">Vendor</th>
+        </tr>
+        <tr>
+          <td>A</td>
+          <td>Adobe Systems</td>
+        </tr>
+        <tr>
+          <td>B</td>
+          <td>Bitstream Inc.</td>
+        </tr>
+        <tr>
+          <td>C</td>
+          <td>Agfa Corporation</td>
+        </tr>
+        <tr>
+          <td>H</td>
+          <td>Bigelow &amp; Holmes</td>
+        </tr>
+        <tr>
+          <td>L</td>
+          <td>Linotype Company</td>
+        </tr>
+        <tr>
+          <td>M</td>
+          <td>Monotype Typography Ltd.</td>
+        </tr>
+      </table>
+      <h2>Pitch</h2>
+      <p>The width of the space in FUnits (FUnits are described by the unitsPerEm field of the 'head' table). Monospace fonts derive the width of all characters from this field.</p>
+      <h2>xHeight</h2>
+      <p>The height of the optical line describing the height of the lowercase x in FUnits. This might not be the same as the measured height of the lowercase x.</p>
+      <h2>Style</h2>
+      <p>The most significant 6 bits are reserved. The 5 next most significant bits encode structure. The next 3 most significant bits encode appearance width. The 2 least significant bits encode posture.</p>
+      <p>
+        <br>
+        <i>Structure</i> (bits 5-9)</p>
+      <table class="gray">
+        <tr>
+          <td>0</td>
+          <td>Solid (normal, black)</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>Outline (hollow)</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Inline (incised, engraved)</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Contour, edged (antique, distressed)</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Solid with shadow</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Outline with shadow</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>Inline with shadow</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>Contour, or edged, with shadow</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td>Pattern filled</td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td>Pattern filled #1 (when more than one pattern)</td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td>Pattern filled #2 (when more than two patterns)</td>
+        </tr>
+        <tr>
+          <td>11</td>
+          <td>Pattern filled #3 (when more than three patterns)</td>
+        </tr>
+        <tr>
+          <td>12</td>
+          <td>Pattern filled with shadow</td>
+        </tr>
+        <tr>
+          <td>13</td>
+          <td>Pattern filled with shadow #1 (when more than one pattern or shadow)</td>
+        </tr>
+        <tr>
+          <td>14</td>
+          <td>Pattern filled with shadow #2 (when more than two patterns or shadows)</td>
+        </tr>
+        <tr>
+          <td>15</td>
+          <td>Pattern filled with shadow #3 (when more than three patterns or shadows)</td>
+        </tr>
+        <tr>
+          <td>16</td>
+          <td>Inverse</td>
+        </tr>
+        <tr>
+          <td>17</td>
+          <td>Inverse with border</td>
+        </tr>
+        <tr>
+          <td>18-31</td>
+          <td>reserved</td>
+        </tr>
+      </table>
+      <p>
+        <br>
+        <i>Width</i> (bits 2-4)</p>
+      <table class="gray">
+        <tr>
+          <td>0</td>
+          <td>normal</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>condensed</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>compressed, extra condensed</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>extra compressed</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>ultra compressed</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>reserved</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>expanded, extended</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>extra expanded, extra extended</td>
+        </tr>
+      </table>
+      <p>
+        <br>
+        <i>Posture</i> (bits 0-1)</p>
+      <table class="gray">
+        <tr>
+          <td>0</td>
+          <td>upright</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>oblique, italic</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>alternate italic (backslanted, cursive, swash)</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>reserved</td>
+        </tr>
+      </table>
+      <h2>TypeFamily</h2>
+      <p>The 4 most significant bits are font vendor codes. The 12 least significant bits are typeface family codes. Both are assigned by HP Boise Division.</p>
+      <p>
+        <br>
+        <i>Vendor Codes</i> (bits 12-15)</p>
+      <table class="gray">
+        <tr>
+          <td>0</td>
+          <td>reserved</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>Agfa Corporation</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Bitstream Inc.</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Linotype Company</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Monotype Typography Ltd.</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Adobe Systems</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>font repackagers</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>vendors of unique typefaces</td>
+        </tr>
+        <tr>
+          <td>8-15</td>
+          <td>reserved</td>
+        </tr>
+      </table>
+      <h2>CapHeight</h2>
+      <p>The height of the optical line describing the top of the uppercase H in FUnits. This might not be the same as the measured height of the uppercase H.</p>
+      <h2>SymbolSet</h2>
+      <p>The most significant 11 bits are the value of the symbol set &ldquo;number&rdquo; field. The value of the least significant 5 bits, when added to 64, is the ASCII value of the symbol set &ldquo;ID&rdquo; field. Symbol set values are assigned by HP Boise Division. Unbound fonts, or &ldquo;typefaces&rdquo; should have a symbol set value of 0. See the <i>PCL 5 Printer Language Technical Reference Manual</i> or the <i>PCL 5 Comparison Guide</i> for the most recent published list of codes.</p>
+      <h3>Examples</h3>
+      <table class="gray">
+        <tr>
+          <td>&nbsp;</td>
+          <td>
+            <b>PCL</b>
+          </td>
+          <td>
+            <b>decimal</b>
+          </td>
+        </tr>
+        <tr>
+          <td>Windows 3.1 &ldquo;ANSI&rdquo;</td>
+          <td>19U</td>
+          <td>629</td>
+        </tr>
+        <tr>
+          <td>Windows 3.0 &ldquo;ANSI&rdquo;</td>
+          <td>9U</td>
+          <td>309</td>
+        </tr>
+        <tr>
+          <td>Adobe &ldquo;Symbol&rdquo;</td>
+          <td>19M</td>
+          <td>621</td>
+        </tr>
+        <tr>
+          <td>Macintosh</td>
+          <td>12J</td>
+          <td>394</td>
+        </tr>
+        <tr>
+          <td>PostScript ISO Latin 1</td>
+          <td>11J</td>
+          <td>362</td>
+        </tr>
+        <tr>
+          <td>PostScript Std. Encoding</td>
+          <td>10J</td>
+          <td>330</td>
+        </tr>
+        <tr>
+          <td>Code Page 1004</td>
+          <td>9J</td>
+          <td>298</td>
+        </tr>
+        <tr>
+          <td>DeskTop</td>
+          <td>7J</td>
+          <td>234</td>
+        </tr>
+      </table>
+      <h2>TypeFace</h2>
+      <p>This 16-byte ASCII string appears in the &ldquo;font print&rdquo; of PCL printers. Care should be taken to insure that the base string for all typefaces of a family are consistent, and that the designators for bold, italic, etc. are standardized.</p>
+      <h3>Example</h3>
+      <table class="gray">
+        <tr>
+          <td>&nbsp;Times New</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>&nbsp;Times New</td>
+          <td>&nbsp;Bd</td>
+        </tr>
+        <tr>
+          <td>&nbsp;Times New</td>
+          <td>&nbsp;It</td>
+        </tr>
+        <tr>
+          <td>&nbsp;Times New</td>
+          <td>&nbsp;BdIt</td>
+        </tr>
+        <tr>
+          <td>&nbsp;Courier New</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>&nbsp;Courier New</td>
+          <td>&nbsp;Bd</td>
+        </tr>
+        <tr>
+          <td>&nbsp;Courier New</td>
+          <td>&nbsp;It</td>
+        </tr>
+        <tr>
+          <td>&nbsp;Courier New</td>
+          <td>&nbsp;BdIt</td>
+        </tr>
+      </table>
+      <h2>CharacterComplement</h2>
+      <p>This 8-byte field identifies the symbol collections provided by the font, each bit identifies a symbol collection and is independently interpreted. Symbol set bound fonts should have this field set to all F's (except bit 0).</p>
+      <h3>Example</h3>
+      <table class="gray">
+        <tr>
+          <td>DOS/PCL Complement</td>
+          <td>0xFFFFFFFF003FFFFE</td>
+        </tr>
+        <tr>
+          <td>Windows 3.1 &ldquo;ANSI&rdquo;</td>
+          <td>0xFFFFFFFF37FFFFFE</td>
+        </tr>
+        <tr>
+          <td>Macintosh</td>
+          <td>0xFFFFFFFF36FFFFFE</td>
+        </tr>
+        <tr>
+          <td>ISO 8859-1 Latin 1</td>
+          <td>0xFFFFFFFF3BFFFFFE</td>
+        </tr>
+        <tr>
+          <td>ISO 8859-1,2,9 Latin 1,2,5</td>
+          <td>0xFFFFFFFF0BFFFFFE</td>
+        </tr>
+      </table>
+      <p>The character collections identified by each bit are as follows:</p>
+      <table class="gray">
+        <tr>
+          <td>31</td>
+          <td>ASCII (supports several standard interpretations)</td>
+        </tr>
+        <tr>
+          <td>30</td>
+          <td>Latin 1 extensions</td>
+        </tr>
+        <tr>
+          <td>29</td>
+          <td>Latin 2 extensions</td>
+        </tr>
+        <tr>
+          <td>28</td>
+          <td>Latin 5 extensions</td>
+        </tr>
+        <tr>
+          <td>27</td>
+          <td>Desktop Publishing Extensions</td>
+        </tr>
+        <tr>
+          <td>26</td>
+          <td>Accent Extensions (East and West Europe)</td>
+        </tr>
+        <tr>
+          <td>25</td>
+          <td>PCL Extensions</td>
+        </tr>
+        <tr>
+          <td>24</td>
+          <td>Macintosh Extensions</td>
+        </tr>
+        <tr>
+          <td>23</td>
+          <td>PostScript Extensions</td>
+        </tr>
+        <tr>
+          <td>22</td>
+          <td>Code Page Extensions</td>
+        </tr>
+      </table>
+      <p>The character complement field also indicates the index mechanism used with an unbound font. Bit 0 must always be cleared when the font elements are provided in Unicode order.</p>
+      <h2>FileName</h2>
+      <p>This 6-byte field is composed of 3 parts. The first 3 bytes are an industry standard typeface family string. The fourth byte is a treatment character, such as R, B, I. The last two characters are either zeroes for an unbound font or a two character mnemonic for a symbol set if symbol set found.</p>
+      <h3>Examples</h3>
+      <table class="gray">
+        <tr>
+          <td>&nbsp;TNRR00</td>
+          <td>Times New (text weight, upright)</td>
+        </tr>
+        <tr>
+          <td>&nbsp;TNRI00</td>
+          <td>Times New Italic</td>
+        </tr>
+        <tr>
+          <td>&nbsp;TNRB00</td>
+          <td>Times New Bold</td>
+        </tr>
+        <tr>
+          <td>&nbsp;TNRJ00</td>
+          <td>Times New Bold Italic</td>
+        </tr>
+        <tr>
+          <td>&nbsp;COUR00</td>
+          <td>Courier</td>
+        </tr>
+        <tr>
+          <td>&nbsp;COUI00</td>
+          <td>Courier Italic</td>
+        </tr>
+        <tr>
+          <td>&nbsp;COUB00</td>
+          <td>Courier Bold</td>
+        </tr>
+        <tr>
+          <td>&nbsp;COUJ00</td>
+          <td>Courier Bold Italic</td>
+        </tr>
+      </table>
+      <h3>Treatment Flags</h3>
+      <table class="gray">
+        <tr>
+          <td>R</td>
+          <td>Text, normal, book, etc.</td>
+        </tr>
+        <tr>
+          <td>I</td>
+          <td>Italic, oblique, slanted, etc.</td>
+        </tr>
+        <tr>
+          <td>B</td>
+          <td>Bold</td>
+        </tr>
+        <tr>
+          <td>J</td>
+          <td>Bold Italic, Bold Oblique</td>
+        </tr>
+        <tr>
+          <td>D</td>
+          <td>Demibold</td>
+        </tr>
+        <tr>
+          <td>E</td>
+          <td>Demibold Italic, Demibold Oblique</td>
+        </tr>
+        <tr>
+          <td>K</td>
+          <td>Black</td>
+        </tr>
+        <tr>
+          <td>G</td>
+          <td>Black Italic, Black Oblique</td>
+        </tr>
+        <tr>
+          <td>L</td>
+          <td>Light</td>
+        </tr>
+        <tr>
+          <td>P</td>
+          <td>Light Italic, Light Oblique</td>
+        </tr>
+        <tr>
+          <td>C</td>
+          <td>Condensed</td>
+        </tr>
+        <tr>
+          <td>A</td>
+          <td>Condensed Italic, Condensed Oblique</td>
+        </tr>
+        <tr>
+          <td>F</td>
+          <td>Bold Condensed</td>
+        </tr>
+        <tr>
+          <td>H</td>
+          <td>Bold Condensed Italic, Bold Condensed Oblique</td>
+        </tr>
+        <tr>
+          <td>S</td>
+          <td>Semibold (lighter than demibold)</td>
+        </tr>
+        <tr>
+          <td>T</td>
+          <td>Semibold Italic, Semibold Oblique</td>
+        </tr>
+      </table>
+      <p>other treatment flags are assigned over time.</p>
+      <h2>StrokeWeight</h2>
+      <p>This signed 1-byte field contains the PCL stroke weight value. Only values in the range -7 to 7 are valid:</p>
+      <table class="gray">
+        <tr>
+          <td>-7</td>
+          <td>Ultra Thin</td>
+        </tr>
+        <tr>
+          <td>-6</td>
+          <td>Extra Thin</td>
+        </tr>
+        <tr>
+          <td>-5</td>
+          <td>Thin</td>
+        </tr>
+        <tr>
+          <td>-4</td>
+          <td>Extra Light</td>
+        </tr>
+        <tr>
+          <td>-3</td>
+          <td>Light</td>
+        </tr>
+        <tr>
+          <td>-2</td>
+          <td>Demilight</td>
+        </tr>
+        <tr>
+          <td>-1</td>
+          <td>Semilight</td>
+        </tr>
+        <tr>
+          <td>0</td>
+          <td>Book, text, regular, etc.</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>Semibold (Medium, when darker than Book)</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Demibold</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Bold</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Extra Bold</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Black</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>Extra Black</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>Ultra Black, or Ultra</td>
+        </tr>
+      </table>
+      <p>Type designers often use interesting names for weights or combinations of weights and styles, such as Heavy, Compact, Inserat, Bold No. 2, etc. PCL stroke weights are assigned on the basis of the entire family and use of the faces. Typically, display faces don't have a &ldquo;text&rdquo; weight assignment.</p>
+      <h2>WidthType</h2>
+      <p>This signed 1-byte field contains the PCL appearance width value. The values are not directly related to those in the appearance with field of the style word above. Only values in the range -5 to 5 are valid.</p>
+      <table class="gray">
+        <tr>
+          <td>-5</td>
+          <td>Ultra Compressed</td>
+        </tr>
+        <tr>
+          <td>-4</td>
+          <td>Extra Compressed</td>
+        </tr>
+        <tr>
+          <td>-3</td>
+          <td>Compressed, or Extra Condensed</td>
+        </tr>
+        <tr>
+          <td>-2</td>
+          <td>Condensed</td>
+        </tr>
+        <tr>
+          <td>0</td>
+          <td>Normal</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Expanded</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Extra Expanded</td>
+        </tr>
+      </table>
+      <h2>SerifStyle</h2>
+      <p>This signed 1-byte field contains the PCL serif style value. The most significant 2 bits of this byte specify the serif/sans or contrast/monoline characterisitics of the typeface.</p>
+      <h3>Bottom 6 bit values:</h3>
+      <table class="gray">
+        <tr>
+          <td>0</td>
+          <td>Sans Serif Square</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>Sans Serif Round</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Serif Line</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Serif Triangle</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Serif Swath</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Serif Block</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>Serif Bracket</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>Rounded Bracket</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td>Flair Serif, Modified Sans</td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td>Script Nonconnecting</td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td>Script Joining</td>
+        </tr>
+        <tr>
+          <td>11</td>
+          <td>Script Calligraphic</td>
+        </tr>
+        <tr>
+          <td>12</td>
+          <td>Script Broken Letter</td>
+        </tr>
+      </table>
+      <h3>Top 2 bit values:</h3>
+      <table class="gray">
+        <tr>
+          <td>0</td>
+          <td>reserved</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>Sans Serif/Monoline</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Serif/Contrasting</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>reserved</td>
+        </tr>
+      </table>
+      <h2>Reserved</h2>
+      <p>Should be set to zero. </p>
+      <hr class="separator">
+      <p class="fineprint">This page was last updated 21 August 2002.</p>
+      <p class="fineprint">&copy; 1998 Microsoft Corporation. All rights reserved. <a href="http://www.microsoft.com/Misc/cpyright.htm">Terms of use</a>.</p>
+      <p class="fineprint">Comments to the MST group: <a href="/typography/AboutMST.mspx">how to contact us</a>.</p>
+    </div>
+    <div class="middlerule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType tables</a> | The PCLT table</p>
+    <div class="bottomrule">
+    </div>
+  </body>
+</html>

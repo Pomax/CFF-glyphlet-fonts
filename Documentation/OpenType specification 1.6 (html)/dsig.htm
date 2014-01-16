@@ -1,0 +1,152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+  <head>
+    <title>The Digital Signature Table</title>
+    <link rel="STYLESHEET" href="otspec.css" type="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  </head>
+  <body>
+    <div class="toprule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType tables</a> | The DSIG table</p>
+    <div class="middlerule">
+    </div>
+    <div class="contents">
+      <h1>DSIG - Digital Signature Table</h1>
+      <p>The DSIG table contains the digital signature of the OpenType&trade; font. Signature formats are widely documented and rely on a key pair architecture. Software developers, or publishers posting material on the Internet, create signatures using a private key. Operating systems or applications authenticate the signature using a public key.</p>
+      <p>The W3C and major software and operating system developers have specified security standards that describe signature formats, specify secure collections of web objects, and recommend authentication architecture. OpenType fonts with signatures will support these standards.</p>
+      <p>OpenType fonts offer many security features:</p>
+      <ul>
+        <li>Operating systems and browsing applications can identify the source and integrity of font files before using them,</li>
+        <li>Font developers can specify embedding restrictions in OpenType fonts, and these restrictions cannot be altered in a font signed by the developer.</li>
+      </ul>
+      <p>The enforcement of signatures is an administrative policy, enabled by the operating system. Windows will soon require installed software components, including fonts, to be signed. Internet browsers will also give users and administrators the ability to screen out unsigned objects obtained on-line, including web pages, fonts, graphics, and software components.</p>
+      <p>Anyone can obtain identity certificates and encryption keys from a certifying agency, such as Verisign or GTE's Cybertrust, free or at a very low cost.</p>
+      <p>The DSIG table is organized as follows. The first portion of the table is the header:</p>
+      <table class="gray">
+        <caption>DSIG Header</caption>
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 30%;">Name</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+        <tr>
+          <td>ULONG</td>
+          <td>ulVersion</td>
+          <td>Version number of the DSIG table (0x00000001)</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>usNumSigs</td>
+          <td>Number of signatures in the table</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>usFlag</td>
+          <td>permission flags<br>Bit 0: cannot be resigned<br>Bits 1-7: Reserved (Set to 0)</td>
+        </tr>
+      </table>
+      <p>The version of the DSIG table is expressed as a ULONG, beginning at 0. The version of the DSIG table currently used is version 1 (0x00000001).</p>
+      <p>Permission bit 0 allows a party signing the font to prevent any other parties from also signing the font (counter-signatures). If this bit is set to zero (0) the font may have a signature applied over the existing digital signature(s). A party who wants to ensure that their signature is the last signature can set this bit.</p>
+      <p>The DSIG header information is followed by entries for each of the signatures in the table specifying format and offset information:</p>
+      <table class="gray">
+        <caption>Format/Offset Table</caption>
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 30%;">Name</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+        <tr>
+          <td>ULONG</td>
+          <td>ulFormat</td>
+          <td>format of the signature</td>
+        </tr>
+        <tr>
+          <td>ULONG</td>
+          <td>ulLength</td>
+          <td>Length of signature in bytes</td>
+        </tr>
+        <tr>
+          <td>ULONG</td>
+          <td>ulOffset</td>
+          <td>Offset to the signature block from the beginning of the table</td>
+        </tr>
+      </table>
+      <p>This information is then followed by one or more signature blocks:</p>
+      <table class="gray">
+        <caption>Signature Block</caption>
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 30%;">Name</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>usReserved1</td>
+          <td>Reserved for later use; 0 for now</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>usReserved2</td>
+          <td>Reserved for later use; 0 for now</td>
+        </tr>
+        <tr>
+          <td>ULONG</td>
+          <td>cbSignature</td>
+          <td>Length (in bytes) of the PKCS#7 packet in pbSignature</td>
+        </tr>
+        <tr>
+          <td>BYTE []</td>
+          <td>bSignature</td>
+          <td>PKCS#7 packet</td>
+        </tr>
+      </table>
+      <p>The format identifier specifies both the format of the signature object, as well as the hashing algorithm used to create and authenticate the signature. Currently only one format is defined, but at least one other format will soon be defined to handle subsetting scenarios. Format 1 supports PKCS#7 signatures with X.509 certificates and counter-signatures, as these signatures have been standardized for use by the W3C with the participation of numerous software developers.</p>
+      <p>For more information about PKCS#7 signatures, see <a href="ftp://ftp.rsa.com/pub/pkcs/ascii/pkcs-7.asc">ftp://ftp.rsa.com/pub/pkcs/ascii/pkcs-7.asc</a></p>
+      <p>For more information about counter-signatures, see <a href="ftp://ftp.rsa.com/pub/pkcs/ascii/pkcs-9.asc">ftp://ftp.rsa.com/pub/pkcs/ascii/pkcs-9.asc</a></p>
+      <p>
+        <br>
+        <b>Format 1: For whole fonts, with either TrueType outlines and/or CFF data</b>
+      </p>
+      <p>PKCS#7 or PKCS#9. The signed content digest is created as follows:</p>
+      <ol>
+        <li>If there is an existing DSIG table in the font,
+                <ol><li>Remove DSIG table from font.</li><li>Remove DSIG table entry from sfnt Table Directory.</li><li>Adjust table offsets as necessary.</li><li>Zero out the file checksum in the head table.</li><li>Add the usFlag (reserved, set at 1 for now) to the stream of bytes</li></ol></li>
+        <li>Hash the full stream of bytes using a secure one-way hash (such as MD5) to create the content digest.</li>
+        <li>Create the PKCS#7 signature block using the content digest.</li>
+        <li>Create a new DSIG table containing the signature block.</li>
+        <li>Add the DSIG table to the font, adjusting table offsets as necessary.</li>
+        <li>Add a DSIG table entry to the sfnt Table Directory.</li>
+        <li>Recalculate the checksum in the head table.</li>
+      </ol>
+      <p>Prior to signing a font file, ensure that all the following attributes are true.</p>
+      <ul>
+        <li>The magic number in the head table is correct.</li>
+        <li>Given the number of tables value in the offset table, the other values in the offset table are consistent.</li>
+        <li>The tags of the tables are ordered alphabetically and there are no duplicate tags.</li>
+        <li>The offset of each table is a multiple of 4. (That is, tables are long word aligned.)</li>
+        <li>The first actual table in the file comes immediately after the directory of tables.</li>
+        <li>If the tables are sorted by offset, then for all tables i (where index 0 means the the table with the smallest offset), Offset[i] + Length[i] &lt;= Offset[i+1] and Offset[i] + Length[i] &gt;= Offset[i+1] - 3. In other words, the tables do not overlap, and there are at most 3 bytes of padding between tables.</li>
+        <li>The pad bytes between tables are all zeros.</li>
+        <li>The offset of the last table in the file plus its length is not greater than the size of the file.</li>
+        <li>The checksums of all tables are correct.</li>
+        <li>The head table's checkSumAdjustment field is correct.</li>
+      </ul>
+      <h2>Signatures for TrueType Collections</h2>
+      <p>The DSIG table for a TrueType Collection (TTC) must be the last table in the TTC file. The offset and checksum to the table is put in the TTCHeader (version 2). Signatures of TTC files are expected to be Format 1 signatures.</p>
+      <p>The signature of a TTC file applies to the entire file, not to the individual fonts contained within the TTC. Signing the TTC file ensures that other contents are not added to the TTC.</p>
+      <p>Individual fonts included in a TrueType collection should not be individually signed as the process of making the TTC could invalidate the signature on the font.</p>
+      <hr class="separator">
+      <p class="fineprint">This page was last updated 23 March 2002.</p>
+      <p class="fineprint">&copy; 1998 Microsoft Corporation. All rights reserved. <a href="http://www.microsoft.com/Misc/cpyright.htm">Terms of use</a>.</p>
+      <p class="fineprint">Comments to the MST group: <a href="/typography/AboutMST.mspx">how to contact us</a>.</p>
+    </div>
+    <div class="middlerule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType tables</a> | The DSIG table</p>
+    <div class="bottomrule">
+    </div>
+  </body>
+</html>

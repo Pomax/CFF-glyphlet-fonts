@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+  <head>
+    <title>The Index to Location Table</title>
+    <link rel="STYLESHEET" href="otspec.css" type="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  </head>
+  <body>
+    <div class="toprule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType tables</a> | The loca table</p>
+    <div class="middlerule">
+    </div>
+    <div class="contents">
+      <h1>loca - Index to Location</h1>
+      <p>The indexToLoc table stores the offsets to the locations of the glyphs in the font, relative to the beginning of the glyphData table. In order to compute the length of the last glyph element, there is an extra entry after the last valid index.</p>
+      <p>By definition, index zero points to the &ldquo;missing character,&rdquo; which is the character that appears if a character is not found in the font. The missing character is commonly represented by a blank box or a space. If the font does not contain an outline for the missing character, then the first and second offsets should have the same value. This also applies to any other characters without an outline, such as the space character. If a glyph has no outline, then loca[n] = loca [n+1]. In the particular case of the last glyph(s), loca[n] will be equal the length of the glyph data (<a href="glyf.htm">'glyf'</a>) table. The offsets must be in ascending order with loca[n] &lt;= loca[n+1].</p>
+      <p>Most routines will look at the 'maxp' table to determine the number of glyphs in the font, but the value in the 'loca' table must agree.</p>
+      <p>There are two versions of this table, the short and the long. The version is specified in the indexToLocFormat entry in the 'head' table.</p>
+      <h2>Short version</h2>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 20%;">Name</th>
+          <th style="width: 60%;">Description</th>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>offsets[<i>n</i>]</td>
+          <td>The actual local offset divided by 2 is stored. The value of <i>n</i> is numGlyphs + 1. The value for numGlyphs is found in the 'maxp' table.</td>
+        </tr>
+      </table>
+      <h2>Long version</h2>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 20%;">Name</th>
+          <th style="width: 60%;">Description</th>
+        </tr>
+        <tr>
+          <td>ULONG</td>
+          <td>offsets[<i>n</i>]</td>
+          <td>The actual local offset is stored. The value of <i>n</i> is numGlyphs + 1. The value for numGlyphs is found in the 'maxp' table.</td>
+        </tr>
+      </table>
+      <p>Note that the local offsets should be long-aligned, i.e., multiples of 4. Offsets which are not long-aligned may seriously degrade performance of some processors. </p>
+      <hr class="separator">
+      <p class="fineprint">This page was last updated 19 November 2008.</p>
+      <p class="fineprint">&copy; 2008 Microsoft Corporation. All rights reserved. <a href="http://www.microsoft.com/Misc/cpyright.htm">Terms of use</a>.</p>
+      <p class="fineprint">Comments to the MST group: <a href="/typography/AboutMST.mspx">how to contact us</a>.</p>
+    </div>
+    <div class="middlerule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType tables</a> | The loca table</p>
+    <div class="bottomrule">
+    </div>
+  </body>
+</html>

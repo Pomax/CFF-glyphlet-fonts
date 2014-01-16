@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+  <head>
+    <title>The Maximum Profile Table</title>
+    <link rel="STYLESHEET" href="otspec.css" type="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  </head>
+  <body>
+    <div class="toprule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType tables</a> | The maxp table</p>
+    <div class="middlerule">
+    </div>
+    <div class="contents">
+      <h1>maxp - Maximum Profile</h1>
+      <p>This table establishes the memory requirements for this font. Fonts with CFF data must use Version 0.5 of this table, specifying only the numGlyphs field. Fonts with TrueType outlines must use Version 1.0 of this table, where all data is required.</p>
+      <p>Version 0.5</p>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 30%;">Name</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+        <tr>
+          <td>Fixed</td>
+          <td>Table version number</td>
+          <td>0x00005000 for version 0.5 <br> (Note the difference in the representation of a non-zero fractional part, in Fixed numbers.)</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>numGlyphs</td>
+          <td>The number of glyphs in the font.</td>
+        </tr>
+      </table>
+      <p>Version 1.0</p>
+      <table class="gray">
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 30%;">Name</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+        <tr>
+          <td>Fixed</td>
+          <td>Table version number</td>
+          <td>0x00010000 for version 1.0.</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>numGlyphs</td>
+          <td>The number of glyphs in the font.</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>maxPoints</td>
+          <td>Maximum points in a non-composite glyph.</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>maxContours</td>
+          <td>Maximum contours in a non-composite glyph.</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>maxCompositePoints</td>
+          <td>Maximum points in a composite glyph.</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>maxCompositeContours</td>
+          <td>Maximum contours in a composite glyph.</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>maxZones</td>
+          <td>1 if instructions do not use the twilight zone (Z0), or 2 if instructions do use Z0; should be set to 2 in most cases.</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>maxTwilightPoints</td>
+          <td>Maximum points used in Z0.</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>maxStorage</td>
+          <td>Number of Storage Area locations.</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>maxFunctionDefs</td>
+          <td>Number of FDEFs.</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>maxInstructionDefs</td>
+          <td>Number of IDEFs.</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>maxStackElements</td>
+          <td>Maximum stack depth<sup>2</sup>.</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>maxSizeOfInstructions</td>
+          <td>Maximum byte count for glyph instructions.</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>maxComponentElements</td>
+          <td>Maximum number of components referenced at &ldquo;top level&rdquo; for any composite glyph.</td>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>maxComponentDepth</td>
+          <td>Maximum levels of recursion; 1 for simple components.</td>
+        </tr>
+      </table>
+      <span class="tab">
+        <sup>2</sup>This includes Font and CVT Programs, as well as the instructions for each glyph.</span>
+      <hr class="separator">
+      <p class="fineprint">This page was last updated 20 March 2008.</p>
+      <p class="fineprint">&copy; 2008 Microsoft Corporation. All rights reserved. <a href="http://www.microsoft.com/Misc/cpyright.htm">Terms of use</a>.</p>
+      <p class="fineprint">Comments to the MST group: <a href="/typography/AboutMST.mspx">how to contact us</a>.</p>
+    </div>
+    <div class="middlerule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType tables</a> | The MAXP table</p>
+    <div class="bottomrule">
+    </div>
+  </body>
+</html>

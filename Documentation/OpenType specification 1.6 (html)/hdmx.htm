@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+  <head>
+    <title>Horizontal Device Metrics</title>
+    <link rel="STYLESHEET" href="otspec.css" type="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  </head>
+  <body>
+    <div class="toprule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType Tables</a> | The hdmx Table</p>
+    <div class="middlerule">
+    </div>
+    <div class="contents">
+      <h1>hdmx - Horizontal Device Metrics</h1>
+      <p>The hdmx table relates to OpenType&trade; fonts with TrueType outlines. The Horizontal Device Metrics table stores integer advance widths scaled to particular pixel sizes. This allows the font manager to build integer width tables without calling the scaler for each glyph. Typically this table contains only selected screen sizes. This table is sorted by pixel size. The checksum for this table applies to both subtables listed.</p>
+      <p>Note that for non-square pixel grids, the character width (in pixels) will be used to determine which device record to use. For example, a 12 point character on a device with a resolution of 72x96 would be 12 pixels high and 16 pixels wide. The hdmx device record for 16 pixel characters would be used.</p>
+      <p>If bit 4 of the flag field in the 'head' table is not set, then it is assumed that the font scales linearly; in this case an 'hdmx' table is not necessary and should not be built. If bit 4 of the flag field is set, then one or more glyphs in the font are assumed to scale nonlinearly. In this case, performance can be improved by including the 'hdmx' table with one or more important DeviceRecord's for important sizes. Please see the chapter <a href="recom.htm#hdmx">&ldquo;Recommendations for OpenType Fonts&rdquo;</a> for more detail.</p>
+      <p>The table begins as follows:</p>
+      <table class="gray">
+        <caption>hdmx Header</caption>
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 30%;">Name</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+        <tr>
+          <td>USHORT</td>
+          <td>version</td>
+          <td>Table version number (0)</td>
+        </tr>
+        <tr>
+          <td>SHORT</td>
+          <td>numRecords</td>
+          <td>Number of device records.</td>
+        </tr>
+        <tr>
+          <td>LONG</td>
+          <td>sizeDeviceRecord</td>
+          <td>Size of a device record, long aligned.</td>
+        </tr>
+        <tr>
+          <td>DeviceRecord</td>
+          <td>records[numRecords]</td>
+          <td>Array of device records.</td>
+        </tr>
+      </table>
+      <p>Each DeviceRecord for format 0 looks like this.</p>
+      <table class="gray">
+        <caption>Device Record</caption>
+        <tr>
+          <th style="width: 20%;">Type</th>
+          <th style="width: 30%;">Name</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>pixelSize</td>
+          <td>Pixel size for following widths (as ppem).</td>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>maxWidth</td>
+          <td>Maximum width.</td>
+        </tr>
+        <tr>
+          <td>BYTE</td>
+          <td>widths[numGlyphs]</td>
+          <td>Array of widths (numGlyphs is from the 'maxp' table).</td>
+        </tr>
+      </table>
+      <p>Each DeviceRecord is padded with 0's to make it long word aligned.</p>
+      <p>Each Width value is the width of the particular glyph, in pixels, at the pixels per em (ppem) size listed at the start of the DeviceRecord.</p>
+      <p>The ppem sizes are measured along the y axis. </p>
+      <hr class="separator">
+      <p class="fineprint">This page was last updated 14 October 2002.</p>
+      <p class="fineprint">&copy; 1998 Microsoft Corporation. All rights reserved. <a href="http://www.microsoft.com/Misc/cpyright.htm">Terms of use</a>.</p>
+      <p class="fineprint">Comments to the MST group: <a href="/typography/AboutMST.mspx">how to contact us</a>.</p>
+    </div>
+    <div class="middlerule">
+    </div>
+    <p class="menu">
+      <a href="http://www.microsoft.com/typography/default.mspx">Microsoft Typography</a> | <a href="http://www.microsoft.com/typography/creators.htm">Developer...</a> | <a href="default.htm">OpenType specification</a> | <a href="otff.htm#otttables">OpenType Tables</a> | The hdmx Table</p>
+    <div class="bottomrule">
+    </div>
+  </body>
+</html>
