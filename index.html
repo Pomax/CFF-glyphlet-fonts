@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>test</title>
+<style>
+	table { width: 40%; float:left; font-family: monospace; border-collapse: collapse; width: auto; border: 1px solid gray; }
+	table+table { margin-left: 2em; }
+	table, tr, td { padding: 0; margin : 0 0 1em 0; }
+	tr { margin: -1px 0; }
+	tr:nth-child(2n) { background: rgba(144, 134, 177, 0.15); }
+	td { height: 1.2em; width: 2em; display: table-cell; text-align: center; }
+	td:nth-child(2n) { background: rgba(156, 143, 89, 0.15); }
+	tr:nth-child(4n+1) { border-top: 1px solid rgba(0,100,0,0.2); }
+	td:nth-child(4n+1) { border-left: 1px solid rgba(0,100,0,0.2); }
+	p { clear: both; }
+</style>
+<script src="Tables.js"></script>
+</head>
+<body>
+<h1>Let's make a font</h1>
+
+<p>We all use fonts every day, and we don't even have to bother noticing. Text looks pretty
+(okay, sometimes it looks horrible) and that's pretty much the extent of our interaction with
+fonts. We take them for granted, and that's a good thing: they're not just easy to use, we
+simply don't care how they work because we don't need to. They just work, and we don't have
+to think about whatever complexities are involved in actually getting text styled using a
+specific font.</p>
+
+<p>But, sometimes you want to dive into a subject for a bit to find out how something that
+you take for granted in every day life works. How does your car's engine work? Where does
+milk come from? Why do clocks show 12 instead of 24 steps? Do dolphins even sleep?</p>
+
+<p>Or, in this case, how does a font work? In order to best see how a font works, we're
+actually going to "roll our own" font. And not the simple kind either, we're going to
+make our own OpenType font (if you've ever seen a font file and it ended in .ttf or .otf,
+those are OpenType fonts. It's the defacto standard in font land), using Adobe Type2
+charstrings, which are a very rich —but also generally complex— way to specify vector
+graphics.</p>
+
+<script>
+var asHex = function(v) { v = v.toString(16).toUpperCase(); if(v.length === 1) v = "0" + v; return v; };
+var asChars = function(v) { return String.fromCharCode(v); };
+function makeTable(data, limit) {
+  limit = limit || 16;
+  var table = document.createElement("table");
+  for(var i=0, end = data.length; i*limit<end; i++) {
+    var row = document.createElement("tr");
+    var entries = data.slice(limit*i, limit*(i+1));
+    var addColumn = function(entry) {
+      var column = document.createElement("td");
+      column.innerHTML = entry;
+      row.appendChild(column);
+    };
+    entries.forEach(addColumn);
+    var len = 16 - entries.length;
+    if(len>0) {
+      (new Array(len+1)).join(' ').split('').forEach(addColumn);
+    }
+    table.appendChild(row);
+  }
+  return table;
+};
+var binary = buildFontData();
+var hexmap = binary.map(asHex);
+var charmap = binary.map(asChars);
+document.body.appendChild(makeTable(hexmap));
+document.body.appendChild(makeTable(charmap));
+</script>
+
+<p>The above two tables are fonts. Seriously! The one on the left shows you the bytecode
+for a custom font that was just made, right now, on this page (<em>in fact, if you keep
+your page-reload hotkeys pressed, you'll see two values change, identically, as the number
+of milliseconds since January 1st 1969 increases</em>). On the right the same bytecode has
+been turned into letters, but not every byte has a corresponding letter, because the ANSI
+table for bytes-to-letters doesn't assign a letter to every code. The code 00, for
+instance, has no equivalent letter, while 41 is the letter "A".</p>
+
+</body>
+</html>

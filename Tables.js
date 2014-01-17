@@ -30,14 +30,48 @@ var FWORD = SHORT,
  */
 
 function NUMBER(v) {
-  return [v];
+  if (-107 <= v && v <= 107) {
+    return [v + 139]; }
+  if (108 <= v && v <= 1131) {
+    var b0 = v >> 8,
+        b1 = v - (b0 << 8);
+    return [b0 + 247, b1 - 108]; }
+  if (-1131 <= v && v <= -108) {
+    var v2 = -v - 108,
+        b0 = v2 >> 8,
+        b1 = v2 - (b0 << 8);
+    return [(b0 + 251), b1]; }
+  if (-32768 <= v && v <= 32767) {
+    return [28, (v >> 8) & 0xFF, v & 0xFF]; }
+  return [29, (v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF];
 }
 
-// CFF-specific
+// Validation of the "number" function, values
+// that it should generate are listed as comment.
+if(false) {
+  console.log(NUMBER(0).map(asHex));       // 8b
+  console.log(NUMBER(100).map(asHex));     // ef
+  console.log(NUMBER(-100).map(asHex));    // 27
+  console.log(NUMBER(1000).map(asHex));    // fa 7c
+  console.log(NUMBER(-1000).map(asHex));   // fe 7c
+  console.log(NUMBER(10000).map(asHex));   // 1c 27 10
+  console.log(NUMBER(-10000).map(asHex));  // 1c d8 f0
+  console.log(NUMBER(100000).map(asHex));  // 1d 00 01 86 a0
+  console.log(NUMBER(-100000).map(asHex)); // 1d ff fe 79 60
+}
+
 function OPERAND(v1, v2) {
-  var opcode = [v1];
-  if(v2 !== undefined) { opcode.push(v2); }
+  var opcode = [NUMBER(v1)];
+  if(v2 !== undefined) { opcode.push(NUMBER(v2)); }
   return opcode;
+}
+
+function DICTINSTRUCTION(codes) {
+  var data = [];
+  codes.forEach(function(code) {
+    data = data.concat(NUMBER(code));
+  });
+  return data;
 }
 
 // aliased datatypes
@@ -45,7 +79,7 @@ var GlyphID = USHORT,
     Offset = USHORT,
     Card8 = BYTE,
     Card16 = USHORT,
-    SID = USHORT,
+    SID = NUMBER,
     OffSize = BYTE,
     Offset1 = BYTE,
     Offset2 = USHORT,
@@ -61,20 +95,12 @@ var GlyphID = USHORT,
 // this is the tricky bit: Let's byte-model an entire CFF font!
 // note: The CFF specification is described in Adobe's technical note 5176
 var createCFF = function(label, data) {
-  var asBytes = function(obj) {
-    // form single data block and return
-    var data = [],
-        fn = function(key) { data = data.concat(obj[key]); };
-    Object.keys(obj).forEach(fn);
-    return data;
-  }
 
   // be mindful of the fact that there are 390 predefined strings (see appendix A, pp 29)
   var strings = [
       ["version", CHARARRAY, "font version string; string id 391", "001.000"]
     , ["full name", CHARARRAY, "the font's full name  (id 392)", "custom font"]
     , ["family name", CHARARRAY, "the official font family name (id 393)", "custom"]
-    , ["label", CHARARRAY, "the passed label for this font (id 394)", label]
   ];
 
   // the top dict contains "global" metadata
@@ -84,7 +110,7 @@ var createCFF = function(label, data) {
     , ["family name", DICTINSTRUCTION, "", [SID(393), OPERAND(3)]]
     , ["weight", DICTINSTRUCTION, "", [SID(389), OPERAND(4)]]
     , ["uniqueID", DICTINSTRUCTION, "", [NUMBER(1), OPERAND(13)]]
-    , ["FontBBox", DICTINSTRUCTION, "", [NUMBER(data.xMin), NUMBER(data.yMin), NUMBER(data.xMax) NUMBER(data.yMax), OPERAND(5)]]
+    , ["FontBBox", DICTINSTRUCTION, "", [NUMBER(0), NUMBER(0), NUMBER(0), NUMBER(0), OPERAND(5)]]
     // these two instruction can't be properly asserted until after we pack up the CFF...
     , ["charstrings", DICTINSTRUCTION, "offset to charstrings (from start of file)", [NUMBER(-1), OPERAND(17)]]
     , ["private", DICTINSTRUCTION, "'size of', then 'offset to' (from start of file) the private dict", [NUMBER(-1), NUMBER(-1), OPERAND(18)]]
@@ -94,76 +120,82 @@ var createCFF = function(label, data) {
     // .notdef has an empty glyph outline
       [ ".notdef", DICTINSTRUCTION, "the outline for .notdef", [OPERAND(14)]]
     // our second glyph is non-empty, based on `data`
-    , [ "our letter", DICTINSTRUCTION, "the outline for our own glyph", data.toCharString(SID, NUMBER, OPERAND).concat([OPERAND(14)])
+    , [ "our letter", DICTINSTRUCTION, "the outline for our own glyph", [OPERAND(14)]]
   ];
 
-  var cff = {
-    "header": [
-          ["major", Card8, "major version", 1]
-        , ["minor", Card8, "minor version", 0]
-        , ["length", Card8, "header length in bytes", 4]
-        , ["offSize", OffSize, "how many bytes for an offset value?", 1]
-      ],
+  var generateOffsets = function(records) {
+    var tally = 1,
+        idx = 0,
+        data= [];
+    records.forEach(function(record) {
+      data.push([""+idx++, Offset1, "Offset "+idx, tally]);
+      tally += record.length;
+    });
+    return data;
+  };
 
-      "name index": [
-          ["count", Card16, "number of stored names (We only have one)", 1]
-        , ["offSize", OffSize, "offsets use 1 byte", 1]
-        // there are (count+1) offsets: the first offset is always 1, and the last offset marks the end of the table
-        , ["offset", [
-            ["0", Offset1, "first offset, relative to the byte preceding the data block", 1]
-          , ["1", Offset1, "offset to end of the data block", (1 + "customfont".length)]]]
-        // object data
-        , ["data", CHARARRAY, "we only include one name, namely the compact font name", "customfont"]
-      ],
+  var cff = [
+    ["header", [
+        ["major", Card8, "major version", 1]
+      , ["minor", Card8, "minor version", 0]
+      , ["length", Card8, "header length in bytes", 4]
+      , ["offSize", OffSize, "how many bytes for an offset value?", 1]]
+    ],
 
-      "top dict index": [
-          ["count", Card16, "number of stored indices (We have one)", 1]
-        , ["offSize", OffSize, "offsets use 2 bytes in this index", 2]
-        , ["offset", [
-            ["0", Offset2, "first offset, relative to the byte preceding the data block", 1]
-          , ["1", Offset2, "offset to end of the data block", 1 + top_dict_data.length]]]
-        // actual data is concatenated in:
-      ].concat(top_dict_data),
+    ["name index", [
+        ["count", Card16, "number of stored names (We only have one)", 1]
+      , ["offSize", OffSize, "offsets use 1 byte", 1]
+      // there are (count+1) offsets: the first offset is always 1, and the last offset marks the end of the table
+      , ["offset", [
+          ["0", Offset1, "first offset, relative to the byte preceding the data block", 1]
+        , ["1", Offset1, "offset to end of the data block", (1 + "customfont".length)]]]
+      // object data
+      , ["data", CHARARRAY, "we only include one name, namely the compact font name", "customfont"]]
+    ],
 
-      "string index": [
-          ["", Card16, "number of stored strings", "strings.length"]
-        , ["", OffSize(1, "offsets use 1 byte"]
-        // offset array
-        ["offset", [
-            ["0", Offset1, "first offset", 1]
-          , ["1", Offset1, "second offset", 1 + strings[0].length]
-          , ["2", Offset1, "third offset", 1 + strings[0].length + strings[1].length]
-          , ["3", Offset1, "end of data block", 1 + strings[0].length + strings[1].length + strings[2].length]]]
-        // data is concatenated in:
-      ].concat(strings),
+    ["top dict index", [
+        ["count", Card16, "number of stored indices (We have one)", 1]
+      , ["offSize", OffSize, "offsets use 2 bytes in this index", 2]
+      , ["offset", generateOffsets(top_dict_data)]
+      , ["top dict data", top_dict_data]]
+    ],
 
-      "global subroutine index": [
+    ["string index", [
+        ["count", Card16, "number of stored strings", strings.length]
+      , ["offSize", OffSize, "offsets use 1 byte", 1]
+      , ["offset", generateOffsets(strings)]
+      , ["strings", strings]]
+    ],
+
+    ["global subroutine index", [
         ["count", Card16, "no global subroutines, so count is 0 and there are no further index values", 0]
-      ],
+      ]
+    ],
 
-      // this is the part that actually contains the characters outline data,
-      // encoded as Type 2 charstrings (one charstring per glyph).
-      "charstring index": [
-          ["count", Card16, "two charstrings; .notdef and our glyph", 2],
-        , ["offSize", OffSize, "offsets use 1 byte", 1]
-        , ["offset", [
-          , ["0", Offset1, "first offset", 1]
-          , ["1", Offset1, "second offset", 1 + charstrings[0].length]
-          , ["2", Offset1, "end of data block", 1 + charstrings[0].length + charstrings[1].length]]]
-      ].concat(charstrings),
+    // this is the part that actually contains the characters outline data,
+    // encoded as Type 2 charstrings (one charstring per glyph).
+    ["charstring index", [
+        ["count", Card16, "two charstrings; .notdef and our glyph", 2],
+      , ["offSize", OffSize, "offsets use 1 byte", 1]
+      , ["offset", generateOffsets(charstrings)]
+      , ["charstrings", charstrings]]
+    ],
 
-      "private dict": [
-          ["BlueValues", DICTINSTRUCTION, "empty array (see Type 1 font format, pp 37)", [OPERAND(6)]
-        , ["FamilyBlues", DICTINSTRUCTION, "idem dito", [OPERAND(8)]]
-        , ["StdHW", DICTINSTRUCTION, "dominant horizontal stem width. We set it to 10", [NUMBER(10), OPERAND(10)]]
-        , ["StdVW", DICTINSTRUCTION, "dominant vertical stem width. We set it to 10", [NUMBER(10), OPERAND(11)]]
-      ],
-  }
-  return asBytes(cff);
+    ["private dict", [
+        ["BlueValues", DICTINSTRUCTION, "empty array (see Type 1 font format, pp 37)", [OPERAND(6)]]
+      , ["FamilyBlues", DICTINSTRUCTION, "idem dito", [OPERAND(8)]]
+      , ["StdHW", DICTINSTRUCTION, "dominant horizontal stem width. We set it to 10", [NUMBER(10), OPERAND(10)]]
+      , ["StdVW", DICTINSTRUCTION, "dominant vertical stem width. We set it to 10", [NUMBER(10), OPERAND(11)]]
+      ]
+    ]
+  ];
+  return cff;
 };
 
 // OpenType tables
 var TableModels = {
+  "CFF ": createCFF()
+  ,
   "OS/2": [
       ["version", USHORT, "OS/2 table version 1, because this is a very simple font.", 0x0001]
     , ["xAvgCharWidth", SHORT, "xAvgCharWidth", 0]
@@ -340,48 +372,59 @@ var TableModels = {
  * Generate the font's binary data
  */
 function buildFontData() {
+  const READER = 1;
+  const NESTED_RECORD = 1;
+  const DATA = 3;
+
   var numTables = Object.keys(TableModels).length,
       maxPower = ((Math.log(numTables)/Math.log(2))|0),
       searchRange = Math.pow(2, maxPower) * 16,
       entrySelector = maxPower,
-      rangeShift = numTables * 16 - searchRange;
-
-  var opentype = CHARARRAY("OTTO")
+      rangeShift = numTables * 16 - searchRange,
+      opentype = CHARARRAY("OTTO")
                  .concat(USHORT(numTables))
                  .concat(USHORT(searchRange))
                  .concat(USHORT(entrySelector))
                  .concat(USHORT(rangeShift)),
-      opentype_len = opentype.length;
-
-  var headers = [],
-      headers_len = numTables * 16;
-
-  var fontdata = [];
+      opentype_len = opentype.length,
+      headers = [],
+      headers_len = numTables * 16,
+      fontdata = [];
 
   var processTag = function(tag) {
+    var processRecord = function(record) {
+      if(typeof record[1] === "function") {
+        fontdata = fontdata.concat(record[READER](record[DATA]));
+      }
+      else { record[NESTED_RECORD].forEach(processRecord); }
+    };
+
     var table = TableModels[tag];
     var offset = fontdata.length;
-    var processRecord = function(record) {
-      if(typeof record[1] === "function") { fontdata = fontdata.concat(record[1](record[3])); }
-      else { record[1].forEach(processRecord); }
-    };
     table.forEach(processRecord);
+
     // ensure LONG alignment
     while(fontdata.length % 4 !== 0) { fontdata.push(BYTE(0)); }
+
     var length = fontdata.length - offset;
     var checksum = (function(chunk) {
       var decodeULONG = function(ulong) {
-        // TODO: implement
-        return 0;
+        var b = ulong.split('').map(function(c) {
+          return c.charCodeAt(0);
+        });
+        var val = (b[0] << 24) + (b[1] << 16) + (b[2] << 8) + b[3];
+        if (val < 0 ) { val += Math.pow(2,32); }
+        return val;
       };
+      // ULONG sum the entire chunk
       var tally = 0;
-      var chunks = chunk.join('').match(/.{4}/g);
+      var chunks = chunk.map(function(v) { return String.fromCharCode(v); }).join('').match(/.{4}/g);
       chunks.forEach(function(ulong) {
         tally += decodeULONG(ulong);
       });
-      // ULONG sum the entire chunk
-      return 0;
+      return tally;
     }(fontdata.slice(offset)));
+
     // update OpenType header
     headers = headers.concat(CHARARRAY(tag));
     headers = headers.concat(ULONG(checksum));
@@ -393,16 +436,3 @@ function buildFontData() {
 
   return opentype.concat(headers).concat(fontdata);
 }
-
-var binary = buildFontData();
-var hexmap = binary.map(function(v) { v = v.toString(16).toUpperCase(); if(v.length === 1) v = "0" + v; return v; });
-var charmap = binary.map(function(v) { return String.fromCharCode(v); });
-var print = function(list) {
-  for(var i=0, end = list.length; i*16<end; i++) {
-    console.log(list.slice(16*i, 16*(i+1)));
-  }
-};
-console.log("---as hex map---");
-print(hexmap);
-console.log("---as string---");
-print(charmap);
