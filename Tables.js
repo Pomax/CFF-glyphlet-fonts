@@ -168,8 +168,7 @@ var createCFF = function(label, data) {
     ],
 
     ["global subroutine index", [
-        ["count", Card16, "no global subroutines, so count is 0 and there are no further index values", 0]
-      ]
+        ["count", Card16, "no global subroutines, so count is 0 and there are no further index values", 0]]
     ],
 
     // this is the part that actually contains the characters outline data,
@@ -185,8 +184,7 @@ var createCFF = function(label, data) {
         ["BlueValues", DICTINSTRUCTION, "empty array (see Type 1 font format, pp 37)", [OPERAND(6)]]
       , ["FamilyBlues", DICTINSTRUCTION, "idem dito", [OPERAND(8)]]
       , ["StdHW", DICTINSTRUCTION, "dominant horizontal stem width. We set it to 10", [NUMBER(10), OPERAND(10)]]
-      , ["StdVW", DICTINSTRUCTION, "dominant vertical stem width. We set it to 10", [NUMBER(10), OPERAND(11)]]
-      ]
+      , ["StdVW", DICTINSTRUCTION, "dominant vertical stem width. We set it to 10", [NUMBER(10), OPERAND(11)]]]
     ]
   ];
   return cff;
@@ -310,15 +308,15 @@ var TableModels = {
   ],
   "hmtx": [ // uses struct longHorMetric{USHORT advanceWidth, SHORT lsb}. NOTE: we do not encode any lsb values (which would be SHORT[])
     ["hMetrics", [
-        // first entry longHorMetric (notdef)
-        ["0", [
-            ["advanceWidth", USHORT, "", 0]
-          , ["lsb", SHORT, "", 0]]]
-        // second entry longHorMetric (real glyph)
-      , ["1", [
-            ["advanceWidth", USHORT, "", 0]
-          , ["lsb", SHORT, "", 0]]]]]
-  ],
+      // first entry longHorMetric (notdef)
+      ["0", [
+        ["advanceWidth", USHORT, "", 0]
+      , ["lsb", SHORT, "", 0]]]
+      // second entry longHorMetric (real glyph)
+    , ["1", [
+        ["advanceWidth", USHORT, "", 0]
+      , ["lsb", SHORT, "", 0]]]]]
+],
   "maxp": [
       ["version", FIXED, "table version 1.0", 0x00010000]
     , ["numGlyphs", USHORT, "number of glyphs in the font", 2]
@@ -343,14 +341,14 @@ var TableModels = {
     , ["stringOffset", USHORT, "offset for the string data, relative to the table start", 18],
     // name records: {platform/encoding/language, nameid, length, offset}
     , ["NameRecord", [
-          ["0", [
-              ["platform", USHORT, "unicode", 0]
-            , ["encoding", USHORT, "Unicode 2.0 and onwards semantics, Unicode full repertoire", 4]
-            , ["language", USHORT, "US english, but technically irrelevant for this font", 0x0409]
-            , ["recordID", USHORT, "first record", 1]
-            , ["length", USHORT, "empty string", 0]
-            , ["offset", USHORT, "offset for this string in the string heap", 0]]]]]
-    // and the string data is a single null character
+        ["0", [
+          ["platform", USHORT, "unicode", 0]
+        , ["encoding", USHORT, "Unicode 2.0 and onwards semantics, Unicode full repertoire", 4]
+        , ["language", USHORT, "US english, but technically irrelevant for this font", 0x0409]
+        , ["recordID", USHORT, "first record", 1]
+        , ["length", USHORT, "empty string", 0]
+        , ["offset", USHORT, "offset for this string in the string heap", 0]]]]]
+  // and the string data is a single null character
     , ["stringData", USHORT, "", 0]
   ],
 
