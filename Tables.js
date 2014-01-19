@@ -69,7 +69,7 @@ function OPERAND(v1, v2) {
 function DICTINSTRUCTION(codes) {
   var data = [];
   codes.forEach(function(code) {
-    data = data.concat(NUMBER(code));
+    data = data.concat(code);
   });
   return data;
 }
@@ -148,14 +148,18 @@ var buildFont = function(options) {
   var createCFF = function() {
 
     // helper function
-    var generateOffsets = function(records) {
+    var generateOffsets = function(records, size) {
+      size = size || 1;
       var tally = 1,
           idx = 0,
-          data= [];
+          data= [],
+          bytes;
       records.forEach(function(record) {
-        data.push([""+idx++, Offset1, "Offset "+idx, tally]);
-        tally += record.length;
+        data.push([""+idx++, window["Offset"+size], "Offset "+idx, tally]);
+        bytes = record[1](record[3]);
+        tally += bytes.length;
       });
+      data.push(["last", window["Offset"+size], "last offset", tally]);
       return data;
     };
 
@@ -186,7 +190,7 @@ var buildFont = function(options) {
         // .notdef has an empty glyph outline
         [ ".notdef", DICTINSTRUCTION, "the outline for .notdef", OPERAND(14)]
         // our second glyph is non-empty, based on `data`
-      , [ "our letter", DICTINSTRUCTION, "the outline for our own glyph", options.charstring.concat(OPERAND(14))]
+      , [ "our letter", DICTINSTRUCTION, "the outline for our own glyph", OPERAND(14)]
     ];
 
     var cff = [
@@ -207,15 +211,15 @@ var buildFont = function(options) {
         , ["data", CHARARRAY, "we only include one name, namely the compact font name", "customfont"]
       ]],
       ["top dict index", [
-          ["count", Card16, "number of stored indices (We have one)", 1]
-        , ["offSize", OffSize, "offsets use 2 bytes in this index", 2]
-        , ["offset", generateOffsets(top_dict_data)]
+          ["count", Card16, "number of stored objects", top_dict_data.length]
+        , ["offSize", OffSize, "offsets use 1 bytes in this index", 1]
+        , ["offset", generateOffsets(top_dict_data, 1)]
         , ["top dict data", top_dict_data]
       ]],
       ["string index", [
           ["count", Card16, "number of stored strings", strings.length]
         , ["offSize", OffSize, "offsets use 1 byte", 1]
-        , ["offset", generateOffsets(strings)]
+        , ["offset", generateOffsets(strings, 1)]
         , ["strings", strings]
       ]],
       ["global subroutine index", [
@@ -244,7 +248,7 @@ var buildFont = function(options) {
                                // encoded as Type 2 charstrings (one charstring per glyph).
                                ["count", Card16, "two charstrings; .notdef and our glyph", 2],
                              , ["offSize", OffSize, "offsets use 1 byte", 1]
-                             , ["offset", generateOffsets(charstrings)]
+                             , ["offset", generateOffsets(charstrings, 1)]
                              , ["charstrings", charstrings]
                            ]];
     cff.push(charstring_index);
