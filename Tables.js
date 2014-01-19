@@ -20,10 +20,16 @@ function LONG(v)  {
   return [(v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF];
 }
 
+function LONGDATETIME(v) {
+  // This doesn't actually work in JS. Then again, these values that use
+  // this are irrelevant, too, so we just return a 64bit "zero"
+  return [0,0,0,0,0,0,0,0];
+}
+
+
 // aliased datatypes
 var FWORD = SHORT,
-    UFWORD = USHORT,
-    LONGDATETIME = ULONG;
+    UFWORD = USHORT;
 
 /**
  * CFF data types
@@ -310,7 +316,7 @@ var buildFont = function(options) {
       , ["usLastCharIndex", USHORT, "last character to be in this font", 0x41]
       , ["sTypoAscender", SHORT, "typographic ascender", 1024]
       , ["sTypoDescender", SHORT, "typographic descender", 0]
-      , ["sTypoLineGap", SHORT, "line gap", 0]
+      , ["sTypoLineGap", SHORT, "line gap", options.quadSize]
       , ["usWinAscent", USHORT, "usWinAscent", 1024]
       , ["usWinDescent", USHORT, , "usWinDescent", 0]
       , ["ulCodePageRange1", ULONG, "", 0]
@@ -327,7 +333,7 @@ var buildFont = function(options) {
       // subtable start
       , ["subtable format 4", [
           ["format", USHORT, "format 4 subtable", 4]
-        , ["length", USHORT, "table length", 0x20]
+        , ["length", USHORT, "table length in bytes", 30]
         , ["language", USHORT, "language", 0]
         , ["segCountX2", USHORT, "2x segment count; we only have one segment", 2]
         , ["searchRange", USHORT, "search range: 2 * (2^floor(log2(segCount)))", 2]
@@ -343,9 +349,13 @@ var buildFont = function(options) {
             ["characterCode ", USHORT, "the letter 'A', for now", 0x41]
           , ["characterCode ", USHORT, "array terminator 0xFFFF", 0xFFFF]]]
         // the following two values are val[segcount]
-        , ["idDelta", USHORT, "delta for segment (only 1 segment = only 1 value)", 1]
-        , ["idRangeOffset", USHORT, "range offset for segment (only 1 segment = only 1 value)", 0]
-        , ["glyphIdArray", USHORT, "glyph id array", 0]
+        , ["idDelta", [
+            ["0", USHORT, "delta for segment 1", 1]
+        ]]
+        , ["idRangeOffset", [
+            ["0", USHORT, "range offset for segment 1", 0]
+        ]]
+        , ["glyphIdArray", USHORT, "glyph id array. We only have one glyph, with id=1", 1]
       ]]
     ],
     "head": [
@@ -355,8 +365,8 @@ var buildFont = function(options) {
       , ["magicNumber", ULONG, "OpenType magic number, used to verify this is, in fact, an OpenType font", 0x5F0F3CF5]
       , ["flags", USHORT, "flags, see http://www.microsoft.com/typography/otspec/head.htm", 0]
       , ["unitsPerEm", USHORT, "units per EM, we go with 1024 (ttf default. cff is usually 2000 instead)", 1024]
-      , ["created", LONGDATETIME, "date created", (Date.now()/1000)|0]
-      , ["modified", LONGDATETIME, "date modified", (Date.now()/1000)|0]
+      , ["created", LONGDATETIME, "date created", 0]
+      , ["modified", LONGDATETIME, "date modified", 0]
       , ["xMin", SHORT, "global xMin", options.xMin]
       , ["yMin", SHORT, "global yMin", options.yMin]
       , ["xMax", SHORT, "global xMax", options.xMax]
@@ -371,13 +381,14 @@ var buildFont = function(options) {
         ["version", FIXED, "table version", 0x00010000]
       , ["Ascender", FWORD, "typographic ascender", options.yMax]
       , ["Descender", FWORD, "typographic descender", options.yMin]
-      , ["LineGap", UFWORD, "Typographic line gap", options.quad]
+      , ["LineGap", UFWORD, "Typographic line gap", options.quadSize]
       , ["advanceWidthMax", FWORD, "Maximum advance width value in 'hmtx' table.", options.xMax - options.xMin]
       , ["minLeftSideBearing", FWORD, "Minimum left sidebearing value in 'hmtx' table.", 0]
       , ["minRightSideBearing", FWORD, "Minimum right sidebearing value; calculated as Min(aw - lsb - (xMax - xMin)).", 0]
       , ["xMaxExtent", FWORD, "Max(lsb + (xMax - xMin))", options.xMax - options.xMin]
       , ["caretSlopeRise", SHORT, "Used to calculate the slope of the cursor (rise/run); 1 for vertical.", 0]
-      , ["caretSlopeRun", SHORT, "The amount by which a slanted highlight on a glyph needs to be shifted to produce the best appearance. Set to 0 for non-slanted fonts", 0]
+      , ["caretSlopeRun", SHORT, "0 for vertical.", 0]
+      , ["caretOffset", SHORT, "The amount by which a slanted highlight on a glyph needs to be shifted to produce the best appearance. Set to 0 for non-slanted fonts", 0]
       , ["_reserved1", SHORT, "reserved; must be 0", 0]
       , ["_reserved2", SHORT, "reserved; must be 0", 0]
       , ["_reserved3", SHORT, "reserved; must be 0", 0]
@@ -439,7 +450,7 @@ var buildFont = function(options) {
       , ["italicAngle", FIXED, "", 0]
       , ["underlinePosition", FWORD, "", 0]
       , ["underlineThickness", FWORD, "", 0]
-      , ["isFixedPitch", ULONG, "", 0]
+      , ["isFixedPitch", ULONG, "", 1]
       , ["minMemType42", ULONG, "", 0]
       , ["maxMemType42", ULONG, "", 0]
       , ["minMemType1", ULONG, "", 0]
