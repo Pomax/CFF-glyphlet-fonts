@@ -61,8 +61,8 @@ if(false) {
 }
 
 function OPERAND(v1, v2) {
-  var opcode = [NUMBER(v1)];
-  if(v2 !== undefined) { opcode.push(NUMBER(v2)); }
+  var opcode = NUMBER(v1);
+  if(v2 !== undefined) { opcode.concat(NUMBER(v2)); }
   return opcode;
 }
 
@@ -86,351 +86,462 @@ var GlyphID = USHORT,
     Offset3 = UINT24,
     Offset4 = ULONG;
 
-/**
- * Font structure models
- */
-
-// Type2 font as a CFF data block
-
-// this is the tricky bit: Let's byte-model an entire CFF font!
-// note: The CFF specification is described in Adobe's technical note 5176
-var createCFF = function(label, data) {
-
-  // be mindful of the fact that there are 390 predefined strings (see appendix A, pp 29)
-  var strings = [
-      ["version", CHARARRAY, "font version string; string id 391", "001.000"]
-    , ["full name", CHARARRAY, "the font's full name  (id 392)", "custom font"]
-    , ["family name", CHARARRAY, "the official font family name (id 393)", "custom"]
-  ];
-
-  // the top dict contains "global" metadata
-  var top_dict_data = [
-      ["version", DICTINSTRUCTION, "", [SID(391), OPERAND(0)]]
-    , ["full name", DICTINSTRUCTION, "", [SID(392), OPERAND(2)]]
-    , ["family name", DICTINSTRUCTION, "", [SID(393), OPERAND(3)]]
-    , ["weight", DICTINSTRUCTION, "", [SID(389), OPERAND(4)]]
-    , ["uniqueID", DICTINSTRUCTION, "", [NUMBER(1), OPERAND(13)]]
-    , ["FontBBox", DICTINSTRUCTION, "", [NUMBER(0), NUMBER(0), NUMBER(0), NUMBER(0), OPERAND(5)]]
-    // these two instruction can't be properly asserted until after we pack up the CFF...
-    , ["charstrings", DICTINSTRUCTION, "offset to charstrings (from start of file)", [NUMBER(-1), OPERAND(17)]]
-    , ["private", DICTINSTRUCTION, "'size of', then 'offset to' (from start of file) the private dict", [NUMBER(-1), NUMBER(-1), OPERAND(18)]]
-  ];
-
-  var charstrings = [
-    // .notdef has an empty glyph outline
-      [ ".notdef", DICTINSTRUCTION, "the outline for .notdef", [OPERAND(14)]]
-    // our second glyph is non-empty, based on `data`
-    , [ "our letter", DICTINSTRUCTION, "the outline for our own glyph", [OPERAND(14)]]
-  ];
-
-  var generateOffsets = function(records) {
-    var tally = 1,
-        idx = 0,
-        data= [];
-    records.forEach(function(record) {
-      data.push([""+idx++, Offset1, "Offset "+idx, tally]);
-      tally += record.length;
-    });
-    return data;
-  };
-
-  var cff = [
-    ["header", [
-        ["major", Card8, "major version", 1]
-      , ["minor", Card8, "minor version", 0]
-      , ["length", Card8, "header length in bytes", 4]
-      , ["offSize", OffSize, "how many bytes for an offset value?", 1]]
-    ],
-
-    ["name index", [
-        ["count", Card16, "number of stored names (We only have one)", 1]
-      , ["offSize", OffSize, "offsets use 1 byte", 1]
-      // there are (count+1) offsets: the first offset is always 1, and the last offset marks the end of the table
-      , ["offset", [
-          ["0", Offset1, "first offset, relative to the byte preceding the data block", 1]
-        , ["1", Offset1, "offset to end of the data block", (1 + "customfont".length)]]]
-      // object data
-      , ["data", CHARARRAY, "we only include one name, namely the compact font name", "customfont"]]
-    ],
-
-    ["top dict index", [
-        ["count", Card16, "number of stored indices (We have one)", 1]
-      , ["offSize", OffSize, "offsets use 2 bytes in this index", 2]
-      , ["offset", generateOffsets(top_dict_data)]
-      , ["top dict data", top_dict_data]]
-    ],
-
-    ["string index", [
-        ["count", Card16, "number of stored strings", strings.length]
-      , ["offSize", OffSize, "offsets use 1 byte", 1]
-      , ["offset", generateOffsets(strings)]
-      , ["strings", strings]]
-    ],
-
-    ["global subroutine index", [
-        ["count", Card16, "no global subroutines, so count is 0 and there are no further index values", 0]]
-    ],
-
-    // this is the part that actually contains the characters outline data,
-    // encoded as Type 2 charstrings (one charstring per glyph).
-    ["charstring index", [
-        ["count", Card16, "two charstrings; .notdef and our glyph", 2],
-      , ["offSize", OffSize, "offsets use 1 byte", 1]
-      , ["offset", generateOffsets(charstrings)]
-      , ["charstrings", charstrings]]
-    ],
-
-    ["private dict", [
-        ["BlueValues", DICTINSTRUCTION, "empty array (see Type 1 font format, pp 37)", [OPERAND(6)]]
-      , ["FamilyBlues", DICTINSTRUCTION, "idem dito", [OPERAND(8)]]
-      , ["StdHW", DICTINSTRUCTION, "dominant horizontal stem width. We set it to 10", [NUMBER(10), OPERAND(10)]]
-      , ["StdVW", DICTINSTRUCTION, "dominant vertical stem width. We set it to 10", [NUMBER(10), OPERAND(11)]]]
-    ]
-  ];
-  return cff;
-};
-
-// OpenType tables
-var TableModels = {
-  "CFF ": createCFF()
-  ,
-  "OS/2": [
-      ["version", USHORT, "OS/2 table version 1, because this is a very simple font.", 0x0001]
-    , ["xAvgCharWidth", SHORT, "xAvgCharWidth", 0]
-    , ["usWeightClass", USHORT, "usWeightClass", 0x2000]
-    , ["usWidthClass", USHORT, "usWidthClass", 1]
-    , ["fsType", USHORT, "fsType", 0]
-    , ["ySubscriptXSize", SHORT, "", 0]
-    , ["ySubscriptYSize", SHORT, "", 0]
-    , ["ySubscriptXOffset", SHORT, "", 0]
-    , ["ySubscriptYOffset", SHORT, "", 0]
-    , ["ySuperscriptXSize", SHORT, "", 0]
-    , ["ySuperscriptYSize", SHORT, "", 0]
-    , ["ySuperscriptXOffset", SHORT, "", 0]
-    , ["ySuperscriptYOffset", SHORT, "", 0]
-    , ["yStrikeoutSize", SHORT, "", 0]
-    , ["yStrikeoutPosition", SHORT, "", 0]
-    , ["sFamilyClass", SHORT, "sFamilyClass", 0]
-    , ["bFamilyType", BYTE, "", 0]
-    , ["bSerifStyle", BYTE, "", 0]
-    , ["bWeight", BYTE, "", 0]
-    , ["bProportion", BYTE, "", 0]
-    , ["bContrast", BYTE, "", 0]
-    , ["bStrokeVariation", BYTE, "", 0]
-    , ["bArmStyle", BYTE, "", 0]
-    , ["bLetterform", BYTE, "", 0]
-    , ["bMidline", BYTE, "", 0]
-    , ["bXHeight", BYTE, "", 0]
-    , ["ulUnicodeRange1", ULONG, "", 0]
-    , ["ulUnicodeRange2", ULONG, "", 0]
-    , ["ulUnicodeRange3", ULONG, "", 0]
-    , ["ulUnicodeRange4", ULONG, "", 0]
-    , ["achVendID", CHARARRAY, "vendor id", "noop"]
-    , ["fsSelection", USHORT, "font selection flag: bit 6 (lsb=0) is high, to indicate 'regular font'.", 0x40]
-    , ["usFirstCharIndex", USHORT, "first character to be in this font", 0x41]
-    , ["usLastCharIndex", USHORT, "last character to be in this font", 0x41]
-    , ["sTypoAscender", SHORT, "typographic ascender", 1024]
-    , ["sTypoDescender", SHORT, "typographic descender", 0]
-    , ["sTypoLineGap", SHORT, "line gap", 0]
-    , ["usWinAscent", USHORT, "usWinAscent", 1024]
-    , ["usWinDescent", USHORT, , "usWinDescent", 0]
-    , ["ulCodePageRange1", ULONG, "", 0]
-    , ["ulCodePageRange2", ULONG, "", 0]
-  ],
-  "cmap": [
-      ["version", USHORT, "table version", 0]
-    , ["numTables", USHORT, "number of subtables", 1]
-    // Note that we're hard-wiring cmap here for a single table.
-    // this is NOT the usual layout for a cmap table!
-    , ["platformID", USHORT, "platform", 3] // windows
-    , ["encodingID", USHORT, "encoding", 1] // default Unicode BMP (UCS-2)
-    , ["offset", ULONG, "table offset from cmap-start", 12]
-    // subtable start
-    , ["subtable", [
-        ["format", USHORT, "format 4 subtable", 4]
-      , ["length", USHORT, "table length", 0x20]
-      , ["language", USHORT, "language", 0]
-      , ["segCountX2", USHORT, "2x segment count; we only have one segment", 2]
-      , ["searchRange", USHORT, "search range: 2 * (2^floor(log2(segCount)))", 2]
-      , ["entrySelector", USHORT, "entry selector: log2(searchRange/2)", 0]
-      , ["rangeShift", USHORT, "range shift: 2x segment count - search range", 0]
-      // endCount[segCount]
-      , ["endCount", [
-          ["characterCode ", USHORT, "the letter 'A', for now", 0x41]
-        , ["characterCode ", USHORT, "array terminator 0xFFFF", 0xFFFF]]]
-      , ["reservedPad", USHORT, "a 'reserve pad' value; must be 0", 0]
-      // startCount[segCount]
-      , ["startCount", [
-          ["characterCode ", USHORT, "the letter 'A', for now", 0x41]
-        , ["characterCode ", USHORT, "array terminator 0xFFFF", 0xFFFF]]]
-      // the following two values are val[segcount]
-      , ["idDelta", USHORT, "delta for segment (only 1 segment = only 1 value)", 1]
-      , ["idRangeOffset", USHORT, "range offset for segment (only 1 segment = only 1 value)", 0]
-      , ["glyphIdArray", USHORT, "glyph id array", 0]
-    ]]
-  ],
-  "head": [
-      ["version", FIXED, "table version", 0x00010000]
-    , ["fontRevision", FIXED, "font version", 1]
-    , ["checkSumAdjustment", ULONG, "0xB1B0AFBA minus (sum of entire font as ULONGs)", 0]
-    , ["magicNumber", ULONG, "OpenType magic number, used to verify this is, in fact, an OpenType font", 0x5F0F3CF5]
-    , ["flags", USHORT, "flags, see http://www.microsoft.com/typography/otspec/head.htm", 0]
-    , ["unitsPerEm", USHORT, "units per EM, we go with 1024 (ttf default. cff is usually 2000 instead)", 1024]
-    , ["created", LONGDATETIME, "date created", Date.now()]
-    , ["modified", LONGDATETIME, "date modified", Date.now()]
-    , ["xMin", SHORT, "global xMin", 0]
-    , ["yMin", SHORT, "global yMin", 0]
-    , ["xMax", SHORT, "global xMax", 0]
-    , ["yMax", SHORT, "global yMax", 0]
-    , ["macStyle", USHORT, "font style, according to old Apple mac rules", 0]
-    , ["lowestRecPPEM", USHORT, "smallest readable size in pixels. We claim 8px for no real reason", 8]
-    , ["fontDirectionHint", SHORT, "deprecated value (font direction hint). must be 0x0002", 2]
-    , ["indexToLocFormat", SHORT, "offset datatype (we use 0, for SHORT offsets", 0]
-    , ["glyphDataFormat", SHORT, "glyph data format. default value = 0", 0]
-  ],
-  "hhea": [
-      ["version", FIXED, "table version", 0x00010000]
-    , ["Ascender", FWORD, "typographic ascender", 0]
-    , ["Descender", FWORD, "typographic descender", 0]
-    , ["LineGap", UFWORD, "Maximum advance width value in 'hmtx' table", 0]
-    , ["advanceWidthMax", FWORD, "Maximum advance width value in 'hmtx' table.", 0]
-    , ["minLeftSideBearing", FWORD, "Minimum left sidebearing value in 'hmtx' table.", 0]
-    , ["minRightSideBearing", FWORD, "Minimum right sidebearing value; calculated as Min(aw - lsb - (xMax - xMin)).", 0]
-    , ["xMaxExtent", FWORD, "Max(lsb + (xMax - xMin))", 0]
-    , ["caretSlopeRise", SHORT, "Used to calculate the slope of the cursor (rise/run); 1 for vertical.", 0]
-    , ["caretSlopeRun", SHORT, "The amount by which a slanted highlight on a glyph needs to be shifted to produce the best appearance. Set to 0 for non-slanted fonts", 0]
-    , ["_reserved1", SHORT, "reserved; must be 0", 0]
-    , ["_reserved2", SHORT, "reserved; must be 0", 0]
-    , ["_reserved3", SHORT, "reserved; must be 0", 0]
-    , ["_reserved4", SHORT, "reserved; must be 0", 0]
-    , ["metricDataFormat", SHORT, "metricDataFormat, 0 for current format", 0]
-    , ["numberOfHMetrics", USHORT, "number of hMetric entries. We only encode 1 glyph, so there are 2: one for .notdef, and one for our real glyph", 2]
-  ],
-  "hmtx": [ // uses struct longHorMetric{USHORT advanceWidth, SHORT lsb}. NOTE: we do not encode any lsb values (which would be SHORT[])
-    ["hMetrics", [
-      // first entry longHorMetric (notdef)
-      ["0", [
-        ["advanceWidth", USHORT, "", 0]
-      , ["lsb", SHORT, "", 0]]]
-      // second entry longHorMetric (real glyph)
-    , ["1", [
-        ["advanceWidth", USHORT, "", 0]
-      , ["lsb", SHORT, "", 0]]]]]
-],
-  "maxp": [
-      ["version", FIXED, "table version 1.0", 0x00010000]
-    , ["numGlyphs", USHORT, "number of glyphs in the font", 2]
-    , ["maxPoints", USHORT, "maximum points in a non-composite glyph", 3]
-    , ["maxContours", USHORT, "Maximum contours in a non-composite glyph", 1]
-    , ["maxCompositePoints", USHORT, "Maximum points in a composite glyph", 0]
-    , ["maxCompositeContours", USHORT, "Maximum contours in a composite glyph", 0]
-    , ["maxZones", USHORT, "number of twilight zones. 1 = no twilight zone (Z0). default = 2", 2]
-    // the rest of this table can be all zeroes. It's mostly TTF related and this is a CFF font.
-    , ["maxTwilightPoints", USHORT, "", 0]
-    , ["maxStorage", USHORT, "", 0]
-    , ["maxFunctionDefs", USHORT, "", 0]
-    , ["maxInstructionDefs", USHORT, "", 0]
-    , ["maxStackElements", USHORT, "", 0]
-    , ["maxSizeOfInstructions", USHORT, "", 0]
-    , ["maxComponentElements", USHORT, "", 0]
-    , ["maxComponentDepth", USHORT, "", 0]
-  ],
-  "name": [
-      ["format", USHORT, "format 0", 0]
-    , ["count", USHORT, "number of name records", 2]
-    , ["stringOffset", USHORT, "offset for the string data, relative to the table start", 18],
-    // name records: {platform/encoding/language, nameid, length, offset}
-    , ["NameRecord", [
-        ["0", [
-          ["platform", USHORT, "unicode", 0]
-        , ["encoding", USHORT, "Unicode 2.0 and onwards semantics, Unicode full repertoire", 4]
-        , ["language", USHORT, "US english, but technically irrelevant for this font", 0x0409]
-        , ["recordID", USHORT, "first record", 1]
-        , ["length", USHORT, "empty string", 0]
-        , ["offset", USHORT, "offset for this string in the string heap", 0]]]]]
-  // and the string data is a single null character
-    , ["stringData", USHORT, "", 0]
-  ],
-
-  // I hate this table. It's only relevant to printing, which we don't care about.
-  "post": [
-      ["version", FIXED, "most recent post table format", 0x00030000]
-    , ["italicAngle", FIXED, "", 0]
-    , ["underlinePosition", FWORD, "", 0]
-    , ["underlineThickness", FWORD, "", 0]
-    , ["isFixedPitch", ULONG, "", 0]
-    , ["minMemType42", ULONG, "", 0]
-    , ["maxMemType42", ULONG, "", 0]
-    , ["minMemType1", ULONG, "", 0]
-    , ["maxMemType1", ULONG, "", 0]
-  ]
-};
+const LABEL = 0;
+const READER = 1;
+const NESTED_RECORD = 1;
+const DATA = 3;
 
 /**
- * Generate the font's binary data
+ * Serialise a record structure into byte code
  */
-function buildFontData() {
-  const READER = 1;
-  const NESTED_RECORD = 1;
-  const DATA = 3;
-
-  var numTables = Object.keys(TableModels).length,
-      maxPower = ((Math.log(numTables)/Math.log(2))|0),
-      searchRange = Math.pow(2, maxPower) * 16,
-      entrySelector = maxPower,
-      rangeShift = numTables * 16 - searchRange,
-      opentype = CHARARRAY("OTTO")
-                 .concat(USHORT(numTables))
-                 .concat(USHORT(searchRange))
-                 .concat(USHORT(entrySelector))
-                 .concat(USHORT(rangeShift)),
-      opentype_len = opentype.length,
-      headers = [],
-      headers_len = numTables * 16,
-      fontdata = [];
-
-  var processTag = function(tag) {
-    var processRecord = function(record) {
-      if(typeof record[1] === "function") {
-        fontdata = fontdata.concat(record[READER](record[DATA]));
+var serialize = function(record) {
+  var data = [];
+  (function _serialize(record) {
+    if (typeof record[LABEL] !== "string") {
+      record.forEach(_serialize);
+    }
+    else if (typeof record[READER] === "function") {
+      data = data.concat(record[READER](record[DATA]));
+    }
+    else {
+      var nested = record[NESTED_RECORD];
+      if(nested instanceof Array) {
+        _serialize(nested);
       }
-      else { record[NESTED_RECORD].forEach(processRecord); }
+      else {
+        throw new Error("what?");
+      }
+    }
+  }(record));
+  return data;
+};
+
+/**
+ * Create a font. Options:
+ * {
+ *   name: "glyph name"
+ *   outline: "SVG outline string"
+ *   quadSize: <num>
+ *   fontname: "simple font name. No spaces or special characters"
+ * }
+ */
+var buildFont = function(options) {
+
+  // make sure the options are good.
+  if(!options.outline) { throw new Error("No outline was passed to build a font for"); }
+  options.name = options.name || "A";
+  options.quadSize = options.quadSize || 1024;
+  options.fontname = options.fontname || "custom";
+  (function convertOutline(options) {
+    var outline = options.outline;
+    var sections = outline.match(/[MmLlCcAaZ]\s*(\d+\s+)*/g).map(function(s){return s.trim()});
+    options.xMin = 0;
+    options.yMin = 0;
+    options.xMax = 0;
+    options.yMax = 0;
+    options.charstring = [];
+  }(options));
+
+
+  // Type2 font as a CFF data block
+  // note: The CFF specification is described in Adobe's technical note 5176
+  var createCFF = function() {
+
+    // helper function
+    var generateOffsets = function(records) {
+      var tally = 1,
+          idx = 0,
+          data= [];
+      records.forEach(function(record) {
+        data.push([""+idx++, Offset1, "Offset "+idx, tally]);
+        tally += record.length;
+      });
+      return data;
     };
 
-    var table = TableModels[tag];
-    var offset = fontdata.length;
-    table.forEach(processRecord);
+    // be mindful of the fact that there are 390 predefined strings (see appendix A, pp 29)
+    var strings = [
+        ["version", CHARARRAY, "font version string; string id 391", "001.000"]
+      , ["full name", CHARARRAY, "the font's full name  (id 392)", options.fontname]
+      //, ["family name", CHARARRAY, "Instead of the familyname, we'll reuse the full name.", options.fontname]
+    ];
 
-    // ensure LONG alignment
-    while(fontdata.length % 4 !== 0) { fontdata.push(BYTE(0)); }
+    // the top dict contains "global" metadata
+    var top_dict_data = [
+        ["version", DICTINSTRUCTION, "", SID(391).concat(OPERAND(0))]
+      , ["full name", DICTINSTRUCTION, "", SID(392).concat(OPERAND(2))]
+      , ["family name", DICTINSTRUCTION, "here we point to the same string as for full name", SID(392).concat(OPERAND(3))]
+      , ["weight", DICTINSTRUCTION, "", SID(389).concat(OPERAND(4))]
+      , ["uniqueID", DICTINSTRUCTION, "", NUMBER(1).concat(OPERAND(13))]
+      , ["FontBBox", DICTINSTRUCTION, "",
+          NUMBER(options.xMin).concat(NUMBER(options.yMin)).concat(NUMBER(options.xMax)).concat(NUMBER(options.yMax)).concat(OPERAND(5))
+      ]
+      // these two instruction can't be properly asserted until after we pack up the CFF, so we use placeholder values
+      , ["charstrings", DICTINSTRUCTION, "offset to charstrings (from start of file)", [0x00, 0x00]]
+      , ["private", DICTINSTRUCTION, "'size of', then 'offset to' (from start of file) the private dict", [0x00, 0x00, 0x00]
+    ]];
 
-    var length = fontdata.length - offset;
-    var checksum = (function(chunk) {
-      var decodeULONG = function(ulong) {
-        var b = ulong.split('').map(function(c) {
-          return c.charCodeAt(0);
-        });
-        var val = (b[0] << 24) + (b[1] << 16) + (b[2] << 8) + b[3];
-        if (val < 0 ) { val += Math.pow(2,32); }
-        return val;
-      };
-      // ULONG sum the entire chunk
-      var tally = 0;
-      var chunks = chunk.map(function(v) { return String.fromCharCode(v); }).join('').match(/.{4}/g);
-      chunks.forEach(function(ulong) {
-        tally += decodeULONG(ulong);
-      });
-      return tally;
-    }(fontdata.slice(offset)));
+    // the character outlines for .notdef and our custom glyph
+    var charstrings = [
+        // .notdef has an empty glyph outline
+        [ ".notdef", DICTINSTRUCTION, "the outline for .notdef", OPERAND(14)]
+        // our second glyph is non-empty, based on `data`
+      , [ "our letter", DICTINSTRUCTION, "the outline for our own glyph", options.charstring.concat(OPERAND(14))]
+    ];
 
-    // update OpenType header
-    headers = headers.concat(CHARARRAY(tag));
-    headers = headers.concat(ULONG(checksum));
-    headers = headers.concat(ULONG(opentype_len + headers_len + offset));
-    headers = headers.concat(ULONG(length));
+    var cff = [
+      ["header", [
+          ["major", Card8, "major version", 1]
+        , ["minor", Card8, "minor version", 0]
+        , ["length", Card8, "header length in bytes", 4]
+        , ["offSize", OffSize, "how many bytes for an offset value?", 1]
+      ]],
+      ["name index", [
+          ["count", Card16, "number of stored names (We only have one)", 1]
+        , ["offSize", OffSize, "offsets use 1 byte", 1]
+          // there are (count+1) offsets: the first offset is always 1, and the last offset marks the end of the table
+        , ["offset", [
+            ["0", Offset1, "first offset, relative to the byte preceding the data block", 1]
+          , ["1", Offset1, "offset to end of the data block", (1 + "customfont".length)]]]
+          // object data
+        , ["data", CHARARRAY, "we only include one name, namely the compact font name", "customfont"]
+      ]],
+      ["top dict index", [
+          ["count", Card16, "number of stored indices (We have one)", 1]
+        , ["offSize", OffSize, "offsets use 2 bytes in this index", 2]
+        , ["offset", generateOffsets(top_dict_data)]
+        , ["top dict data", top_dict_data]
+      ]],
+      ["string index", [
+          ["count", Card16, "number of stored strings", strings.length]
+        , ["offSize", OffSize, "offsets use 1 byte", 1]
+        , ["offset", generateOffsets(strings)]
+        , ["strings", strings]
+      ]],
+      ["global subroutine index", [
+          ["count", Card16, "no global subroutines, so count is 0 and there are no further index values", 0]
+      ]]
+    ];
+
+    // And here's a part I don't like about CFF, from a byte design point of view. The
+    // top dict data contains offsets to the charstring inedx and private dict, and that's
+    // all well and good, but those values are not known until the font is actually serialised.
+    // However, when we do that, the value that we end up encoding can change the offset,
+    // so we need to serialise, encode, see if the offset changed, and then RE-encode.
+
+    // initial guess
+    var charstring_index_offset = serialize(cff).length;
+    top_dict_data[6][3] = NUMBER(charstring_index_offset).concat(OPERAND(17));
+
+    // after writing the value, the offset may have changed by up to four bytes!
+    // so we need to redo the evaluation + offset recording the whole thing. Yay.
+    charstring_index_offset = serialize(cff).length;
+    top_dict_data[6][3] = NUMBER(charstring_index_offset).concat(OPERAND(17));
+
+    // then we add the charstring index.
+    var charstring_index = ["charstring index", [
+                               // this is the part that actually contains the characters outline data,
+                               // encoded as Type 2 charstrings (one charstring per glyph).
+                               ["count", Card16, "two charstrings; .notdef and our glyph", 2],
+                             , ["offSize", OffSize, "offsets use 1 byte", 1]
+                             , ["offset", generateOffsets(charstrings)]
+                             , ["charstrings", charstrings]
+                           ]];
+    cff.push(charstring_index);
+
+    // then we do the private dict section:
+    var private_dict = ["private dict", [
+                           ["BlueValues", DICTINSTRUCTION, "empty array (see Type 1 font format, pp 37)", [OPERAND(6)]]
+                         , ["FamilyBlues", DICTINSTRUCTION, "idem dito", [OPERAND(8)]]
+                         , ["StdHW", DICTINSTRUCTION, "dominant horizontal stem width. We set it to 10", NUMBER(10).concat(OPERAND(10))]
+                         , ["StdVW", DICTINSTRUCTION, "dominant vertical stem width. We set it to 10", NUMBER(10).concat(OPERAND(11))]
+                       ]];
+
+    var private_dict_offset = serialize(cff).length;
+    var private_dict_length = serialize(private_dict).length;
+    top_dict_data[7][3] = NUMBER(private_dict_offset).concat(NUMBER(private_dict_length)).concat(OPERAND(18));
+
+    // then we add the private dict
+    cff.push(private_dict);
+
+    // but of course, we need to redo the offset calculation, in case private_dict_length is more than one byte.
+    var new_private_dict_offset = serialize(cff).length;
+    top_dict_data[7][3] = NUMBER(new_private_dict_offset).concat(NUMBER(private_dict_length)).concat(OPERAND(18));
+
+    // But guess what? This may have changed the offset for the charstring index, too!
+    var diff = private_dict_offset - new_private_dict_offset;
+    if(diff > 0) {
+      var cl1 = NUMBER(charstring_index_offset).length;
+      top_dict_data[6][3] = NUMBER(charstring_index_offset + diff).concat(OPERAND(17));
+
+      // What, you thought we were done? THAT MAY JUST HAVE CHANGED THE OFFSETS *AGAIN*!
+      // I lack the words to express how much I despise this data layout choice.
+      var cl2 = NUMBER(charstring_index_offset + diff).length;
+      var cl_diff = cl2 - cl1;
+      if (cl_diff > 0) {
+        top_dict_data[6][3] = NUMBER(charstring_index_offset + diff + cl_diff).concat(OPERAND(17));
+        top_dict_data[7][3] = NUMBER(new_private_dict_offset + cl_diff).concat(NUMBER(private_dict_length)).concat(OPERAND(18));
+      }
+    }
+
+    console.log(serialize(cff).map(function(v) { v = v.toString(16).toUpperCase(); if(v.length === 1) v = "0" + v; return v; }).join(" "));
+
+    return cff;
   };
 
-  Object.keys(TableModels).forEach(processTag);
+  // OpenType tables
+  var TableModels = {
+    "CFF ": createCFF()
+    ,
+    "OS/2": [
+        ["version", USHORT, "OS/2 table 1", 0x0001]
+      , ["xAvgCharWidth", SHORT, "xAvgCharWidth", 0]
+      , ["usWeightClass", USHORT, "usWeightClass", 0x2000]
+      , ["usWidthClass", USHORT, "usWidthClass", 1]
+      , ["fsType", USHORT, "fsType", 0]
+      , ["ySubscriptXSize", SHORT, "", 0]
+      , ["ySubscriptYSize", SHORT, "", 0]
+      , ["ySubscriptXOffset", SHORT, "", 0]
+      , ["ySubscriptYOffset", SHORT, "", 0]
+      , ["ySuperscriptXSize", SHORT, "", 0]
+      , ["ySuperscriptYSize", SHORT, "", 0]
+      , ["ySuperscriptXOffset", SHORT, "", 0]
+      , ["ySuperscriptYOffset", SHORT, "", 0]
+      , ["yStrikeoutSize", SHORT, "", 0]
+      , ["yStrikeoutPosition", SHORT, "", 0]
+      , ["sFamilyClass", SHORT, "sFamilyClass", 0]
+      , ["panose", [
+        , ["bFamilyType", BYTE, "", 0]
+        , ["bSerifStyle", BYTE, "", 0]
+        , ["bWeight", BYTE, "", 0]
+        , ["bProportion", BYTE, "", 0]
+        , ["bContrast", BYTE, "", 0]
+        , ["bStrokeVariation", BYTE, "", 0]
+        , ["bArmStyle", BYTE, "", 0]
+        , ["bLetterform", BYTE, "", 0]
+        , ["bMidline", BYTE, "", 0]
+        , ["bXHeight", BYTE, "", 0]
+      ]]
+      , ["ulUnicodeRange1", ULONG, "", 0]
+      , ["ulUnicodeRange2", ULONG, "", 0]
+      , ["ulUnicodeRange3", ULONG, "", 0]
+      , ["ulUnicodeRange4", ULONG, "", 0]
+      , ["achVendID", CHARARRAY, "vendor id (http://www.microsoft.com/typography/links/vendorlist.aspx for the 'real' list)", "CSTM"]
+      , ["fsSelection", USHORT, "font selection flag: bit 6 (lsb=0) is high, to indicate 'regular font'.", 0x40]
+      , ["usFirstCharIndex", USHORT, "first character to be in this font", 0x41]
+      , ["usLastCharIndex", USHORT, "last character to be in this font", 0x41]
+      , ["sTypoAscender", SHORT, "typographic ascender", 1024]
+      , ["sTypoDescender", SHORT, "typographic descender", 0]
+      , ["sTypoLineGap", SHORT, "line gap", 0]
+      , ["usWinAscent", USHORT, "usWinAscent", 1024]
+      , ["usWinDescent", USHORT, , "usWinDescent", 0]
+      , ["ulCodePageRange1", ULONG, "", 0]
+      , ["ulCodePageRange2", ULONG, "", 0]
+    ],
+    "cmap": [
+        ["version", USHORT, "table version", 0]
+      , ["numTables", USHORT, "number of subtables", 1]
+      // Note that we're hard-wiring cmap here for a single table.
+      // this is NOT the usual layout for a cmap table!
+      , ["platformID", USHORT, "platform", 3] // windows
+      , ["encodingID", USHORT, "encoding", 1] // default Unicode BMP (UCS-2)
+      , ["offset", ULONG, "table offset from cmap-start", 12]
+      // subtable start
+      , ["subtable format 4", [
+          ["format", USHORT, "format 4 subtable", 4]
+        , ["length", USHORT, "table length", 0x20]
+        , ["language", USHORT, "language", 0]
+        , ["segCountX2", USHORT, "2x segment count; we only have one segment", 2]
+        , ["searchRange", USHORT, "search range: 2 * (2^floor(log2(segCount)))", 2]
+        , ["entrySelector", USHORT, "entry selector: log2(searchRange/2)", 0]
+        , ["rangeShift", USHORT, "range shift: 2x segment count - search range", 0]
+        // endCount[segCount]
+        , ["endCount", [
+            ["characterCode ", USHORT, "the letter 'A', for now", 0x41]
+          , ["characterCode ", USHORT, "array terminator 0xFFFF", 0xFFFF]]]
+        , ["reservedPad", USHORT, "a 'reserve pad' value; must be 0", 0]
+        // startCount[segCount]
+        , ["startCount", [
+            ["characterCode ", USHORT, "the letter 'A', for now", 0x41]
+          , ["characterCode ", USHORT, "array terminator 0xFFFF", 0xFFFF]]]
+        // the following two values are val[segcount]
+        , ["idDelta", USHORT, "delta for segment (only 1 segment = only 1 value)", 1]
+        , ["idRangeOffset", USHORT, "range offset for segment (only 1 segment = only 1 value)", 0]
+        , ["glyphIdArray", USHORT, "glyph id array", 0]
+      ]]
+    ],
+    "head": [
+        ["version", FIXED, "table version", 0x00010000]
+      , ["fontRevision", FIXED, "font version", 1]
+      , ["checkSumAdjustment", ULONG, "0xB1B0AFBA minus (sum of entire font as ULONGs)", 0]
+      , ["magicNumber", ULONG, "OpenType magic number, used to verify this is, in fact, an OpenType font", 0x5F0F3CF5]
+      , ["flags", USHORT, "flags, see http://www.microsoft.com/typography/otspec/head.htm", 0]
+      , ["unitsPerEm", USHORT, "units per EM, we go with 1024 (ttf default. cff is usually 2000 instead)", 1024]
+      , ["created", LONGDATETIME, "date created", (Date.now()/1000)|0]
+      , ["modified", LONGDATETIME, "date modified", (Date.now()/1000)|0]
+      , ["xMin", SHORT, "global xMin", options.xMin]
+      , ["yMin", SHORT, "global yMin", options.yMin]
+      , ["xMax", SHORT, "global xMax", options.xMax]
+      , ["yMax", SHORT, "global yMax", options.yMax]
+      , ["macStyle", USHORT, "font style, according to old Apple mac rules", 0]
+      , ["lowestRecPPEM", USHORT, "smallest readable size in pixels. We claim 8px for no real reason", 8]
+      , ["fontDirectionHint", SHORT, "deprecated value (font direction hint). must be 0x0002", 2]
+      , ["indexToLocFormat", SHORT, "offset datatype (we use 0, for SHORT offsets", 0]
+      , ["glyphDataFormat", SHORT, "glyph data format. default value = 0", 0]
+    ],
+    "hhea": [
+        ["version", FIXED, "table version", 0x00010000]
+      , ["Ascender", FWORD, "typographic ascender", options.yMax]
+      , ["Descender", FWORD, "typographic descender", options.yMin]
+      , ["LineGap", UFWORD, "Typographic line gap", options.quad]
+      , ["advanceWidthMax", FWORD, "Maximum advance width value in 'hmtx' table.", options.xMax - options.xMin]
+      , ["minLeftSideBearing", FWORD, "Minimum left sidebearing value in 'hmtx' table.", 0]
+      , ["minRightSideBearing", FWORD, "Minimum right sidebearing value; calculated as Min(aw - lsb - (xMax - xMin)).", 0]
+      , ["xMaxExtent", FWORD, "Max(lsb + (xMax - xMin))", options.xMax - options.xMin]
+      , ["caretSlopeRise", SHORT, "Used to calculate the slope of the cursor (rise/run); 1 for vertical.", 0]
+      , ["caretSlopeRun", SHORT, "The amount by which a slanted highlight on a glyph needs to be shifted to produce the best appearance. Set to 0 for non-slanted fonts", 0]
+      , ["_reserved1", SHORT, "reserved; must be 0", 0]
+      , ["_reserved2", SHORT, "reserved; must be 0", 0]
+      , ["_reserved3", SHORT, "reserved; must be 0", 0]
+      , ["_reserved4", SHORT, "reserved; must be 0", 0]
+      , ["metricDataFormat", SHORT, "metricDataFormat, 0 for current format", 0]
+      , ["numberOfHMetrics", USHORT, "number of hMetric entries. We only encode 1 glyph, so there are 2: one for .notdef, and one for our real glyph", 2]
+    ],
+    "hmtx": [ // uses struct longHorMetric{USHORT advanceWidth, SHORT lsb}. NOTE: we do not encode any lsb values (which would be SHORT[])
+      ["hMetrics", [
+        // first entry longHorMetric (notdef)
+        ["0", [
+          ["advanceWidth", USHORT, "", 0]
+        , ["lsb", SHORT, "", 0]]]
+        // second entry longHorMetric (real glyph)
+      , ["1", [
+          ["advanceWidth", USHORT, "", options.xMax - options.xMin]
+        , ["lsb", SHORT, "", 0]]]]]
+    ],
+    "maxp": [
+        ["version", FIXED, "table version. For CFF this must be 0.5, for TTF it must be 1.0", 0x00005000]
+      , ["numGlyphs", USHORT, "number of glyphs in the font", 2]
+    ],
+    "name": [
+        ["format", USHORT, "format 0", 0]
+      , ["count", USHORT, "number of name records", 3]
+      , ["stringOffset", USHORT, "offset for the string data, relative to the table start", 6 + (3*10)],
+      // name records: {platform/encoding/language, nameid, length, offset}
+      , ["NameRecord", [
+          ["universal", [
+            ["platform", USHORT, "unicode", 0]
+          , ["encoding", USHORT, "ISO/IEC 10646 semantics", 2]
+          , ["language", USHORT, "unicode has no specific language, and is set to 0", 0]
+          , ["recordID", USHORT, "first record", 1]
+          , ["length", USHORT, "a single space character", 1]
+          , ["offset", USHORT, "offset for this string in the string heap", 0]]]
+        , ["windows", [
+            ["platform", USHORT, "windows", 3]
+          , ["encoding", USHORT, "Unicode BMP (UCS-2)", 1]
+          , ["language", USHORT, "US english (technically irrelevant)", 0x0409]
+          , ["recordID", USHORT, "second record", 2]
+          , ["length", USHORT, "a single space character", 1]
+          , ["offset", USHORT, "offset for this string in the string heap", 0]]]
+        , ["mac", [
+            ["platform", USHORT, "macintosh", 1]
+          , ["encoding", USHORT, "uninterpreted", 32]
+          , ["language", USHORT, "english", 0]
+          , ["recordID", USHORT, "third record", 3]
+          , ["length", USHORT, "a single space character", 1]
+          , ["offset", USHORT, "offset for this string in the string heap", 0]]]
+      ]]
+      // and the string data is a single null character
+      , ["stringData", USHORT, "our single space character", 0x20]
+    ],
 
-  return opentype.concat(headers).concat(fontdata);
-}
+    "post": [
+      // I hate this table. It's only relevant to printing, which we don't care about,
+      // and for CFF only version 3 is a legal version, so it needs those 8 values.
+        ["version", FIXED, "most recent post table format", 0x00030000]
+      , ["italicAngle", FIXED, "", 0]
+      , ["underlinePosition", FWORD, "", 0]
+      , ["underlineThickness", FWORD, "", 0]
+      , ["isFixedPitch", ULONG, "", 0]
+      , ["minMemType42", ULONG, "", 0]
+      , ["maxMemType42", ULONG, "", 0]
+      , ["minMemType1", ULONG, "", 0]
+      , ["maxMemType1", ULONG, "", 0]
+    ]
+  };
+
+  /**
+   * Generate the font's binary data
+   */
+  function buildFontData() {
+
+    var numTables = Object.keys(TableModels).length,
+        maxPower = ((Math.log(numTables)/Math.log(2))|0),
+        searchRange = Math.pow(2, maxPower) * 16,
+        entrySelector = maxPower,
+        rangeShift = numTables * 16 - searchRange,
+        opentype = CHARARRAY("OTTO")
+                   .concat(USHORT(numTables))
+                   .concat(USHORT(searchRange))
+                   .concat(USHORT(entrySelector))
+                   .concat(USHORT(rangeShift)),
+        opentype_len = opentype.length,
+        headers = [],
+        headers_len = numTables * 16,
+        fontdata = [];
+
+    var processTag = function(tag) {
+
+      var table = TableModels[tag];
+      var offset = fontdata.length;
+      var data = [];
+      table.forEach(function(e) {
+        var rdata = serialize(e);
+        data = data.concat(rdata);
+      });
+      fontdata = fontdata.concat(data);
+
+      // ensure LONG alignment
+      while(fontdata.length % 4 !== 0) { fontdata.push(0); }
+
+      var length = fontdata.length - offset;
+      var checksum = (function(chunk) {
+        var decodeULONG = function(ulong) {
+          var b = ulong.split('').map(function(c) {
+            return c.charCodeAt(0);
+          });
+          var val = (b[0] << 24) + (b[1] << 16) + (b[2] << 8) + b[3];
+          if (val < 0 ) { val += Math.pow(2,32); }
+          return val;
+        };
+        // ULONG sum the entire chunk
+        var tally = 0;
+        var chunks = chunk.map(function(v) { return String.fromCharCode(v); }).join('').match(/.{4}/g);
+        chunks.forEach(function(ulong) {
+          tally += decodeULONG(ulong);
+        });
+        return tally;
+      }(fontdata.slice(offset)));
+
+      // update OpenType header
+      headers = headers.concat(CHARARRAY(tag));
+      headers = headers.concat(ULONG(checksum));
+      headers = headers.concat(ULONG(opentype_len + headers_len + offset));
+      headers = headers.concat(ULONG(length));
+    };
+
+    Object.keys(TableModels).forEach(processTag);
+
+    return opentype.concat(headers).concat(fontdata);
+  }
+
+  var bytecode = buildFontData();
+
+  for (var b=0, last=bytecode.length; b<last; b++) {
+    var c = bytecode[b];
+    if(c instanceof Array) {
+      console.log("what? "+b);
+    }
+  }
+
+  return bytecode;
+};
