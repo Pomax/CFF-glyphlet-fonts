@@ -152,7 +152,7 @@ var buildFont = function(options) {
 
     // be mindful of the fact that there are 390 predefined strings (see appendix A, pp 29)
     var strings = [
-        ["version", CHARARRAY, "font version string; string id 391", "001.000"]
+        ["version", CHARARRAY, "font version string; string id 391", "1"]
       , ["full name", CHARARRAY, "the font's full name  (id 392)", options.fontname]
     //, ["family name", CHARARRAY, "Instead of the familyname, we'll reuse the full name.", options.fontname]
     ];
@@ -230,18 +230,23 @@ var buildFont = function(options) {
                            ]];
     var charstring_index_length = serialize(charstring_index).length;
     var cbytes = NUMBER(charstring_index_length).length;
-    var cdiff = cbytes - 1; // we used a 1 byte place holder in the top_dict_data
+    var cdiff = Math.max(0, cbytes - 1); // we used a 1 byte place holder in the top_dict_data
 
     // then process the private dict section:
     var private_dict = ["private dict", [
-                           ["BlueValues", DICTINSTRUCTION, "empty array (see Type 1 font format, pp 37)", OPERAND(6)]
-                         , ["FamilyBlues", DICTINSTRUCTION, "idem dito", OPERAND(8)]
-                         , ["StdHW", DICTINSTRUCTION, "dominant horizontal stem width. We set it to 10", NUMBER(10).concat(OPERAND(10))]
-                         , ["StdVW", DICTINSTRUCTION, "dominant vertical stem width. We set it to 10", NUMBER(10).concat(OPERAND(11))]
+//                           ["BlueValues", DICTINSTRUCTION, "empty array (see Type 1 font format, pp 37)", OPERAND(6)]
+//                         , ["FamilyBlues", DICTINSTRUCTION, "idem dito", OPERAND(8)]
+//                         , ["StdHW", DICTINSTRUCTION, "dominant horizontal stem width. We set it to 10", NUMBER(10).concat(OPERAND(10))]
+//                         , ["StdVW", DICTINSTRUCTION, "dominant vertical stem width. We set it to 10", NUMBER(10).concat(OPERAND(11))]
+//
+//                         FIXME: These values don't seem correct.
+//                                Using an empty private dict works for now,
+//                                but this needs to be made to work properly
+//                                for a "custom glyph" font
                        ]];
     var private_dict_length = serialize(private_dict).length;
     var pbytes = NUMBER(private_dict_length + cff_end + cdiff).length;
-    var pdiff = pbytes - 2;  // we used two 1 byte place holders in the top_dict_data
+    var pdiff = Math.max(0, pbytes - 2);  // we used two 1 byte place holders in the top_dict_data
 
     // actual offsets are now cff_end + cdiff +
     cff_end = cff_end + cdiff + pdiff;
@@ -471,12 +476,12 @@ var buildFont = function(options) {
         var rdata = serialize(e);
         data = data.concat(rdata);
       });
-      fontdata = fontdata.concat(data);
+      var length = data.length;
 
-      // ensure LONG alignment
+      // ensure we preserve LONG alignment
+      fontdata = fontdata.concat(data);
       while(fontdata.length % 4 !== 0) { fontdata.push(0); }
 
-      var length = fontdata.length - offset;
       var checksum = (function(chunk) {
         var decodeULONG = function(ulong) {
           var b = ulong.split('').map(function(c) {
@@ -496,10 +501,13 @@ var buildFont = function(options) {
       }(fontdata.slice(offset)));
 
       // update OpenType header
-      headers = headers.concat(CHARARRAY(tag));
-      headers = headers.concat(ULONG(checksum));
-      headers = headers.concat(ULONG(opentype_len + headers_len + offset));
-      headers = headers.concat(ULONG(length));
+      table_entry = CHARARRAY(tag).concat(ULONG(checksum)).concat(ULONG(opentype_len + headers_len + offset)).concat(ULONG(length));
+/*
+      console.log(tag + " ("+ (opentype_len + headers_len + offset) +"): " + data.length);
+      console.log(table_entry);
+      console.log(data);
+*/
+      headers = headers.concat(table_entry);
     };
 
     Object.keys(TableModels).forEach(processTag);
