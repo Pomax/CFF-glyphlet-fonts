@@ -219,8 +219,6 @@ var buildFont = function(options) {
 
     var cff_end = serialize(cff).length;
 
-    console.log("mark: " + cff_end);
-
     // process the charstring index.
     var charstring_index = ["charstring index", [
                                // this is the part that actually contains the characters outline data,
@@ -234,8 +232,6 @@ var buildFont = function(options) {
     var cbytes = NUMBER(charstring_index_length).length;
     var cdiff = cbytes - 1; // we used a 1 byte place holder in the top_dict_data
 
-    console.log("cs: " + charstring_index_length + ", blen: " + cbytes);
-
     // then process the private dict section:
     var private_dict = ["private dict", [
                            ["BlueValues", DICTINSTRUCTION, "empty array (see Type 1 font format, pp 37)", OPERAND(6)]
@@ -247,13 +243,9 @@ var buildFont = function(options) {
     var pbytes = NUMBER(private_dict_length + cff_end + cdiff).length;
     var pdiff = pbytes - 2;  // we used two 1 byte place holders in the top_dict_data
 
-    console.log("pd: " + private_dict_length + ", blen: " + pbytes);
-
     // actual offsets are now cff_end + cdiff +
     cff_end = cff_end + cdiff + pdiff;
-    console.log("cso: " + cff_end);
     top_dict_data[6][3] = NUMBER(cff_end).concat(OPERAND(17));
-    console.log("pdo: " + (cff_end + charstring_index_length));
     top_dict_data[7][3] = NUMBER(private_dict_length).concat(NUMBER(cff_end + charstring_index_length)).concat(OPERAND(18));
 
     // and finally, append
