@@ -47,8 +47,8 @@ function NUMBER(v) {
 }
 
 function OPERAND(v1, v2) {
-  var opcode = NUMBER(v1);
-  if(v2 !== undefined) { opcode.concat(NUMBER(v2)); }
+  var opcode = BYTE(v1);
+  if(v2 !== undefined) { opcode.concat(BYTE(v2)); }
   return opcode;
 }
 
@@ -198,9 +198,12 @@ var buildFont = function(options) {
         , ["data", CHARARRAY, "we only include one name, namely the compact font name", "customfont"]
       ]],
       ["top dict index", [
-          ["count", Card16, "number of stored objects", top_dict_data.length]
+          ["count", Card16, "top dicts store one 'thing' by definition", 1]
         , ["offSize", OffSize, "offsets use 1 bytes in this index", 1]
-        , ["offset", generateOffsets(top_dict_data, 1)]
+        , ["offset", [
+            ["0", Offset1, "first offset", 1]
+          , ["1", Offset1, "end of data black", 1 + serialize(top_dict_data).length]
+        ]]
         , ["top dict data", top_dict_data]
       ]],
       ["string index", [
@@ -214,22 +217,11 @@ var buildFont = function(options) {
       ]]
     ];
 
-    // And here's a part I don't like about CFF, from a byte design point of view. The
-    // top dict data contains offsets to the charstring inedx and private dict, and that's
-    // all well and good, but those values are not known until the font is actually serialised.
-    // However, when we do that, the value that we end up encoding can change the offset,
-    // so we need to serialise, encode, see if the offset changed, and then RE-encode.
+    var cff_end = serialize(cff).length;
 
-    // initial guess
-    var charstring_index_offset = serialize(cff).length;
-    top_dict_data[6][3] = NUMBER(charstring_index_offset).concat(OPERAND(17));
+    console.log("mark: " + cff_end);
 
-    // after writing the value, the offset may have changed by up to four bytes!
-    // so we need to redo the evaluation + offset recording the whole thing. Yay.
-    charstring_index_offset = serialize(cff).length;
-    top_dict_data[6][3] = NUMBER(charstring_index_offset).concat(OPERAND(17));
-
-    // then we add the charstring index.
+    // process the charstring index.
     var charstring_index = ["charstring index", [
                                // this is the part that actually contains the characters outline data,
                                // encoded as Type 2 charstrings (one charstring per glyph).
@@ -238,44 +230,42 @@ var buildFont = function(options) {
                              , ["offset", generateOffsets(charstrings, 1)]
                              , ["charstrings", charstrings]
                            ]];
-    cff.push(charstring_index);
+    var charstring_index_length = serialize(charstring_index).length;
+    var cbytes = NUMBER(charstring_index_length).length;
+    var cdiff = cbytes - 1; // we used a 1 byte place holder in the top_dict_data
 
-    // then we do the private dict section:
+    console.log("cs: " + charstring_index_length + ", blen: " + cbytes);
+
+    // then process the private dict section:
     var private_dict = ["private dict", [
-                           ["BlueValues", DICTINSTRUCTION, "empty array (see Type 1 font format, pp 37)", [OPERAND(6)]]
-                         , ["FamilyBlues", DICTINSTRUCTION, "idem dito", [OPERAND(8)]]
+                           ["BlueValues", DICTINSTRUCTION, "empty array (see Type 1 font format, pp 37)", OPERAND(6)]
+                         , ["FamilyBlues", DICTINSTRUCTION, "idem dito", OPERAND(8)]
                          , ["StdHW", DICTINSTRUCTION, "dominant horizontal stem width. We set it to 10", NUMBER(10).concat(OPERAND(10))]
                          , ["StdVW", DICTINSTRUCTION, "dominant vertical stem width. We set it to 10", NUMBER(10).concat(OPERAND(11))]
                        ]];
-
-    var private_dict_offset = serialize(cff).length;
     var private_dict_length = serialize(private_dict).length;
-    top_dict_data[7][3] = NUMBER(private_dict_offset).concat(NUMBER(private_dict_length)).concat(OPERAND(18));
+    var pbytes = NUMBER(private_dict_length + cff_end + cdiff).length;
+    var pdiff = pbytes - 2;  // we used two 1 byte place holders in the top_dict_data
 
-    // then we add the private dict
+    console.log("pd: " + private_dict_length + ", blen: " + pbytes);
+
+    // actual offsets are now cff_end + cdiff +
+    cff_end = cff_end + cdiff + pdiff;
+    console.log("cso: " + cff_end);
+    top_dict_data[6][3] = NUMBER(cff_end).concat(OPERAND(17));
+    console.log("pdo: " + (cff_end + charstring_index_length));
+    top_dict_data[7][3] = NUMBER(private_dict_length).concat(NUMBER(cff_end + charstring_index_length)).concat(OPERAND(18));
+
+    // and finally, append
+    cff.push(charstring_index);
     cff.push(private_dict);
 
-    // but of course, we need to redo the offset calculation, in case private_dict_length is more than one byte.
-    var new_private_dict_offset = serialize(cff).length;
-    top_dict_data[7][3] = NUMBER(new_private_dict_offset).concat(NUMBER(private_dict_length)).concat(OPERAND(18));
-
-    // But guess what? This may have changed the offset for the charstring index, too!
-    var diff = private_dict_offset - new_private_dict_offset;
-    if(diff > 0) {
-      var cl1 = NUMBER(charstring_index_offset).length;
-      top_dict_data[6][3] = NUMBER(charstring_index_offset + diff).concat(OPERAND(17));
-
-      // What, you thought we were done? THAT MAY JUST HAVE CHANGED THE OFFSETS *AGAIN*!
-      // I lack the words to express how much I despise this data layout choice.
-      var cl2 = NUMBER(charstring_index_offset + diff).length;
-      var cl_diff = cl2 - cl1;
-      if (cl_diff > 0) {
-        top_dict_data[6][3] = NUMBER(charstring_index_offset + diff + cl_diff).concat(OPERAND(17));
-        top_dict_data[7][3] = NUMBER(new_private_dict_offset + cl_diff).concat(NUMBER(private_dict_length)).concat(OPERAND(18));
-      }
-    }
-
-    console.log(serialize(cff).map(function(v) { v = v.toString(16).toUpperCase(); if(v.length === 1) v = "0" + v; return v; }).join(" "));
+    // for validation purposes, print the CFF block as hex data to the console before returning
+    console.log(serialize(cff).map(function(v) {
+      v = v.toString(16).toUpperCase();
+      if(v.length === 1) v = "0" + v;
+      return v;
+    }).join(" "));
 
     return cff;
   };
