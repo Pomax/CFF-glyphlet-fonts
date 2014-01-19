@@ -46,20 +46,6 @@ function NUMBER(v) {
   return [29, (v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF];
 }
 
-// Validation of the "number" function, values
-// that it should generate are listed as comment.
-if(false) {
-  console.log(NUMBER(0).map(asHex));       // 8b
-  console.log(NUMBER(100).map(asHex));     // ef
-  console.log(NUMBER(-100).map(asHex));    // 27
-  console.log(NUMBER(1000).map(asHex));    // fa 7c
-  console.log(NUMBER(-1000).map(asHex));   // fe 7c
-  console.log(NUMBER(10000).map(asHex));   // 1c 27 10
-  console.log(NUMBER(-10000).map(asHex));  // 1c d8 f0
-  console.log(NUMBER(100000).map(asHex));  // 1d 00 01 86 a0
-  console.log(NUMBER(-100000).map(asHex)); // 1d ff fe 79 60
-}
-
 function OPERAND(v1, v2) {
   var opcode = NUMBER(v1);
   if(v2 !== undefined) { opcode.concat(NUMBER(v2)); }
@@ -140,6 +126,7 @@ var buildFont = function(options) {
     options.xMax = 0;
     options.yMax = 0;
     options.charstring = [];
+    // TODO: finish this part up so we can use actual charstrings
   }(options));
 
 
@@ -167,7 +154,7 @@ var buildFont = function(options) {
     var strings = [
         ["version", CHARARRAY, "font version string; string id 391", "001.000"]
       , ["full name", CHARARRAY, "the font's full name  (id 392)", options.fontname]
-      //, ["family name", CHARARRAY, "Instead of the familyname, we'll reuse the full name.", options.fontname]
+    //, ["family name", CHARARRAY, "Instead of the familyname, we'll reuse the full name.", options.fontname]
     ];
 
     // the top dict contains "global" metadata
@@ -180,7 +167,7 @@ var buildFont = function(options) {
       , ["FontBBox", DICTINSTRUCTION, "",
           NUMBER(options.xMin).concat(NUMBER(options.yMin)).concat(NUMBER(options.xMax)).concat(NUMBER(options.yMax)).concat(OPERAND(5))
       ]
-      // these two instruction can't be properly asserted until after we pack up the CFF, so we use placeholder values
+        // these two instruction can't be properly asserted until after we pack up the CFF, so we use placeholder values
       , ["charstrings", DICTINSTRUCTION, "offset to charstrings (from start of file)", [0x00, 0x00]]
       , ["private", DICTINSTRUCTION, "'size of', then 'offset to' (from start of file) the private dict", [0x00, 0x00, 0x00]
     ]];
@@ -188,9 +175,9 @@ var buildFont = function(options) {
     // the character outlines for .notdef and our custom glyph
     var charstrings = [
         // .notdef has an empty glyph outline
-        [ ".notdef", DICTINSTRUCTION, "the outline for .notdef", OPERAND(14)]
+        [".notdef", DICTINSTRUCTION, "the outline for .notdef", OPERAND(14)]
         // our second glyph is non-empty, based on `data`
-      , [ "our letter", DICTINSTRUCTION, "the outline for our own glyph", OPERAND(14)]
+      , ["our letter", DICTINSTRUCTION, "the outline for our own glyph", OPERAND(14)]
     ];
 
     var cff = [
@@ -538,14 +525,5 @@ var buildFont = function(options) {
     return opentype.concat(headers).concat(fontdata);
   }
 
-  var bytecode = buildFontData();
-
-  for (var b=0, last=bytecode.length; b<last; b++) {
-    var c = bytecode[b];
-    if(c instanceof Array) {
-      console.log("what? "+b);
-    }
-  }
-
-  return bytecode;
+  return buildFontData();
 };
