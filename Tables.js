@@ -358,7 +358,7 @@ var buildFont = function(options) {
   function setupCmapFormat4() {
     window.SUBTABLE4 = [
         ["format", USHORT, "format 4 subtable", 4]
-      , ["length", USHORT, "table length in bytes", 36]
+      , ["length", USHORT, "table length in bytes", 32 + (2 * 2)]
       , ["language", USHORT, "language", 0]
       , ["segCountX2", USHORT, "2x segment count; we only have one segment", 4]
       , ["searchRange", USHORT, "search range: 2 * (2^floor(log2(segCount)))", 4]
@@ -366,7 +366,7 @@ var buildFont = function(options) {
       , ["rangeShift", USHORT, "range shift: 2x segment count - search range", 0]
       // endCount[segCount]
       , ["endCount", [
-          ["characterCode ", USHORT, "range end", 0x41]
+          ["characterCode ", USHORT, "the letter 'A', for now", 0x41]
         , ["characterCode ", USHORT, "array terminator 0xFFFF", 0xFFFF]
       ]]
       , ["reservedPad", USHORT, "a 'reserve pad' value; must be 0", 0]
@@ -377,14 +377,14 @@ var buildFont = function(options) {
       ]]
       // the following two values are val[segcount]
       , ["idDelta", [
-          ["0", USHORT, "delta for segment 1", -0x40]
+          ["0", USHORT, "delta for segment 1", -0x40] // point to glyphid index 1 (0 is .notdef)
         , ["0", USHORT, "bogus last segment value", 1]
       ]]
       , ["idRangeOffset", [
           ["0", USHORT, "range offset for segment 1", 0]
         , ["0", USHORT, "bogus last segment value", 0]
       ]]
-      , ["glyphIdArray", USHORT, "notdef offset is always zero", 0]
+      , ["glyphIdArray", USHORT, "We only have one real glyph, with id=1", 0]
       , ["glyphIdArray", USHORT, "We only have one real glyph, with id=1", 1]
     ];
     return 1;
