@@ -1,7 +1,9 @@
+var debug = false;
+var NULLCHAR = String.fromCharCode(0);
+
 /**
  * OpenType data types
  */
-
 function BYTE(v) { return [v]; }
 function CHAR(v) { return [v.charCodeAt(0)]; }
 function CHARARRAY(v) { return v.split('').map(function(v) { return v.charCodeAt(0); }); }
@@ -129,8 +131,8 @@ var buildFont = function(options) {
     var sections = outline.match(/[MmLlCcAaZ]\s*(\d+\s+)*/g).map(function(s){return s.trim()});
     options.xMin = 0;
     options.yMin = 0;
-    options.xMax = 0;
-    options.yMax = 0;
+    options.xMax = 1;
+    options.yMax = 1;
     options.charstring = [];
     // TODO: finish this part up so we can use actual charstrings
   }(options));
@@ -273,6 +275,122 @@ var buildFont = function(options) {
     return cff;
   };
 
+  /**
+   * The name table is an amazing bit of legacy data from a time when
+   * macintosh and windows were properly different beasts, and the idea
+   * of "encoding the encoding" (to say that strings are in ASCII or UTF8
+   * or ...) wasn't even on the table. Macintosh strings are in ASCII,
+   * windows strings are in UTF16. The result? For strings that keep to
+   * ASCII, this table could be 1/3rd the size if we didn't need to duplicate
+   * the data in windows's amazing UTF16 encoding scheme. Those bytes add up.
+   */
+  function setupNameTableData() {
+    window.NAMESTRINGS = [];
+
+    // See the 'Name IDs' section on http://www.microsoft.com/typography/otspec/name.htm for details
+    var strings = {
+                          //  "0" = the copyright text
+      "1": "X",           //      = font name
+      "2": "Regular",     //      = font subfamily name
+                          //  "3" = the unique font identifier. Irrelevant for our purposes
+      "4": "X",           //      = full font name
+      "5": "Version 1.0",
+                          //  "7" = trademark text
+                          // "13" = a tl;dr. version of the font's license
+    };
+
+    var macRecords = [],
+        macHeader = [
+          ["platform", USHORT, "macintosh", 1]
+        , ["encoding", USHORT, "uninterpreted", 32]
+        , ["language", USHORT, "english (a bit nonsense if we're uninterpreted)", 0]];
+
+    var winRecords = [],
+        winHeader = [
+          ["platform", USHORT, "windows", 3]
+        , ["encoding", USHORT, "Unicode BMP (UCS-2)", 1]
+        , ["language", USHORT, "US english (a bit nonsense if we're doing unicode)", 0x0409]];
+
+    // build all the name records.
+    var offset = 0;
+    var nameRecordPartial = [];
+    Object.keys(strings).forEach(function(key) {
+      var string = strings[key];
+      var recordId = parseInt(key, 10);
+
+      // Encode string as standard ASCII for mac:
+      nameRecordPartial = [
+          ["recordID", USHORT, "See the 'Name IDs' section on http://www.microsoft.com/typography/otspec/name.htm for details", recordId]
+        , ["length", USHORT, "the length of this string", string.length]
+        , ["offset", USHORT, "offset for this string in the string heap", offset]
+      ];
+
+      macRecords.push(macHeader.concat(nameRecordPartial));
+      NAMESTRINGS.push(string);
+      offset += string.length;
+
+      // And encode the same string but then in UTF16 for windows.
+      string = (function() {
+        var chars = string.split(''), utf = [];
+        chars.forEach(function(c) {
+          utf.push(NULLCHAR);
+          utf.push(c);
+        });
+        return utf.join('');
+      }());
+
+      nameRecordPartial = [
+          ["recordID", USHORT, "See the 'Name IDs' section on http://www.microsoft.com/typography/otspec/name.htm for details", recordId]
+        , ["length", USHORT, "the length of this string", string.length]
+        , ["offset", USHORT, "offset for this string in the string heap", offset]
+      ];
+
+      winRecords.push(winHeader.concat(nameRecordPartial));
+      NAMESTRINGS.push(string);
+      offset += string.length;
+    });
+
+    NAMESTRINGS = NAMESTRINGS.join('');
+    window.NAMERECORDS = macRecords.concat(winRecords);
+    return NAMERECORDS.length;
+  }
+
+  function setupCmapFormat4() {
+    window.SUBTABLE4 = [
+        ["format", USHORT, "format 4 subtable", 4]
+      , ["length", USHORT, "table length in bytes", 36]
+      , ["language", USHORT, "language", 0]
+      , ["segCountX2", USHORT, "2x segment count; we only have one segment", 4]
+      , ["searchRange", USHORT, "search range: 2 * (2^floor(log2(segCount)))", 4]
+      , ["entrySelector", USHORT, "entry selector: log2(searchRange/2)", 1]
+      , ["rangeShift", USHORT, "range shift: 2x segment count - search range", 0]
+      // endCount[segCount]
+      , ["endCount", [
+          ["characterCode ", USHORT, "range end", 0x41]
+        , ["characterCode ", USHORT, "array terminator 0xFFFF", 0xFFFF]
+      ]]
+      , ["reservedPad", USHORT, "a 'reserve pad' value; must be 0", 0]
+      // startCount[segCount]
+      , ["startCount", [
+          ["characterCode ", USHORT, "the letter 'A', for now", 0x41]
+        , ["characterCode ", USHORT, "array terminator 0xFFFF", 0xFFFF]
+      ]]
+      // the following two values are val[segcount]
+      , ["idDelta", [
+          ["0", USHORT, "delta for segment 1", -0x40]
+        , ["0", USHORT, "bogus last segment value", 1]
+      ]]
+      , ["idRangeOffset", [
+          ["0", USHORT, "range offset for segment 1", 0]
+        , ["0", USHORT, "bogus last segment value", 0]
+      ]]
+      , ["glyphIdArray", USHORT, "notdef offset is always zero", 0]
+      , ["glyphIdArray", USHORT, "We only have one real glyph, with id=1", 1]
+    ];
+    return 1;
+  }
+
+
   // OpenType tables
   var TableModels = {
     "CFF ": createCFF()
@@ -280,7 +398,7 @@ var buildFont = function(options) {
     "OS/2": [
         ["version", USHORT, "OS/2 table 1", 0x0001]
       , ["xAvgCharWidth", SHORT, "xAvgCharWidth", 0]
-      , ["usWeightClass", USHORT, "usWeightClass", 0x2000]
+      , ["usWeightClass", USHORT, "usWeightClass", 400]
       , ["usWidthClass", USHORT, "usWidthClass", 1]
       , ["fsType", USHORT, "fsType", 0]
       , ["ySubscriptXSize", SHORT, "", 0]
@@ -312,55 +430,30 @@ var buildFont = function(options) {
       , ["ulUnicodeRange4", ULONG, "", 0]
       , ["achVendID", CHARARRAY, "vendor id (http://www.microsoft.com/typography/links/vendorlist.aspx for the 'real' list)", "CSTM"]
       , ["fsSelection", USHORT, "font selection flag: bit 6 (lsb=0) is high, to indicate 'regular font'.", 0x40]
-      , ["usFirstCharIndex", USHORT, "first character to be in this font", 0x41]
-      , ["usLastCharIndex", USHORT, "last character to be in this font", 0x41]
-      , ["sTypoAscender", SHORT, "typographic ascender", 1024]
-      , ["sTypoDescender", SHORT, "typographic descender", 0]
+      , ["usFirstCharIndex", USHORT, "first character to be in this font. We claim 'A'.", 0x41]
+      , ["usLastCharIndex", USHORT, "last character to be in this font. We again claim 'A'.", 0x41]
+      , ["sTypoAscender", SHORT, "typographic ascender", 1024] // currently not based on anything
+      , ["sTypoDescender", SHORT, "typographic descender", 0]  // currently not based on anything
       , ["sTypoLineGap", SHORT, "line gap", options.quadSize]
-      , ["usWinAscent", USHORT, "usWinAscent", 1024]
-      , ["usWinDescent", USHORT, , "usWinDescent", 0]
+      , ["usWinAscent", USHORT, "usWinAscent", options.yMax]
+      , ["usWinDescent", USHORT, , "usWinDescent", options.yMin]
       , ["ulCodePageRange1", ULONG, "", 0]
       , ["ulCodePageRange2", ULONG, "", 0]
     ],
     "cmap": [
-        ["version", USHORT, "table version", 0]
-      , ["numTables", USHORT, "number of subtables", 1]
+        ["version", USHORT, "cmap main version", 0]
+      , ["numTables", USHORT, "number of subtables",setupCmapFormat4()]
       // Note that we're hard-wiring cmap here for a single table.
       // this is NOT the usual layout for a cmap table!
       , ["platformID", USHORT, "platform", 3] // windows
       , ["encodingID", USHORT, "encoding", 1] // default Unicode BMP (UCS-2)
       , ["offset", ULONG, "table offset from cmap-start", 12]
       // subtable start
-      , ["subtable format 4", [
-          ["format", USHORT, "format 4 subtable", 4]
-        , ["length", USHORT, "table length in bytes", 30]
-        , ["language", USHORT, "language", 0]
-        , ["segCountX2", USHORT, "2x segment count; we only have one segment", 2]
-        , ["searchRange", USHORT, "search range: 2 * (2^floor(log2(segCount)))", 2]
-        , ["entrySelector", USHORT, "entry selector: log2(searchRange/2)", 0]
-        , ["rangeShift", USHORT, "range shift: 2x segment count - search range", 0]
-        // endCount[segCount]
-        , ["endCount", [
-            ["characterCode ", USHORT, "the letter 'A', for now", 0x41]
-          , ["characterCode ", USHORT, "array terminator 0xFFFF", 0xFFFF]]]
-        , ["reservedPad", USHORT, "a 'reserve pad' value; must be 0", 0]
-        // startCount[segCount]
-        , ["startCount", [
-            ["characterCode ", USHORT, "the letter 'A', for now", 0x41]
-          , ["characterCode ", USHORT, "array terminator 0xFFFF", 0xFFFF]]]
-        // the following two values are val[segcount]
-        , ["idDelta", [
-            ["0", USHORT, "delta for segment 1", 1]
-        ]]
-        , ["idRangeOffset", [
-            ["0", USHORT, "range offset for segment 1", 0]
-        ]]
-        , ["glyphIdArray", USHORT, "glyph id array. We only have one glyph, with id=1", 1]
-      ]]
+      , ["subtable format 4", SUBTABLE4]
     ],
     "head": [
         ["version", FIXED, "table version", 0x00010000]
-      , ["fontRevision", FIXED, "font version", 1]
+      , ["fontRevision", FIXED, "font version", 0x00010000]
       , ["checkSumAdjustment", ULONG, "0xB1B0AFBA minus (sum of entire font as ULONGs)", 0]
       , ["magicNumber", ULONG, "OpenType magic number, used to verify this is, in fact, an OpenType font", 0x5F0F3CF5]
       , ["flags", USHORT, "flags, see http://www.microsoft.com/typography/otspec/head.htm", 0]
@@ -379,8 +472,8 @@ var buildFont = function(options) {
     ],
     "hhea": [
         ["version", FIXED, "table version", 0x00010000]
-      , ["Ascender", FWORD, "typographic ascender", options.yMax]
-      , ["Descender", FWORD, "typographic descender", options.yMin]
+      , ["Ascender", FWORD, "typographic ascender", 1]    // how do we compute this?
+      , ["Descender", FWORD, "typographic descender", -1] // how do we compute this?
       , ["LineGap", UFWORD, "Typographic line gap", options.quadSize]
       , ["advanceWidthMax", FWORD, "Maximum advance width value in 'hmtx' table.", options.xMax - options.xMin]
       , ["minLeftSideBearing", FWORD, "Minimum left sidebearing value in 'hmtx' table.", 0]
@@ -413,34 +506,12 @@ var buildFont = function(options) {
     ],
     "name": [
         ["format", USHORT, "format 0", 0]
-      , ["count", USHORT, "number of name records", 3]
-      , ["stringOffset", USHORT, "offset for the string data, relative to the table start", 6 + (3*10)],
+      , ["count", USHORT, "number of name records", setupNameTableData()]
+      , ["stringOffset", USHORT, "offset for the string data, relative to the table start", 6 + serialize(NAMERECORDS).length],
       // name records: {platform/encoding/language, nameid, length, offset}
-      , ["NameRecord", [
-          ["universal", [
-            ["platform", USHORT, "unicode", 0]
-          , ["encoding", USHORT, "ISO/IEC 10646 semantics", 2]
-          , ["language", USHORT, "unicode has no specific language, and is set to 0", 0]
-          , ["recordID", USHORT, "first record", 1]
-          , ["length", USHORT, "a single space character", 1]
-          , ["offset", USHORT, "offset for this string in the string heap", 0]]]
-        , ["windows", [
-            ["platform", USHORT, "windows", 3]
-          , ["encoding", USHORT, "Unicode BMP (UCS-2)", 1]
-          , ["language", USHORT, "US english (technically irrelevant)", 0x0409]
-          , ["recordID", USHORT, "second record", 2]
-          , ["length", USHORT, "a single space character", 1]
-          , ["offset", USHORT, "offset for this string in the string heap", 0]]]
-        , ["mac", [
-            ["platform", USHORT, "macintosh", 1]
-          , ["encoding", USHORT, "uninterpreted", 32]
-          , ["language", USHORT, "english", 0]
-          , ["recordID", USHORT, "third record", 3]
-          , ["length", USHORT, "a single space character", 1]
-          , ["offset", USHORT, "offset for this string in the string heap", 0]]]
-      ]]
+      , ["NameRecord", NAMERECORDS]
       // and the string data is a single null character
-      , ["stringData", USHORT, "our single space character", 0x20]
+      , ["stringData", CHARARRAY, "The font's strings", NAMESTRINGS]
     ],
 
     "post": [
@@ -457,6 +528,28 @@ var buildFont = function(options) {
       , ["maxMemType1", ULONG, "", 0]
     ]
   };
+
+  /**
+   * Helper function for decoding strings as ULONG
+   */
+  function decodeULONG(ulong) {
+    var b = ulong.split('').map(function(c) { return c.charCodeAt(0); });
+    var val = (b[0] << 24) + (b[1] << 16) + (b[2] << 8) + b[3];
+    if (val < 0 ) { val += Math.pow(2,32); }
+    return val;
+  }
+
+  /**
+   * Helper function for computing ULONG checksums for data blocks
+   */
+  function computeChecksum(chunk) {
+    var tally = 0;
+    var chunks = chunk.map(function(v) { return String.fromCharCode(v); }).join('').match(/.{4}/g);
+    chunks.forEach(function(ulong) { tally += decodeULONG(ulong); });
+    return tally;
+  }
+
+  var headoffset = 0;
 
   /**
    * Generate the font's binary data
@@ -478,53 +571,54 @@ var buildFont = function(options) {
         headers_len = numTables * 16,
         fontdata = [];
 
+    /**
+     * This is run once, for each table
+     */
     var processTag = function(tag) {
-
       var table = TableModels[tag];
+      // we're computing offset based on a running tally
       var offset = fontdata.length;
+      if(tag==="head") { headoffset = opentype_len + headers_len + offset; }
+      // serialize all records in the table
       var data = [];
-      table.forEach(function(e) {
-        var rdata = serialize(e);
-        data = data.concat(rdata);
-      });
+      data = data.concat(serialize(table)); //table.forEach(function(e) { data = data.concat(serialize(e)); });
       var length = data.length;
-
-      // ensure we preserve LONG alignment
+      // ensure we preserve LONG alignment, by padding tables if need be.
+      while(data.length % 4 !== 0) { data.push(0); }
+      var checksum = computeChecksum(data);
       fontdata = fontdata.concat(data);
-      while(fontdata.length % 4 !== 0) { fontdata.push(0); }
-
-      var checksum = (function(chunk) {
-        var decodeULONG = function(ulong) {
-          var b = ulong.split('').map(function(c) {
-            return c.charCodeAt(0);
-          });
-          var val = (b[0] << 24) + (b[1] << 16) + (b[2] << 8) + b[3];
-          if (val < 0 ) { val += Math.pow(2,32); }
-          return val;
-        };
-        // ULONG sum the entire chunk
-        var tally = 0;
-        var chunks = chunk.map(function(v) { return String.fromCharCode(v); }).join('').match(/.{4}/g);
-        chunks.forEach(function(ulong) {
-          tally += decodeULONG(ulong);
-        });
-        return tally;
-      }(fontdata.slice(offset)));
-
-      // update OpenType header
-      table_entry = CHARARRAY(tag).concat(ULONG(checksum)).concat(ULONG(opentype_len + headers_len + offset)).concat(ULONG(length));
-/*
-      console.log(tag + " ("+ (opentype_len + headers_len + offset) +"): " + data.length);
-      console.log(table_entry);
-      console.log(data);
-*/
+      // compute the table's checksum as a sum of ULONG values
+      // (which explains why we needed the LONG alignment).
+      var checksum = computeChecksum(data);
+      // and then update the OpenType header with the table's 16 byte record
+      table_entry = CHARARRAY(tag)
+                   .concat(ULONG(checksum))
+                   .concat(ULONG(opentype_len + headers_len + offset))
+                   .concat(ULONG(length));
+      //console.log(tag, offset, data)
       headers = headers.concat(table_entry);
     };
 
     Object.keys(TableModels).forEach(processTag);
-
     return opentype.concat(headers).concat(fontdata);
   }
 
-  return buildFontData();
+  var data = buildFontData();
+
+/*
+  // getting the font's checksum correctly is a chore.
+  var checksum = computeChecksum(data);
+  var actal = 2981146554 - checksum;
+  if (checksum < 0) { checksum += 2147483648; }
+  console.log(checksum);
+  // find head table, and overwrite the checkSumAdjustment value
+  var head = data.slice(0, headoffset+8),
+      oldsum = data.slice(headoffset+8, headoffset+12),
+      checksum = ULONG(checksum),
+      tail = data.slice(headoffset+12);
+  console.log("replacing "+oldsum + " ("+(headoffset+8)+") with " + checksum);
+  return head.concat(checksum).concat(tail);
+*/
+
+  return data;
 };
