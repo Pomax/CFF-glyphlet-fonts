@@ -58,12 +58,16 @@ function makeTable(data, limit) {
     row.appendChild(prefix)
 
     var entries = data.slice(limit*i, limit*(i+1));
-    var addColumn = function(entry) {
+    var addColumn = function(entry, pos) {
       var column = document.createElement("td");
+      column.classList.add("b");
+      if(entry !== "—") { column.classList.add("p"+pos); }
       column.innerHTML = entry;
       row.appendChild(column);
     };
-    entries.forEach(addColumn);
+    for(var j=0, last=Math.min(entries.length,limit); j<last; j++) {
+      addColumn(entries[j], j+limit*i);
+    }
     var len = 16 - entries.length;
     if(len>0) {
       (new Array(len+1)).join('—').split('').forEach(addColumn);
@@ -72,15 +76,86 @@ function makeTable(data, limit) {
   }
   return table;
 };
-var binary = buildFont({
+var font = buildFont({
   outline: "M 20 20 L 20 1004 1004 1004 1004 20 Z",
   quadSize: 1024
 });
+var binary = font.data;
 var hexmap = binary.map(asHex);
 console.log(hexmap.join(" "));
 var charmap = binary.map(asChars);
 document.body.appendChild(makeTable(hexmap));
 document.body.appendChild(makeTable(charmap));
+
+var otf = font.mappings.filter(function(e) { return e.type !== "cff"; });
+var cff = font.mappings.filter(function(e) { return e.type === "cff"; });
+
+NodeList.prototype.array = function() { return Array.prototype.slice.call(this); };
+
+var formQuery = function(mapping) {
+  var qs = [];
+  for(var s=mapping.start, e=mapping.end; s<e; s++) {
+    qs.push(".p"+s);
+  }
+  return qs.join(",");
+};
+
+var setupMapping = function(color) {
+  return function(mapping) {
+    var query = formQuery(mapping);
+    if(query) {
+      var target = false;
+      if(mapping.name.indexOf("table definition") > -1) {
+        target = font.mappings.filter(function(m) {
+          return m.name === mapping.name.replace("definition","data");
+        })[0];
+      }
+
+      var nodelist = document.querySelectorAll(query);
+      var highlight = function(e, override) {
+        e.style.background = typeof override === "string" ? override : color;
+        e.title = mapping.name;
+      };
+      var restore = function(e) {
+        e.style.background = e.getAttribute("data-background");
+        e.removeAttribute("title");
+      };
+      var colorize = function(e) {
+        e.setAttribute("data-background", e.style.background);
+        e.onmouseover = function(evt) {
+          nodelist.array().forEach(highlight);
+          if(target) {
+            document.querySelectorAll(formQuery(target)).array().forEach(function(e3) {
+              highlight(e3, "rgba(71, 175, 123, 0.2)");
+            });
+          }
+        };
+        e.onmouseout = function(evt) {
+          nodelist.array().forEach(restore);
+          if(target) {
+            document.querySelectorAll(formQuery(target)).array().forEach(function(e3) {
+              restore(e3);
+            });
+          }
+        };
+      };
+      nodelist.array().forEach(colorize);
+    };
+  };
+};
+
+otf.forEach(setupMapping("rgba(71, 175, 123, 0.39)"));
+
+var cff_offset = otf.filter(function(e) {
+  return e.name.indexOf("CFF") === 0;
+})[0].start;
+
+cff.forEach(function(mapping) {
+  mapping.start += cff_offset;
+  mapping.end += cff_offset;
+  setupMapping("rgba(200,200,0,0.3)")(mapping);
+});
+
 </script>
 
 <p>The above two tables are fonts. Seriously! The one on the left shows you the bytecode

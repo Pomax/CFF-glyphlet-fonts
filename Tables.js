@@ -121,6 +121,11 @@ var serialize = function(record) {
  */
 var buildFont = function(options) {
 
+  var mappings = [];
+  var addMapping = function(name, start, end, type) {
+    mappings.push({name:name, start:start, end:end, type:type});
+  };
+
   // make sure the options are good.
   if(!options.outline) { throw new Error("No outline was passed to build a font for"); }
   options.name = options.name || "A";
@@ -225,6 +230,13 @@ var buildFont = function(options) {
       ]]
     ];
 
+    var s = 0, e = 0, i=0;
+    for(i=0; i<cff.length; i++) {
+      s = e;
+      e += serialize(cff[i]).length;
+      addMapping(cff[i][0], s, e, "cff");
+    }
+
     var cff_end = serialize(cff).length;
 
     // process the charstring index.
@@ -262,7 +274,9 @@ var buildFont = function(options) {
     top_dict_data[7][3] = NUMBER(private_dict_length).concat(NUMBER(cff_end + charstring_index_length)).concat(OPERAND(18));
 
     // and finally, append
+    addMapping("charstring index", serialize(cff).length, serialize(cff).length + serialize(charstring_index).length, "cff");
     cff.push(charstring_index);
+    addMapping("private dict", serialize(cff).length, serialize(cff).length + serialize(private_dict).length, "cff");
     cff.push(private_dict);
 
     // for validation purposes, print the CFF block as hex data to the console before returning
@@ -549,6 +563,9 @@ var buildFont = function(options) {
     return tally;
   }
 
+  /**
+   * special marker: we need this to set the full font checksum later.
+   */
   var headoffset = 0;
 
   /**
@@ -590,15 +607,20 @@ var buildFont = function(options) {
       // compute the table's checksum as a sum of ULONG values
       // (which explains why we needed the LONG alignment).
       var checksum = computeChecksum(data);
+
+      addMapping(tag + " table data", opentype_len + headers_len + offset, opentype_len + headers_len + offset + length, "table");
+
       // and then update the OpenType header with the table's 16 byte record
       table_entry = CHARARRAY(tag)
                    .concat(ULONG(checksum))
                    .concat(ULONG(opentype_len + headers_len + offset))
                    .concat(ULONG(length));
       //console.log(tag, offset, data)
+      addMapping(tag + " table definition", opentype_len + headers.length, opentype_len + headers.length + 16, "sfnt");
       headers = headers.concat(table_entry);
     };
 
+    addMapping("sfnt header", 0, 12, "sfnt");
     Object.keys(TableModels).forEach(processTag);
     return opentype.concat(headers).concat(fontdata);
   }
@@ -620,5 +642,8 @@ var buildFont = function(options) {
   return head.concat(checksum).concat(tail);
 */
 
-  return data;
+  return {
+    mappings: mappings,
+    data: data
+  }
 };
