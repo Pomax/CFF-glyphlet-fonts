@@ -1,171 +1,52 @@
 <!doctype html>
 <html>
-<head>
-<meta charset="utf-8">
-<title>test</title>
-<style>
-	table { width: 40%; float:left; font-family: monospace; border-collapse: collapse; width: auto; border: 1px solid gray; }
-	table+table { margin-left: 2em; }
-	table, tr, td { padding: 0; margin : 0 0 1em 0; }
-	tr { margin: -1px 0; }
-	tr:nth-child(2n) { background: rgba(144, 134, 177, 0.15); }
-	td { height: 1.2em; width: 2em; display: table-cell; text-align: center; }
-	td:nth-child(2n) { background: rgba(156, 143, 89, 0.15); }
-	tr:nth-child(4n+1) { border-top: 1px solid rgba(0,0,100,0.2); }
-	td:nth-child(4n+2) { border-left: 1px solid rgba(0,0,100,0.2); }
-	p { clear: both; }
-</style>
-<script src="Tables.js"></script>
-</head>
-<body>
-<h1>Let's make a font</h1>
 
-<p>We all use fonts every day, and we don't even have to bother noticing. Text looks pretty
-(okay, sometimes it looks horrible) and that's pretty much the extent of our interaction with
-fonts. We take them for granted, and that's a good thing: they're not just easy to use, we
-simply don't care how they work because we don't need to. They just work, and we don't have
-to think about whatever complexities are involved in actually getting text styled using a
-specific font.</p>
+  <head>
+    <meta charset="utf-8">
+    <title>test</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="Tables.js"></script>
+    <script>
+      NodeList.prototype.array = function() { return Array.prototype.slice.call(this); };
+    </script>
+  </head>
 
-<p>But, sometimes you want to dive into a subject for a bit to find out how something that
-you take for granted in every day life works. How does your car's engine work? Where does
-milk come from? Why do clocks show 12 instead of 24 steps? Do dolphins even sleep?</p>
+  <body>
+    <h1>Let's make a font</h1>
 
-<p>Or, in this case, how does a font work? In order to best see how a font works, we're
-actually going to "roll our own" font. And not the simple kind either, we're going to
-make our own OpenType font (if you've ever seen a font file and it ended in .ttf or .otf,
-those are OpenType fonts. It's the defacto standard in font land), using Adobe Type2
-charstrings, which are a very rich —but also generally complex— way to specify vector
-graphics.</p>
+    <p>We all use fonts every day, and we don't even have to bother noticing. Text looks pretty
+    (okay, sometimes it looks horrible) and that's pretty much the extent of our interaction with
+    fonts. We take them for granted, and that's a good thing: they're not just easy to use, we
+    simply don't care how they work because we don't need to. They just work, and we don't have
+    to think about whatever complexities are involved in actually getting text styled using a
+    specific font.</p>
 
-<h2>Let's look at a font from the ground up</h2>
+    <p>But, sometimes you want to dive into a subject for a bit to find out how something that
+    you take for granted in every day life works. How does your car's engine work? Where does
+    milk come from? Why do clocks show 12 instead of 24 steps? Do dolphins even sleep?</p>
 
-<p>First off, let's quickly generate a small font that we can use to examine how they're
-built up, and how they work:</p>
+    <p>Or, in this case, how does a font work? In order to best see how a font works, we're
+    actually going to "roll our own" font. And not the simple kind either, we're going to
+    make our own OpenType font (if you've ever seen a font file and it ended in .ttf or .otf,
+    those are OpenType fonts. It's the defacto standard in font land), using Adobe Type2
+    charstrings, which are a very rich —but also generally complex— way to specify vector
+    graphics.</p>
 
-<script>
-var asHex = function(v) { v = v.toString(16).toUpperCase(); if(v.length === 1) v = "0" + v; return v; };
-var asChars = function(v) { return String.fromCharCode(v); };
-function makeTable(data, limit) {
-  limit = limit || 16;
-  var table = document.createElement("table");
-  for(var i=0, end = data.length; i*limit<end; i++) {
-    var row = document.createElement("tr");
-    var prefix = document.createElement("td");
-    prefix.innerHTML = (i*16)|0;
-    prefix.style.background = "rgba(100,180,220,0.3)";
-    prefix.style.textAlign = "right";
-    row.appendChild(prefix)
+    <h2>Let's look at a font from the ground up</h2>
 
-    var entries = data.slice(limit*i, limit*(i+1));
-    var addColumn = function(entry, pos) {
-      var column = document.createElement("td");
-      column.classList.add("b");
-      if(entry !== "—") { column.classList.add("p"+pos); }
-      column.innerHTML = entry;
-      row.appendChild(column);
-    };
-    for(var j=0, last=Math.min(entries.length,limit); j<last; j++) {
-      addColumn(entries[j], j+limit*i);
-    }
-    var len = 16 - entries.length;
-    if(len>0) {
-      (new Array(len+1)).join('—').split('').forEach(addColumn);
-    }
-    table.appendChild(row);
-  }
-  return table;
-};
-var font = buildFont({
-  outline: "M 20 20 L 20 1004 1004 1004 1004 20 Z",
-  quadSize: 1024
-});
-var binary = font.data;
-var hexmap = binary.map(asHex);
-console.log(hexmap.join(" "));
-var charmap = binary.map(asChars);
-document.body.appendChild(makeTable(hexmap));
-document.body.appendChild(makeTable(charmap));
+    <p>First off, let's quickly generate a small font that we can use to examine how they're
+    built up, and how they work:</p>
 
-var otf = font.mappings.filter(function(e) { return e.type !== "cff"; });
-var cff = font.mappings.filter(function(e) { return e.type === "cff"; });
+    <script src="buildTablesNow.js"></script>
 
-NodeList.prototype.array = function() { return Array.prototype.slice.call(this); };
+    <p>The above two tables are fonts. Seriously! The one on the left shows you the bytecode
+    for a custom font that was just made, right now, on this page. On the right the same bytecode has
+    been turned into letters, but not every byte has a corresponding letter, because the <a
+    href="https://en.wikipedia.org/wiki/ISO/IEC_8859-1">8859-1 codepage</a>, the standard
+    byte-to-letter table on modern computers, doesn't assign a readable letter to every
+    number that a byte can represent (which is the numbers 0 through 255). The bytecode
+    00, for instance, has no equivalent letter, while bytecode 41 (representing a base-16
+    value, so actually the decimal value 65) is the letter "A".</p>
+  </body>
 
-var formQuery = function(mapping) {
-  var qs = [];
-  for(var s=mapping.start, e=mapping.end; s<e; s++) {
-    qs.push(".p"+s);
-  }
-  return qs.join(",");
-};
-
-var setupMapping = function(color) {
-  return function(mapping) {
-    var query = formQuery(mapping);
-    if(query) {
-      var target = false;
-      if(mapping.name.indexOf("table definition") > -1) {
-        target = font.mappings.filter(function(m) {
-          return m.name === mapping.name.replace("definition","data");
-        })[0];
-      }
-
-      var nodelist = document.querySelectorAll(query);
-      var highlight = function(e, override) {
-        e.style.background = typeof override === "string" ? override : color;
-        e.title = mapping.name;
-      };
-      var restore = function(e) {
-        e.style.background = e.getAttribute("data-background");
-        e.removeAttribute("title");
-      };
-      var colorize = function(e) {
-        e.setAttribute("data-background", e.style.background);
-        e.onmouseover = function(evt) {
-          nodelist.array().forEach(highlight);
-          if(target) {
-            document.querySelectorAll(formQuery(target)).array().forEach(function(e3) {
-              highlight(e3, "rgba(71, 175, 123, 0.2)");
-            });
-          }
-        };
-        e.onmouseout = function(evt) {
-          nodelist.array().forEach(restore);
-          if(target) {
-            document.querySelectorAll(formQuery(target)).array().forEach(function(e3) {
-              restore(e3);
-            });
-          }
-        };
-      };
-      nodelist.array().forEach(colorize);
-    };
-  };
-};
-
-otf.forEach(setupMapping("rgba(71, 175, 123, 0.39)"));
-
-var cff_offset = otf.filter(function(e) {
-  return e.name.indexOf("CFF") === 0;
-})[0].start;
-
-cff.forEach(function(mapping) {
-  mapping.start += cff_offset;
-  mapping.end += cff_offset;
-  setupMapping("rgba(200,200,0,0.3)")(mapping);
-});
-
-</script>
-
-<p>The above two tables are fonts. Seriously! The one on the left shows you the bytecode
-for a custom font that was just made, right now, on this page. On the right the same bytecode has
-been turned into letters, but not every byte has a corresponding letter, because the <a
-href="https://en.wikipedia.org/wiki/ISO/IEC_8859-1">8859-1 codepage</a>, the standard
-byte-to-letter table on modern computers, doesn't assign a readable letter to every
-number that a byte can represent (which is the numbers 0 through 255). The bytecode
-00, for instance, has no equivalent letter, while bytecode 41 (representing a base-16
-value, so actually the decimal value 65) is the letter "A".</p>
-
-</body>
 </html>
