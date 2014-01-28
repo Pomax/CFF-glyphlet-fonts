@@ -16,9 +16,12 @@
     return out.join('');
   }
 
-  /**
+  /***
+   *
    * OpenType data types
-   */
+   *
+   ***/
+
   function BYTE(v) { return [v]; }
   function CHAR(v) { return [v.charCodeAt(0)]; }
   function CHARARRAY(v) { return v.split('').map(function(v) { return v.charCodeAt(0); }); }
@@ -48,9 +51,11 @@
   var FWORD = SHORT,
       UFWORD = USHORT;
 
-  /**
+  /***
+   *
    * CFF data types
-   */
+   *
+   ***/
 
   function NUMBER(v) {
     if (-107 <= v && v <= 107) {
@@ -83,7 +88,12 @@
     return data;
   }
 
-  // aliased datatypes
+  /***
+   *
+   * Aliased data types
+   *
+   ***/
+
   var GlyphID = USHORT,
       Offset = USHORT,
       Card8 = BYTE,
@@ -92,6 +102,15 @@
       OffSize = BYTE,
       OffsetX = [undefined, BYTE, USHORT, UINT24, ULONG];
 
+  /**
+   * Helper function for decoding strings as ULONG
+   */
+  function decodeULONG(ulong) {
+    var b = ulong.split('').map(function(c) { return c.charCodeAt(0); });
+    var val = (b[0] << 24) + (b[1] << 16) + (b[2] << 8) + b[3];
+    if (val < 0 ) { val += Math.pow(2,32); }
+    return val;
+  }
 
   // const, but const in strict mode is not allowed
   var LABEL = 0;
@@ -126,6 +145,18 @@
   };
 
   /**
+   * Helper function for computing ULONG checksums for data blocks
+   */
+  function computeChecksum(chunk, name) {
+    var tally = 0;
+    for(var i=0, last=chunk.length; i<last; i+=4) {
+      tally += (chunk[i] << 24) + (chunk[i + 1] << 16) + (chunk[i + 2] << 8) + (chunk[i + 3]);
+    }
+    tally %= Math.pow(2,32);
+    return tally;
+  }
+
+  /**
    * Create a font. Options:
    * {
    *   name: "glyph name"
@@ -136,6 +167,7 @@
    */
   var buildFont = function(options) {
 
+    // layout mapping for finding regions of interest in the byte code
     var mappings = [];
     var addMapping = function(name, start, end, type) {
       mappings.push({name:name, start:start, end:end, type:type});
@@ -157,9 +189,27 @@
       // TODO: finish this part up so we can use actual charstrings
     }(options));
 
+   // Extract the font-global strings
+    var globals = {
+      vendorId: "----",
+      fontFamily: options.fontFamily || "Custom",
+      subfamily: options.subfamily || "Regular",
+      fontName: options.fontName || "Custom Glyph Font",
+      compactFontName: options.fontName || "customfont",
+      fontVersion: options.fontVersion || "Version 1.0",
+      copyright: options.copyright || "License-free",
+      trademark: options.trademark || "License-free",
+      license: options.license || "License-free",
+    };
 
-    // Type2 font as a CFF data block
-    // note: The CFF specification is described in Adobe's technical note 5176
+
+    /***
+     *
+     * CFF DATA DESCRIPTION (See Adobe's technical note 5176)
+     *
+     **/
+
+
     var createCFF = function() {
 
       // helper function
@@ -180,16 +230,16 @@
 
       // be mindful of the fact that there are 390 predefined strings (see appendix A, pp 29)
       var strings = [
-          ["version", CHARARRAY, "font version string; string id 391", "1"]
-        , ["full name", CHARARRAY, "the font's full name  (id 392)", options.fontname]
-      //, ["family name", CHARARRAY, "Instead of the familyname, we'll reuse the full name.", options.fontname]
+          ["version", CHARARRAY, "font version string; string id 391", globals.fontVersion]
+        , ["full name", CHARARRAY, "the font's full name  (id 392)", globals.fontName]
+        , ["family name", CHARARRAY, "the font family name (id 393)", globals.fontFamily]
       ];
 
       // the top dict contains "global" metadata
       var top_dict_data = [
           ["version", DICTINSTRUCTION, "", SID(391).concat(OPERAND(0))]
         , ["full name", DICTINSTRUCTION, "", SID(392).concat(OPERAND(2))]
-        , ["family name", DICTINSTRUCTION, "here we point to the same string as for full name", SID(392).concat(OPERAND(3))]
+        , ["family name", DICTINSTRUCTION, "", SID(393).concat(OPERAND(3))]
         , ["weight", DICTINSTRUCTION, "", SID(389).concat(OPERAND(4))]
         , ["uniqueID", DICTINSTRUCTION, "", NUMBER(1).concat(OPERAND(13))]
         , ["FontBBox", DICTINSTRUCTION, "",
@@ -223,7 +273,7 @@
               ["0", OffsetX[1], "first offset, relative to the byte preceding the data block", 1]
             , ["1", OffsetX[1], "offset to end of the data block", (1 + "customfont".length)]]]
             // object data
-          , ["data", CHARARRAY, "we only include one name, namely the compact font name", "customfont"]
+          , ["data", CHARARRAY, "we only include one name, namely the compact font name", globals.compactFontName]
         ]],
         ["top dict index", [
             ["count", Card16, "top dicts store one 'thing' by definition", 1]
@@ -304,6 +354,14 @@
       return cff;
     };
 
+
+    /***
+     *
+     * SFNT/OpenType DATA DESCRIPTION (See http://www.microsoft.com/typography/otspec/default.htm)
+     *
+     **/
+
+
     /**
      * The name table is an amazing bit of legacy data from a time when
      * macintosh and windows were properly different beasts, and the idea
@@ -318,14 +376,14 @@
 
       // See the 'Name IDs' section on http://www.microsoft.com/typography/otspec/name.htm for details
       var strings = {
-                            //  "0" = copyright text
-        "1": "customfont", //      = font name
-        "2": "Regular",     //      = font subfamily name
-                            //  "3" = the unique font identifier (irrelevant for our purpose)
-        "4": "Custom Glyph Font", //      = full font name
-        "5": "Version 1.0", //      = font version. "Preferred" format is "Version \d+.\d+; specifics"
-                            //  "7" = trademark text
-                            // "13" = a tl;dr. version of the font's license (irrelevant for our purpose)
+                                  //  "0" = copyright text
+        "1": globals.fontFamily,  //      = font name
+        "2": globals.subfamily,   //      = font subfamily name
+                                  //  "3" = the unique font identifier (irrelevant for our purpose)
+        "4": globals.fontName,    //      = full font name
+        "5": globals.fontVersion, //      = font version. "Preferred" format is "Version \d+.\d+; specifics"
+                                  //  "7" = trademark text
+                                  // "13" = a tl;dr. version of the font's license (irrelevant for our purpose)
       };
 
       var macRecords = [],
@@ -415,7 +473,6 @@
       return 1;
     }
 
-
     // OpenType tables
     var TableModels = {
       "CFF ": createCFF()
@@ -453,7 +510,7 @@
         , ["ulUnicodeRange2", ULONG, "", 0]
         , ["ulUnicodeRange3", ULONG, "", 0]
         , ["ulUnicodeRange4", ULONG, "", 0]
-        , ["achVendID", CHARARRAY, "vendor id (http://www.microsoft.com/typography/links/vendorlist.aspx for the 'real' list)", "CSTM"]
+        , ["achVendID", CHARARRAY, "vendor id (http://www.microsoft.com/typography/links/vendorlist.aspx for the 'real' list)", globals.vendorId]
         , ["fsSelection", USHORT, "font selection flag: bit 6 (lsb=0) is high, to indicate 'regular font'.", 0x40]
         , ["usFirstCharIndex", USHORT, "first character to be in this font. We claim 'A'.", 0x41]
         , ["usLastCharIndex", USHORT, "last character to be in this font. We again claim 'A'.", 0x41]
@@ -553,28 +610,6 @@
         , ["maxMemType1", ULONG, "", 0]
       ]
     };
-
-    /**
-     * Helper function for decoding strings as ULONG
-     */
-    function decodeULONG(ulong) {
-      var b = ulong.split('').map(function(c) { return c.charCodeAt(0); });
-      var val = (b[0] << 24) + (b[1] << 16) + (b[2] << 8) + b[3];
-      if (val < 0 ) { val += Math.pow(2,32); }
-      return val;
-    }
-
-    /**
-     * Helper function for computing ULONG checksums for data blocks
-     */
-    function computeChecksum(chunk, name) {
-      var tally = 0;
-      for(var i=0, last=chunk.length; i<last; i+=4) {
-        tally += (chunk[i] << 24) + (chunk[i + 1] << 16) + (chunk[i + 2] << 8) + (chunk[i + 3]);
-      }
-      tally %= Math.pow(2,32);
-      return tally;
-    }
 
     /**
      * special marker: we need this to set the full font checksum later.
