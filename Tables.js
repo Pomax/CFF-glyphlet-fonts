@@ -579,7 +579,9 @@
     /**
      * special marker: we need this to set the full font checksum later.
      */
-    var headoffset = 0;
+    var fontchecksum = 0,
+        tabledataoffset = 0,
+        checksumoffset = 0;
 
     /**
      * Generate the font's binary data
@@ -601,6 +603,8 @@
           headers_len = numTables * 16,
           fontdata = [];
 
+      tabledataoffset = opentype_len + headers_len;
+
       /**
        * This is run once, for each table
        */
@@ -608,12 +612,14 @@
         var table = TableModels[tag];
         // we're computing offset based on a running tally
         var offset = fontdata.length;
-        if(tag==="head") { headoffset = opentype_len + headers_len + offset; }
+        if(tag==="head") {
+          checksumoffset = tabledataoffset + offset + 8;
+        }
         // serialize all records in the table
         var data = [];
         data = data.concat(serialize(table)); //table.forEach(function(e) { data = data.concat(serialize(e)); });
         var length = data.length;
-        addMapping(tag + " table data", opentype_len + headers_len + offset, opentype_len + headers_len + offset + length, "table");
+        addMapping(tag + " table data", tabledataoffset + offset, tabledataoffset + offset + length, "table");
 
         // ensure we preserve LONG alignment, by padding tables if need be.
         while(data.length % 4 !== 0) { data.push(0); }
@@ -622,6 +628,7 @@
         // compute the table's checksum as a sum of ULONG values
         // (which explains why we needed the LONG alignment).
         var checksum = computeChecksum(data, tag);
+        fontchecksum += checksum;
 
         // and then update the OpenType header with the table's 16 byte record
         var table_entry = CHARARRAY(tag)
@@ -640,21 +647,28 @@
 
     var data = buildFontData();
 
-  /*
-    // getting the font's checksum correctly is a chore.
-    var checksum = computeChecksum(data);
-    var actal = 2981146554 - checksum;
-    if (checksum < 0) { checksum += 2147483648; }
-    console.log(checksum);
-    // find head table, and overwrite the checkSumAdjustment value
-    var head = data.slice(0, headoffset+8),
-        oldsum = data.slice(headoffset+8, headoffset+12),
-        checksum = ULONG(checksum),
-        tail = data.slice(headoffset+12);
-    console.log("replacing "+oldsum + " ("+(headoffset+8)+") with " + checksum);
-    return head.concat(checksum).concat(tail);
-  */
+    // We're almost done, but we still need to compute the full font's checksum.
+    // This one's tricky, and the algorithm for computing all checksums is:
+    //
+    //  1. Set the checkSumAdjustment to 0.
+    //  2. Calculate the checksum for all the tables including the 'head' table and enter that value into the table directory.
+    //  3. Calculate the checksum for the entire font.
+    //  4. Subtract that value from the hex value B1B0AFBA.
+    //  5. Store the result in checkSumAdjustment
+    //
 
+    // Now, we've already done steps 1 and 2, so, next are steps 3 and 4:
+    var checksum = 0xB1B0AFBA - computeChecksum(data);
+    checksum += Math.pow(2,32); // Add first, because mod on a negative...
+    checksum %= Math.pow(2,32); // ...yields a negative, in JavaScript
+    checksum = ULONG(checksum);
+
+    // And then step 5:
+    var head = data.slice(0, checksumoffset),
+        tail = data.slice(checksumoffset + 4);
+    data = head.concat(checksum).concat(tail);
+
+    // and now we're done.
     return {
       mappings: mappings,
       data: data
