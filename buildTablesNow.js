@@ -78,22 +78,22 @@
         };
         var colorize = function(e) {
           e.setAttribute("data-background", e.style.background);
-          e.onmouseover = function(evt) {
+          e.addEventListener("mouseover", function(evt) {
             nodelist.array().forEach(highlight);
             if(target) {
               document.querySelectorAll(formQuery(target)).array().forEach(function(e3) {
                 highlight(e3, "rgba(71, 175, 123, 0.2)");
               });
             }
-          };
-          e.onmouseout = function(evt) {
+          });
+          e.addEventListener("mouseout", function(evt) {
             nodelist.array().forEach(restore);
             if(target) {
               document.querySelectorAll(formQuery(target)).array().forEach(function(e3) {
                 restore(e3);
               });
             }
-          };
+          });
         };
         nodelist.array().forEach(colorize);
       };
