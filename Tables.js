@@ -145,6 +145,17 @@
   };
 
   /**
+   * Turn [[a],[b],[c,d]] into [a.b.c.d]
+   */
+  function arrayconcat() {
+    var data = [];
+    Array.prototype.slice.call(arguments).forEach(function(a) {
+      data = data.concat(a);
+    });
+    return data;
+  }
+
+  /**
    * Helper function for computing ULONG checksums for data blocks
    */
   function computeChecksum(chunk, name) {
@@ -255,7 +266,20 @@
           // .notdef has an empty glyph outline
           [".notdef", DICTINSTRUCTION, "the outline for .notdef", OPERAND(14)]
           // our second glyph is non-empty, based on `data`
-        , ["our letter", DICTINSTRUCTION, "the outline for our own glyph", OPERAND(14)]
+        , ["our letter", DICTINSTRUCTION, "the outline for our own glyph", [
+            // move to 20,20
+            NUMBER(20), NUMBER(20), OPERAND(21),
+            // hline to 1000,20
+            NUMBER(980), OPERAND(6),
+            // vline to 1000,1000
+            NUMBER(980), OPERAND(7),
+            // hline to 20,1000
+            NUMBER(-980), OPERAND(6),
+            // vline to 20,20
+            NUMBER(-980), OPERAND(7),
+            // path end
+            OPERAND(14)]
+        ]
       ];
 
       var cff = [
@@ -295,13 +319,6 @@
         ]]
       ];
 
-      var s = 0, e = 0, i=0;
-      for(i=0; i<cff.length; i++) {
-        s = e;
-        e += serialize(cff[i]).length;
-        addMapping(cff[i][0], s, e, "cff");
-      }
-
       var cff_end = serialize(cff).length;
 
       // process the charstring index.
@@ -330,15 +347,29 @@
   //                                for a "custom glyph" font
                          ]];
       var private_dict_length = serialize(private_dict).length;
-      var pbytes = NUMBER(private_dict_length + cff_end + cdiff).length;
+      var pbytes = NUMBER(private_dict_length).concat(NUMBER(cff_end + charstring_index_length)).length;
       var pdiff = Math.max(0, pbytes - 2);  // we used two 1 byte place holders in the top_dict_data
 
-      // actual offsets are now cff_end + cdiff +
-      cff_end = cff_end + cdiff + pdiff;
-      top_dict_data[6][3] = NUMBER(cff_end).concat(OPERAND(17));
-      top_dict_data[7][3] = NUMBER(private_dict_length).concat(NUMBER(cff_end + charstring_index_length)).concat(OPERAND(18));
+      // get the offset (for charstrings index) after working in the changes
+      // caused by encoding the  charset and private lenghts and offsets:
+      var bytediff = cdiff + pdiff;
+      var new_offset = cff_end + bytediff;
 
-      // and finally, append
+      // update the top dict data
+      top_dict_data[6][3] = NUMBER(new_offset).concat(OPERAND(17));
+      top_dict_data[7][3] = NUMBER(private_dict_length).concat(NUMBER(new_offset + charstring_index_length)).concat(OPERAND(18));
+      // also update the top dict index's "last" offset!
+      cff[2][1][2][1][1][3] += bytediff;
+
+      // record the data mappings for HTML styling, etc.
+      var s = 0, e = 0, i=0;
+      for(i=0; i<cff.length; i++) {
+        s = e;
+        e += serialize(cff[i]).length;
+        addMapping(cff[i][0], s, e, "cff");
+      }
+
+      // And then finally, append the data blocks to the CFF definition
       addMapping("charstring index", serialize(cff).length, serialize(cff).length + serialize(charstring_index).length, "cff");
       cff.push(charstring_index);
       addMapping("private dict", serialize(cff).length, serialize(cff).length + serialize(private_dict).length, "cff");
