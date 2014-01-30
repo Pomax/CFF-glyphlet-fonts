@@ -336,15 +336,27 @@
 
       // then process the private dict section:
       var private_dict = ["private dict", [
-  //                           ["BlueValues", DICTINSTRUCTION, "empty array (see Type 1 font format, pp 37)", OPERAND(6)]
-  //                         , ["FamilyBlues", DICTINSTRUCTION, "idem dito", OPERAND(8)]
-  //                         , ["StdHW", DICTINSTRUCTION, "dominant horizontal stem width. We set it to 10", NUMBER(10).concat(OPERAND(10))]
-  //                         , ["StdVW", DICTINSTRUCTION, "dominant vertical stem width. We set it to 10", NUMBER(10).concat(OPERAND(11))]
-  //
-  //                         FIXME: These values don't seem correct.
-  //                                Using an empty private dict works for now,
-  //                                but this needs to be made to work properly
-  //                                for a "custom glyph" font
+                             ["BlueValues", DICTINSTRUCTION, "empty array (see Type 1 font format, pp 37)", [
+                               NUMBER(0),
+                               NUMBER(0),
+                               OPERAND(6)]
+                             ]
+                           , ["FamilyBlues", DICTINSTRUCTION, "idem dito", [
+                               NUMBER(0),
+                               NUMBER(0),
+                               OPERAND(8)
+                             ]
+                           ]
+                           , ["StdHW", DICTINSTRUCTION, "dominant horizontal stem width. We set it to 10", [
+                               NUMBER(10),
+                               OPERAND(10)
+                             ]
+                           ]
+                           , ["StdVW", DICTINSTRUCTION, "dominant vertical stem width. We set it to 10", [
+                               NUMBER(10),
+                               OPERAND(11)
+                             ]
+                           ]
                          ]];
       var private_dict_length = serialize(private_dict).length;
       var pbytes = NUMBER(private_dict_length).concat(NUMBER(cff_end + charstring_index_length)).length;
@@ -485,8 +497,8 @@
         ]]
         // the following two values are val[segcount]
         , ["idDelta", [
-            ["0", USHORT, "delta for segment 1", -0x40] // point to glyphid index 1 (0 is .notdef)
-          , ["0", USHORT, "bogus last segment value", 1]
+            ["0", SHORT, "delta for segment 1", -0x40] // point to glyphid index 1 (0 is .notdef)
+          , ["0", SHORT, "bogus last segment value", 1]
         ]]
         , ["idRangeOffset", [
             ["0", USHORT, "range offset for segment 1", 0]
