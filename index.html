@@ -3,7 +3,7 @@
 
   <head>
     <meta charset="utf-8">
-    <title>test</title>
+    <title>Let's make a font</title>
     <link rel="stylesheet" href="style.css">
     <script src="Tables.js"></script>
     <script>
@@ -23,7 +23,7 @@
 
     <p>But, sometimes you want to dive into a subject for a bit to find out how something that
     you take for granted in every day life works. How does your car's engine work? Where does
-    milk come from? Why do clocks show 12 instead of 24 steps? Do dolphins even sleep?</p>
+    milk come from? Why do clocks show 12 instead of 3, 6, or 24 steps? Do dolphins even sleep?</p>
 
     <p>Or, in this case, how does a font work? In order to best see how a font works, we're
     actually going to "roll our own" font. And not the simple kind either, we're going to
@@ -39,7 +39,7 @@
 
     <script src="buildTablesNow.js"></script>
 
-    <p>The above two tables are fonts. Seriously! The one on the left shows you the bytecode
+    <p>The above two tables are a font. Seriously! The table on the left shows you the bytecode
     for a custom font that was just made, right now, on this page. On the right the same bytecode has
     been turned into letters, but not every byte has a corresponding letter, because the <a
     href="https://en.wikipedia.org/wiki/ISO/IEC_8859-1">8859-1 codepage</a>, the standard
@@ -48,7 +48,39 @@
     00, for instance, has no equivalent letter, while bytecode 41 (representing a base-16
     value, so actually the decimal value 65) is the letter "A".</p>
 
-    <p>So, let's test that font. If all went well, this is a black rectangle: <span style="font-family: 'custom font';">A</span>.</p>
+    <p>So, let's test that font. If all went well, this is a black rectangle:
+    <span style="font-family: 'custom font';">A</span>. If you're using Firefox,
+    there's a good chance it actually is. Chrome seems to not quite cooperate,
+    so let's pretend it does and figure out <strong><em>why</em></strong> you
+    saw a rectangle instead of the capital letter 'A'.</p>
+
+    <h2>Fonts don't contain letters</h2>
+
+    <p>It's a little unintuitive, but there are no letters in fonts. There sort-of are,
+    but when you pop the bonnet and really look at what's going on, even the sort-of
+    letters aren't really letters at all. Fonts contain, broadly speaking, three things
+    that ultimate lead to you thinking there are letters in it:</p>
+
+    <ol>
+      <li>vector graphics representing, quite often, letters (but not always), each with their own id,</li>
+      <li>a mapping from "virtual id" to one (or combination of more than one) vector graphic, and finally,</li>
+      <li>a mapping from "keyboard code" to "virtual id"</li>
+    </ol>
+
+    <p>When you type a letter, your keyboard, operating system, and text engine conspire to turn
+    your letter into an identifier. It's just a number (if you're lucky, it's the unicode number,
+    but this has historically not been the case, and often still isn't), and that number is
+    passed into the font, which finds the corresponding for-this-font-only virtual id, and then
+    fetches one (or more) vector graphics that belong to that virtual id. If everything went well,
+    the computer will now show you a graphic that matches what you expected it to look like. For
+    instance, if you type "O", you (almost, but again not necessarily, always) expect to see a ring.
+    If the font lacks a mapping for "from the computer" identifier to font-internal virtual id,
+    then you usually see ? or an empty box. What really happens is that the font goes "I have no
+    mapping for this. I will give you the graphics associated with the 'not defined' id". In
+    font land this is called the .notdef glyph, and it's handy because it means the font will
+    always be able to give something back to the computer to use. Your programs don't crash
+    just because a font does not have one or more letters you want from it!</p>
+
   </body>
 
 </html>

@@ -187,25 +187,13 @@
     // make sure the options are good.
     if(!options.outline) { throw new Error("No outline was passed to build a font for"); }
 
-    options.fontname = options.fontname || "custom";
-    (function convertOutline(options) {
-      var outline = options.outline;
-      var sections = outline.match(/[MmLlCcAaZ]\s*(\d+\s+)*/g).map(function(s){return s.trim()});
-      options.xMin = 0;
-      options.yMin = 0;
-      options.xMax = 1;
-      options.yMax = 1;
-      options.charstring = [];
-      // TODO: finish this part up so we can use actual charstrings
-    }(options));
-
-   // Extract the font-global strings
+    // Extract the font-global strings
     var globals = {
       vendorId: "----",
       fontFamily: options.fontFamily || "Custom",
       subfamily: options.subfamily || "Regular",
       fontName: options.fontName || "Custom Glyph Font",
-      compactFontName: options.fontName || "customfont",
+      compactFontName: options.compactFontName || "customfont",
       fontVersion: options.fontVersion || "Version 1.0",
       copyright: options.copyright || "License-free",
       trademark: options.trademark || "License-free",
@@ -213,6 +201,17 @@
       glyphName: options.glyphName || "A",
       quadSize: options.quadSize || 1024
     };
+
+    (function convertOutline(options) {
+      var outline = options.outline;
+      var sections = outline.match(/[MmLlCcAaZ]\s*(\d+\s+)*/g).map(function(s){return s.trim()});
+      options.xMin = 0;
+      options.yMin = 0;
+      options.xMax = (globals.quadSize*0.7)|0;
+      options.yMax = (globals.quadSize*0.7)|0;
+      options.charstring = [];
+      // TODO: finish this part up so we can use actual charstrings
+    }(options));
 
 
     /***
@@ -358,10 +357,10 @@
 
       // With our stable offsets, update the charset, charstrings, and
       // private dict offset values in the top dict data block
-      top_dict_data[6][3] = NUMBER(charset_offset).concat(OPERAND(15));
-      top_dict_data[7][3] = NUMBER(encoding_offset).concat(OPERAND(16));
-      top_dict_data[8][3] = NUMBER(charstring_index_offset).concat(OPERAND(17));
-      top_dict_data[9][3] = NUMBER(private_dict_length).concat(NUMBER(private_dict_offset)).concat(OPERAND(18));
+      top_dict_data[ 6][3] = NUMBER(charset_offset).concat(OPERAND(15));
+      top_dict_data[ 7][3] = NUMBER(encoding_offset).concat(OPERAND(16));
+      top_dict_data[ 8][3] = NUMBER(charstring_index_offset).concat(OPERAND(17));
+      top_dict_data[ 9][3] = NUMBER(private_dict_length).concat(NUMBER(private_dict_offset)).concat(OPERAND(18));
 
       // and of course, also update the top dict index's "last" offset, as that might be invalid now, too.
       cff[2][1][2][1][1][3] += bytediff;
@@ -390,7 +389,8 @@
         , ["uniqueID", DICTINSTRUCTION, "", NUMBER(1).concat(OPERAND(13))]
         , ["FontBBox", DICTINSTRUCTION, "",
             NUMBER(options.xMin).concat(NUMBER(options.yMin)).concat(NUMBER(options.xMax)).concat(NUMBER(options.yMax)).concat(OPERAND(5))
-        ]
+          ]
+
           // these two instruction can't be properly asserted until after we pack up the CFF, so we use placeholder values
         , ["charset", DICTINSTRUCTION, "offset to charset (from start of file)", [0x00, 0x00]]
         , ["encoding", DICTINSTRUCTION, "offset to encoding (from start of file)", [0x00, 0x00]]
@@ -414,6 +414,7 @@
             , ["1", OffsetX[1], "offset to end of the data block", (1 + "customfont".length)]]]
             // object data
           , ["data", CHARARRAY, "we only include one name, namely the compact font name", globals.compactFontName]
+            // fun fact: the compactFontName must be at least 10 characters long before Firefox accepts the font
         ]],
         ["top dict index", [
             ["count", Card16, "top dicts store one 'thing' by definition", 1]
@@ -437,7 +438,6 @@
 
       processDynamicCFFData(cff);
       recordMappings(cff);
-      printAsHexcode(cff);
 
       return cff;
     };
@@ -793,8 +793,9 @@
 
     // and now we're done.
     return {
-      mappings: mappings,
-      data: data
+      cff: serialize(["CFF ", TableModels["CFF "]]),
+      otf: data,
+      mappings: mappings
     }
   };
 

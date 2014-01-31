@@ -17,10 +17,22 @@
   function makeTable(data, limit) {
     limit = limit || 16;
     var table = document.createElement("table");
+
+    var toprow = document.createElement("tr");
+    var cornercol = document.createElement("th");
+    cornercol.style.border =  "none";
+    toprow.appendChild(cornercol)
+    for(var i=0; i< limit; i++) {
+      var hcol = document.createElement("th");
+      hcol.innerHTML = i.toString(16).toUpperCase();
+      toprow.appendChild(hcol);
+    }
+    table.appendChild(toprow);
+
     for(var i=0, end = data.length; i*limit<end; i++) {
       var row = document.createElement("tr");
       var prefix = document.createElement("td");
-      prefix.innerHTML = (i*16)|0;
+      prefix.innerHTML = "0x" + ((i*16)|0).toString(16).toUpperCase();
       prefix.style.background = "rgba(100,180,220,0.3)";
       prefix.style.textAlign = "right";
       row.appendChild(prefix)
@@ -42,6 +54,18 @@
       }
       table.appendChild(row);
     }
+
+    var bottomrow = document.createElement("tr");
+    var cornercol = document.createElement("th");
+    cornercol.style.border =  "none";
+    bottomrow.appendChild(cornercol)
+    for(var i=0; i< limit; i++) {
+      var hcol = document.createElement("th");
+      hcol.innerHTML = i.toString(16).toUpperCase();
+      bottomrow.appendChild(hcol);
+    }
+    table.appendChild(bottomrow);
+
     return table;
   }
 
@@ -100,18 +124,38 @@
     };
   }
 
-  // Build a font!
-  var font = buildFont({
-    outline: "M 20 20 L 20 1004 1004 1004 1004 20 Z",
-    quadSize: 1024
-  });
+  // Using "small" rather than "big" yields a 640 byte font,
+  // as opposed to a 784 bytes font! That's almost 20% smaller!
+  // Of course, most values from the "small" props object are
+  // not very useful for explaining how a font works, but it's
+  // pretty impressive.
+
+  var big = {
+    outline: "M 20 20 L 20 1004 1004 1004 1004 20 Z"
+  };
+
+  var small = {
+      outline: big.outline
+    , quadSize: 1024
+    , glyphName: "A"
+    , vendorId: "****"
+    , fontFamily: "c"
+    , subfamily: "c"
+    , fontName: "c"
+    , compactFontName: "fontnamexx"
+    , fontVersion: "1"
+  };
+
+  // build the font
+  var font = buildFont(small);
 
   // convert to legible data
-  var binary = font.data;
+  var binary = font.otf;
   var hexmap = binary.map(asHex);
   var charmap = binary.map(asChars);
   document.body.appendChild(makeTable(hexmap));
   document.body.appendChild(makeTable(charmap));
+  console.log("--- cff ---\n", font.cff.map(asHex).join(" "));
   console.log("--- otf ---\n", hexmap.join(" "));
 
   // generate OFT and CFF region highlighting in the HTML tables
@@ -124,6 +168,8 @@
     mapping.end += cff_offset;
     setupMapping("rgba(200,200,0,0.3)")(mapping);
   });
+
+  // create stylesheet that uses this font
   var mime = "application/x-font-opentype";
   var dataurl = "data:" + mime + ";base64," + btoa(charmap.join(''));
   var fontface = "@font-face {\n  font-family: 'custom font';\n  src: url('" +dataurl+ "');\n}";

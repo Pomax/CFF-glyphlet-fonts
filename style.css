@@ -1,10 +1,17 @@
-table { width: 40%; float:left; font-family: monospace; border-collapse: collapse; width: auto; border: 1px solid gray; }
+table { width: 40%; float:left; font-family: monospace; border-collapse: collapse; width: auto; }
 table+table { margin-left: 2em; }
 table, tr, td { padding: 0; margin : 0 0 1em 0; }
 tr { margin: -1px 0; }
 tr:nth-child(2n) { background: rgba(144, 134, 177, 0.15); }
 td { height: 1.2em; width: 2em; display: table-cell; text-align: center; }
 td:nth-child(2n) { background: rgba(156, 143, 89, 0.15); }
-tr:nth-child(4n+1) { border-top: 1px solid rgba(0,0,100,0.2); }
+tr:nth-child(4n+2) { border-top: 1px solid rgba(0,0,100,0.2); }
 td:nth-child(4n+2) { border-left: 1px solid rgba(0,0,100,0.2); }
 p { clear: both; }
+
+td:nth-child(1) { border-left: 1px solid black; border-right: 1px solid black; padding: 0 2px 0 0; }
+td:nth-last-child(1) { border-right: 1px solid black; }
+tr:nth-child(2) { border-top: 1px solid black; }
+tr:nth-last-child(2) { border-bottom: 1px solid black; }
+tr:nth-last-child(1) { background: inherit!important; }
+th { color: rgb(200,200,220); }
