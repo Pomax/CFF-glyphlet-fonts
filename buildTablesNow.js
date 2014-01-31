@@ -125,4 +125,9 @@
     setupMapping("rgba(200,200,0,0.3)")(mapping);
   });
 
+  var dataurl = "data:font/opentype;base64," + btoa(charmap.join(''));
+  var fontface = "@font-face {\n  font-family: 'custom font';\n  src: url('" +dataurl+ "');\n}";
+  var sheet = document.createElement("style");
+  sheet.innerHTML = fontface;
+  document.head.appendChild(sheet);
 }());

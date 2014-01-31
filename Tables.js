@@ -62,7 +62,7 @@
       return [v + 139]; }
     if (108 <= v && v <= 1131) {
       var b0 = v >> 8,
-          b1 = v - (b0 << 8);
+          b1 = (v - (b0 << 8)) & 0xFF;
       return [b0 + 247, b1 - 108]; }
     if (-1131 <= v && v <= -108) {
       var v2 = -v - 108,
@@ -98,7 +98,7 @@
       Offset = USHORT,
       Card8 = BYTE,
       Card16 = USHORT,
-      SID = NUMBER,
+      SID = USHORT,
       OffSize = BYTE,
       OffsetX = [undefined, BYTE, USHORT, UINT24, ULONG];
 
@@ -221,66 +221,185 @@
      **/
 
 
+    // helper function
+    var generateOffsets = function(records, size) {
+      size = size || 1;
+      var tally = 1,
+          idx = 0,
+          data= [],
+          bytes;
+      records.forEach(function(record) {
+        data.push([""+idx++, OffsetX[size], "Offset "+idx, tally]);
+        bytes = record[1](record[3]);
+        tally += bytes.length;
+      });
+      data.push(["last", OffsetX[size], "last offset", tally]);
+      return data;
+    };
+
+    // record the data mappings for HTML styling, etc.
+    var recordMappings = function(cff) {
+      var s = 0, e = 0, i=0;
+      for(i=0; i<cff.length; i++) {
+        s = e;
+        e += serialize(cff[i]).length;
+        addMapping(cff[i][0], s, e, "cff");
+      }
+    };
+
+    // for validation purposes, print the CFF block as hex data to the console before returning
+    var printAsHexcode = function(cff) {
+      console.log("--- cff ---\n", serialize(cff).map(function(v) {
+        v = v.toString(16).toUpperCase();
+        if(v.length === 1) v = "0" + v;
+        return v;
+      }).join(" "));
+    };
+
+    /**
+     * This part sets up data that, as it is inserted, may require more
+     * bytes to encode than initially guessed, and as such requires updating
+     * the values already found in the Top DICT.
+     */
+    var processDynamicCFFData = function(cff) {
+      var top_dict_data = cff[2][1][3][1];
+      var cff_end = serialize(cff).length;
+
+      var charset = ["charset", [
+                        ["format", BYTE, "we use the simplest format", 0]
+                      , ["glyphs", [
+                          , ["0", SID, "single entry array for our glyph, which is custom SID 4", 394]
+                        ]]
+                    ]];
+
+      var encoding = ["encoding", [
+                         ["format", BYTE, "we use the encoding best suited for randomly ordered glyphs", 0]
+                       , ["nCodes", BYTE, "number of encoded glyphs (not counting .notdef)", 1]
+                       , ["codes", [
+                           ["0", BYTE, "encoding for glyph 0", 0]
+                       ]]
+                     ]];
+
+      var charstrings = [ [".notdef", DICTINSTRUCTION, "the outline for .notdef", OPERAND(14)]
+                        , ["our letter", DICTINSTRUCTION, "the outline for our own glyph", [
+                            // move to 20,20
+                            NUMBER(20), NUMBER(20), OPERAND(21),
+                            // hline to 1000,20
+                            NUMBER(980), OPERAND(6),
+                            // vline to 1000,1000
+                            NUMBER(980), OPERAND(7),
+                            // hline to 20,1000
+                            NUMBER(-980), OPERAND(6),
+                            // vline to 20,20
+                            NUMBER(-980), OPERAND(7),
+                            // path end
+                            OPERAND(14)]
+                        ]];
+
+      var charstring_index = ["charstring index", [
+                                 // this is the part that actually contains the characters outline data,
+                                 // encoded as Type 2 charstrings (one charstring per glyph).
+                                 ["count", Card16, "two charstrings; .notdef and our glyph", 2],
+                               , ["offSize", OffSize, "offsets use 1 byte", 1]
+                               , ["offset", generateOffsets(charstrings, 1)]
+                               , ["charstrings", charstrings]
+                             ]];
+
+      var private_dict = ["private dict", [
+                             ["BlueValues", DICTINSTRUCTION, "empty array (see Type 1 font format, pp 37)",
+                               NUMBER(0).concat(NUMBER(0)).concat(OPERAND(6))
+                             ]
+                           , ["FamilyBlues", DICTINSTRUCTION, "idem dito",
+                               NUMBER(0).concat(NUMBER(0)).concat(OPERAND(8))
+                             ]
+                           , ["StdHW", DICTINSTRUCTION, "dominant horizontal stem width. We set it to 10",
+                               NUMBER(10).concat(OPERAND(10))
+                             ]
+                           , ["StdVW", DICTINSTRUCTION, "dominant vertical stem width. We set it to 10",
+                               NUMBER(10).concat(OPERAND(11))
+                             ]
+                         ]];
+
+      var private_dict_length = serialize(private_dict).length;
+
+      // tentatively figure out the offsets for each block
+      var charset_offset = cff_end,
+          encoding_offset = charset_offset + serialize(charset).length,
+          charstring_index_offset = encoding_offset + serialize(encoding).length,
+          private_dict_offset = charstring_index_offset + serialize(charstring_index).length;
+
+      // if we need to encode these values, how many bytes would they take up?
+      // We assumed 1 + 1 + 2 in the top dict. We need to check if we were, and
+      // then by how much. However, because updating the number of bytes
+      // necessary to encode the values also increases the values (since they
+      // represent offset) we need to recompute until stable.
+      var bytediff = 0;
+      (function() {
+        var byteCount,
+            oldCount = 5,
+            shift = 0,
+            getByteCount = function() {
+              byteCount = NUMBER(charset_offset)
+                         .concat(NUMBER(encoding_offset))
+                         .concat(NUMBER(charstring_index_offset))
+                         .concat(NUMBER(private_dict_length))
+                         .concat(NUMBER(private_dict_offset))
+                         .length;
+              return byteCount;
+            };
+
+        while(getByteCount() > oldCount) {
+          shift = byteCount - oldCount;
+          oldCount = byteCount;
+          bytediff += shift;
+          charset_offset += shift;
+          encoding_offset += shift;
+          charstring_index_offset += shift;
+          private_dict_offset += shift;
+        }
+      }());
+
+      // With our stable offsets, update the charset, charstrings, and
+      // private dict offset values in the top dict data block
+      top_dict_data[6][3] = NUMBER(charset_offset).concat(OPERAND(15));
+      top_dict_data[7][3] = NUMBER(encoding_offset).concat(OPERAND(16));
+      top_dict_data[8][3] = NUMBER(charstring_index_offset).concat(OPERAND(17));
+      top_dict_data[9][3] = NUMBER(private_dict_length).concat(NUMBER(private_dict_offset)).concat(OPERAND(18));
+
+      // and of course, also update the top dict index's "last" offset, as that might be invalid now, too.
+      cff[2][1][2][1][1][3] += bytediff;
+
+      cff.push(charset);
+      cff.push(encoding);
+      cff.push(charstring_index);
+      cff.push(private_dict);
+    };
+
     var createCFF = function() {
-
-      // helper function
-      var generateOffsets = function(records, size) {
-        size = size || 1;
-        var tally = 1,
-            idx = 0,
-            data= [],
-            bytes;
-        records.forEach(function(record) {
-          data.push([""+idx++, OffsetX[size], "Offset "+idx, tally]);
-          bytes = record[1](record[3]);
-          tally += bytes.length;
-        });
-        data.push(["last", OffsetX[size], "last offset", tally]);
-        return data;
-      };
-
       // be mindful of the fact that there are 390 predefined strings (see appendix A, pp 29)
       var strings = [
           ["version", CHARARRAY, "font version string; string id 391", globals.fontVersion]
         , ["full name", CHARARRAY, "the font's full name  (id 392)", globals.fontName]
         , ["family name", CHARARRAY, "the font family name (id 393)", globals.fontFamily]
+        , ["custom glyph", CHARARRAY, "custom glyph name, for charset/encoding", "custom glyph"]
       ];
 
       // the top dict contains "global" metadata
       var top_dict_data = [
-          ["version", DICTINSTRUCTION, "", SID(391).concat(OPERAND(0))]
-        , ["full name", DICTINSTRUCTION, "", SID(392).concat(OPERAND(2))]
-        , ["family name", DICTINSTRUCTION, "", SID(393).concat(OPERAND(3))]
-        , ["weight", DICTINSTRUCTION, "", SID(389).concat(OPERAND(4))]
+          ["version", DICTINSTRUCTION, "", NUMBER(391).concat(OPERAND(0))]
+        , ["full name", DICTINSTRUCTION, "", NUMBER(392).concat(OPERAND(2))]
+        , ["family name", DICTINSTRUCTION, "", NUMBER(393).concat(OPERAND(3))]
+        , ["weight", DICTINSTRUCTION, "", NUMBER(389).concat(OPERAND(4))]
         , ["uniqueID", DICTINSTRUCTION, "", NUMBER(1).concat(OPERAND(13))]
         , ["FontBBox", DICTINSTRUCTION, "",
             NUMBER(options.xMin).concat(NUMBER(options.yMin)).concat(NUMBER(options.xMax)).concat(NUMBER(options.yMax)).concat(OPERAND(5))
         ]
           // these two instruction can't be properly asserted until after we pack up the CFF, so we use placeholder values
+        , ["charset", DICTINSTRUCTION, "offset to charset (from start of file)", [0x00, 0x00]]
+        , ["encoding", DICTINSTRUCTION, "offset to encoding (from start of file)", [0x00, 0x00]]
         , ["charstrings", DICTINSTRUCTION, "offset to charstrings (from start of file)", [0x00, 0x00]]
         , ["private", DICTINSTRUCTION, "'size of', then 'offset to' (from start of file) the private dict", [0x00, 0x00, 0x00]
       ]];
-
-      // the character outlines for .notdef and our custom glyph
-      var charstrings = [
-          // .notdef has an empty glyph outline
-          [".notdef", DICTINSTRUCTION, "the outline for .notdef", OPERAND(14)]
-          // our second glyph is non-empty, based on `data`
-        , ["our letter", DICTINSTRUCTION, "the outline for our own glyph", [
-            // move to 20,20
-            NUMBER(20), NUMBER(20), OPERAND(21),
-            // hline to 1000,20
-            NUMBER(980), OPERAND(6),
-            // vline to 1000,1000
-            NUMBER(980), OPERAND(7),
-            // hline to 20,1000
-            NUMBER(-980), OPERAND(6),
-            // vline to 20,20
-            NUMBER(-980), OPERAND(7),
-            // path end
-            OPERAND(14)]
-        ]
-      ];
 
       var cff = [
         ["header", [
@@ -319,80 +438,9 @@
         ]]
       ];
 
-      var cff_end = serialize(cff).length;
-
-      // process the charstring index.
-      var charstring_index = ["charstring index", [
-                                 // this is the part that actually contains the characters outline data,
-                                 // encoded as Type 2 charstrings (one charstring per glyph).
-                                 ["count", Card16, "two charstrings; .notdef and our glyph", 2],
-                               , ["offSize", OffSize, "offsets use 1 byte", 1]
-                               , ["offset", generateOffsets(charstrings, 1)]
-                               , ["charstrings", charstrings]
-                             ]];
-      var charstring_index_length = serialize(charstring_index).length;
-      var cbytes = NUMBER(charstring_index_length).length;
-      var cdiff = Math.max(0, cbytes - 1); // we used a 1 byte place holder in the top_dict_data
-
-      // then process the private dict section:
-      var private_dict = ["private dict", [
-                             ["BlueValues", DICTINSTRUCTION, "empty array (see Type 1 font format, pp 37)", [
-                               NUMBER(0),
-                               NUMBER(0),
-                               OPERAND(6)]
-                             ]
-                           , ["FamilyBlues", DICTINSTRUCTION, "idem dito", [
-                               NUMBER(0),
-                               NUMBER(0),
-                               OPERAND(8)
-                             ]
-                           ]
-                           , ["StdHW", DICTINSTRUCTION, "dominant horizontal stem width. We set it to 10", [
-                               NUMBER(10),
-                               OPERAND(10)
-                             ]
-                           ]
-                           , ["StdVW", DICTINSTRUCTION, "dominant vertical stem width. We set it to 10", [
-                               NUMBER(10),
-                               OPERAND(11)
-                             ]
-                           ]
-                         ]];
-      var private_dict_length = serialize(private_dict).length;
-      var pbytes = NUMBER(private_dict_length).concat(NUMBER(cff_end + charstring_index_length)).length;
-      var pdiff = Math.max(0, pbytes - 2);  // we used two 1 byte place holders in the top_dict_data
-
-      // get the offset (for charstrings index) after working in the changes
-      // caused by encoding the  charset and private lenghts and offsets:
-      var bytediff = cdiff + pdiff;
-      var new_offset = cff_end + bytediff;
-
-      // update the top dict data
-      top_dict_data[6][3] = NUMBER(new_offset).concat(OPERAND(17));
-      top_dict_data[7][3] = NUMBER(private_dict_length).concat(NUMBER(new_offset + charstring_index_length)).concat(OPERAND(18));
-      // also update the top dict index's "last" offset!
-      cff[2][1][2][1][1][3] += bytediff;
-
-      // record the data mappings for HTML styling, etc.
-      var s = 0, e = 0, i=0;
-      for(i=0; i<cff.length; i++) {
-        s = e;
-        e += serialize(cff[i]).length;
-        addMapping(cff[i][0], s, e, "cff");
-      }
-
-      // And then finally, append the data blocks to the CFF definition
-      addMapping("charstring index", serialize(cff).length, serialize(cff).length + serialize(charstring_index).length, "cff");
-      cff.push(charstring_index);
-      addMapping("private dict", serialize(cff).length, serialize(cff).length + serialize(private_dict).length, "cff");
-      cff.push(private_dict);
-
-      // for validation purposes, print the CFF block as hex data to the console before returning
-      console.log("--- cff ---\n", serialize(cff).map(function(v) {
-        v = v.toString(16).toUpperCase();
-        if(v.length === 1) v = "0" + v;
-        return v;
-      }).join(" "));
+      processDynamicCFFData(cff);
+      recordMappings(cff);
+      printAsHexcode(cff);
 
       return cff;
     };
