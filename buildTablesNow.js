@@ -170,7 +170,8 @@
   });
 
   // create stylesheet that uses this font
-  var mime = "application/x-font-opentype";
+  var mime = "application/octet-stream";
+  mime = "application/vnd.ms-fontobject"; // test
   var dataurl = "data:" + mime + ";base64," + btoa(charmap.join(''));
   var fontface = "@font-face {\n  font-family: 'custom font';\n  src: url('" +dataurl+ "');\n}";
   var sheet = document.createElement("style");
