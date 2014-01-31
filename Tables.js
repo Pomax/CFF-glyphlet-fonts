@@ -186,8 +186,7 @@
 
     // make sure the options are good.
     if(!options.outline) { throw new Error("No outline was passed to build a font for"); }
-    options.name = options.name || "A";
-    options.quadSize = options.quadSize || 1024;
+
     options.fontname = options.fontname || "custom";
     (function convertOutline(options) {
       var outline = options.outline;
@@ -211,6 +210,8 @@
       copyright: options.copyright || "License-free",
       trademark: options.trademark || "License-free",
       license: options.license || "License-free",
+      glyphName: options.glyphName || "A",
+      quadSize: options.quadSize || 1024
     };
 
 
@@ -280,19 +281,15 @@
                        ]]
                      ]];
 
+      var dim = (globals.quadSize * 0.7)|0;
       var charstrings = [ [".notdef", DICTINSTRUCTION, "the outline for .notdef", OPERAND(14)]
                         , ["our letter", DICTINSTRUCTION, "the outline for our own glyph", [
-                            // move to 20,20
-                            NUMBER(20), NUMBER(20), OPERAND(21),
-                            // hline to 1000,20
-                            NUMBER(980), OPERAND(6),
-                            // vline to 1000,1000
-                            NUMBER(980), OPERAND(7),
-                            // hline to 20,1000
-                            NUMBER(-980), OPERAND(6),
-                            // vline to 20,20
-                            NUMBER(-980), OPERAND(7),
-                            // path end
+                            // move, hline, vline, hline, vline, endchar
+                            NUMBER(  20), NUMBER(-50), OPERAND(21),
+                            NUMBER( dim), OPERAND(6),
+                            NUMBER( dim), OPERAND(7),
+                            NUMBER(-dim), OPERAND(6),
+                            NUMBER(-dim), OPERAND(7),
                             OPERAND(14)]
                         ]];
 
@@ -381,7 +378,7 @@
           ["version", CHARARRAY, "font version string; string id 391", globals.fontVersion]
         , ["full name", CHARARRAY, "the font's full name  (id 392)", globals.fontName]
         , ["family name", CHARARRAY, "the font family name (id 393)", globals.fontFamily]
-        , ["custom glyph", CHARARRAY, "custom glyph name, for charset/encoding", "custom glyph"]
+        , ["custom glyph", CHARARRAY, "custom glyph name, for charset/encoding", globals.glyphName]
       ];
 
       // the top dict contains "global" metadata
@@ -607,7 +604,7 @@
         , ["usLastCharIndex", USHORT, "last character to be in this font. We again claim 'A'.", 0x41]
         , ["sTypoAscender", SHORT, "typographic ascender", 1024] // currently not based on anything
         , ["sTypoDescender", SHORT, "typographic descender", 0]  // currently not based on anything
-        , ["sTypoLineGap", SHORT, "line gap", options.quadSize]
+        , ["sTypoLineGap", SHORT, "line gap", globals.quadSize]
         , ["usWinAscent", USHORT, "usWinAscent", options.yMax]
         , ["usWinDescent", USHORT, , "usWinDescent", options.yMin]
         , ["ulCodePageRange1", ULONG, "", 0]
@@ -647,7 +644,7 @@
           ["version", FIXED, "table version", 0x00010000]
         , ["Ascender", FWORD, "typographic ascender", 1]    // how do we compute this?
         , ["Descender", FWORD, "typographic descender", -1] // how do we compute this?
-        , ["LineGap", UFWORD, "Typographic line gap", options.quadSize]
+        , ["LineGap", UFWORD, "Typographic line gap", globals.quadSize]
         , ["advanceWidthMax", FWORD, "Maximum advance width value in 'hmtx' table.", options.xMax - options.xMin]
         , ["minLeftSideBearing", FWORD, "Minimum left sidebearing value in 'hmtx' table.", 0]
         , ["minRightSideBearing", FWORD, "Minimum right sidebearing value; calculated as Min(aw - lsb - (xMax - xMin)).", 0]
