@@ -552,10 +552,6 @@
         , ["glyphIdArray", [
             ["0", USHORT, "Our first glyphId points to .notdef", 0]
           , ["1", USHORT, "Our second glyphId points to our own glyph", 1]
-            // Note that by pointing to CFF glyph id 1, tools like TTX will
-            // call this glyph "space", because the default character map
-            // has id=1 marked as the space character, even if that is NOT
-            // what we actually use it for.
         ]]
       ];
       return 1;
