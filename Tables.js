@@ -566,7 +566,7 @@
         , ["xAvgCharWidth", SHORT, "xAvgCharWidth", 0]
         , ["usWeightClass", USHORT, "usWeightClass", 400]
         , ["usWidthClass", USHORT, "usWidthClass", 1]
-        , ["fsType", USHORT, "fsType", 0]
+        , ["fsType", USHORT, "this value defineds embedding/install properties. 0 = no restrictions", 0]
         , ["ySubscriptXSize", SHORT, "", 0]
         , ["ySubscriptYSize", SHORT, "", 0]
         , ["ySubscriptXOffset", SHORT, "", 0]

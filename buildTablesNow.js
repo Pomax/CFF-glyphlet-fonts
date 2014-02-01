@@ -147,7 +147,7 @@
   };
 
   // build the font
-  var font = buildFont(small);
+  var font = buildFont(big);
 
   // convert to legible data
   var binary = font.otf;
@@ -170,9 +170,9 @@
   });
 
   // create stylesheet that uses this font
-  var mime = "application/octet-stream";
+  var mime = "font/opentype";
   var dataurl = "data:" + mime + ";base64," + btoa(charmap.join(''));
-  var fontface = "@font-face {\n  font-family: 'custom font';\n  src: url('" +dataurl+ "');\n}";
+  var fontface = "@font-face {\n  font-family: 'custom font';\n  src: url('" +dataurl+ "') format('opentype');\n}";
   var sheet = document.createElement("style");
   sheet.innerHTML = fontface;
   document.head.appendChild(sheet);
