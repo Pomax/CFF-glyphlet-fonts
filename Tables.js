@@ -202,16 +202,101 @@
       quadSize: options.quadSize || 1024
     };
 
-    (function convertOutline(options) {
+    // FIXME: this does not generate the most compact charstring at the moment.
+    (function convertOutline(options, globals) {
       var outline = options.outline;
-      var sections = outline.match(/[MmLlCcAaZ]\s*(\d+\s+)*/g).map(function(s){return s.trim()});
-      options.xMin = 0;
-      options.yMin = 0;
-      options.xMax = (globals.quadSize*0.7)|0;
-      options.yMax = (globals.quadSize*0.7)|0;
-      options.charstring = [];
-      // TODO: finish this part up so we can use actual charstrings
-    }(options));
+      var sections = outline.match(/[MmLlCcZz]\s*([\-\d]+\s+)*/g).map(function(s){return s.trim()});
+      var mx = 99999999, MX=-99999999, my=mx, MY=MX;
+      var x=0, y=0, cx=false, cy=false, i=0, last=0;
+      var charstring = [];
+
+      sections.forEach(function(d) {
+        var op = d.substring(0,1);
+        var values = d.substring(1).trim().split(/\s+/).map(function(v) { return parseInt(v); });
+
+        // first, make all sections relative coordinates (if absolute)
+        if(op === op.toUpperCase()) {
+          op = op.toLowerCase();
+          if(op === 'm') {
+            values[0] -= x; x += values[0];
+            values[1] -= y; y += values[1];
+          }
+          else if(op === 'l') {
+            for(i=0, last=values.length; i<last; i+=2) {
+              values[i+0] -= x; x += values[i+0];
+              values[i+1] -= y; y += values[i+1];
+            }
+          }
+          else if(op === 'c') {
+            for(i=0, last=values.length; i<last; i+=6) {
+              cx = x + values[i+2];
+              cy = y + values[i+3];
+              values[i+0] -= x;
+              values[i+1] -= y;
+              values[i+2] -= x;
+              values[i+3] -= y;
+              values[i+4] -= x; x += values[i+4];
+              values[i+5] -= y; y += values[i+5];
+            }
+          }
+        }
+
+        if(x < mx) { mx = x; }
+        if(y < my) { my = y; }
+        if(x > MX) { MX = x; }
+        if(y > MY) { MY = x; }
+
+        // then convert the data to Type2 charstrings
+        if(op === 'm') {
+          charstring = charstring.concat( NUMBER(values[0]).concat(NUMBER(values[1])).concat(OPERAND(21)) );
+        }
+        else if(op === 'l') {
+          for(i=0, last=values.length; i<last; i+=2) {
+            // vline
+            if(values[i] === x) {
+              charstring = charstring.concat( NUMBER(values[i+1]).concat(OPERAND(7)) );
+            }
+            // hline
+            else if(values[i+1] === y) {
+              charstring = charstring.concat( NUMBER(values[i]).concat(OPERAND(6)) );
+            }
+            // rline
+            else {
+              charstring = charstring.concat( NUMBER(values[i]).concat(NUMBER(values[i+1])).concat(OPERAND(5)) );
+            }
+          }
+        }
+        else if(op === 'c') {
+          for(i=0, last=values.length; i<last; i+=6) {
+            charstring = charstring.concat(
+              NUMBER(values[i+0])
+              .concat(NUMBER(values[i+1]))
+              .concat(NUMBER(values[i+2]))
+              .concat(NUMBER(values[i+3]))
+              .concat(NUMBER(values[i+4]))
+              .concat(NUMBER(values[i+5]))
+              .concat(OPERAND(8))
+            );
+          }
+        }
+        else if(op === 'z') {
+          charstring = charstring.concat(OPERAND(14));
+        }
+        else {
+          // FIXME: add 's' and 'a' support
+          throw "op "+op+" not supported at this time."
+        }
+      });
+
+      // bounding box
+      options.xMin = mx;
+      options.yMin = my;
+      options.xMax = MX;
+      options.yMax = MY;
+
+      // FIXME: add in the (nominalWidthX - trueWidth) value as width indicator.
+      options.charString = charstring;
+    }(options, globals));
 
 
     /***
@@ -282,15 +367,8 @@
 
       var dim = (globals.quadSize * 0.7)|0;
       var charstrings = [ [".notdef", DICTINSTRUCTION, "the outline for .notdef", OPERAND(14)]
-                        , ["our letter", DICTINSTRUCTION, "the outline for our own glyph", [
-                            // move, hline, vline, hline, vline, endchar
-                            NUMBER(  20), NUMBER(-50), OPERAND(21),
-                            NUMBER( dim), OPERAND(6),
-                            NUMBER( dim), OPERAND(7),
-                            NUMBER(-dim), OPERAND(6),
-                            NUMBER(-dim), OPERAND(7),
-                            OPERAND(14)]
-                        ]];
+                        , ["our letter", DICTINSTRUCTION, "the outline for our own glyph", options.charString]
+                        ];
 
       var charstring_index = ["charstring index", [
                                  // this is the part that actually contains the characters outline data,
@@ -602,7 +680,7 @@
         , ["sTypoDescender", SHORT, "typographic descender", 0]  // currently not based on anything
         , ["sTypoLineGap", SHORT, "line gap", globals.quadSize]
         , ["usWinAscent", USHORT, "usWinAscent", options.yMax]
-        , ["usWinDescent", USHORT, , "usWinDescent", options.yMin]
+        , ["usWinDescent", USHORT, , "usWinDescent", -options.yMin]
         , ["ulCodePageRange1", ULONG, "", 0]
         , ["ulCodePageRange2", ULONG, "", 0]
       ],
@@ -638,9 +716,9 @@
       ],
       "hhea": [
           ["version", FIXED, "table version", 0x00010000]
-        , ["Ascender", FWORD, "typographic ascender", 1]    // how do we compute this?
-        , ["Descender", FWORD, "typographic descender", -1] // how do we compute this?
-        , ["LineGap", UFWORD, "Typographic line gap", globals.quadSize]
+        , ["Ascender", FWORD, "typographic ascender", options.yMax]
+        , ["Descender", FWORD, "typographic descender", -options.ymin]
+        , ["LineGap", UFWORD, "Typographic line gap", options.yMax - options.yMin]
         , ["advanceWidthMax", FWORD, "Maximum advance width value in 'hmtx' table.", options.xMax - options.xMin]
         , ["minLeftSideBearing", FWORD, "Minimum left sidebearing value in 'hmtx' table.", 0]
         , ["minRightSideBearing", FWORD, "Minimum right sidebearing value; calculated as Min(aw - lsb - (xMax - xMin)).", 0]
