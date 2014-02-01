@@ -147,7 +147,7 @@
   };
 
   // build the font
-  var font = buildFont(big);
+  var font = buildFont(small);
 
   // convert to legible data
   var binary = font.otf;
