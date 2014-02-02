@@ -645,6 +645,7 @@
         , ["usWeightClass", USHORT, "usWeightClass", 400]
         , ["usWidthClass", USHORT, "usWidthClass", 1]
         , ["fsType", USHORT, "this value defineds embedding/install properties. 0 = no restrictions", 0]
+          // we don't really care about the sub/super/strikeout values
         , ["ySubscriptXSize", SHORT, "", 0]
         , ["ySubscriptYSize", SHORT, "", 0]
         , ["ySubscriptXOffset", SHORT, "", 0]
@@ -655,6 +656,7 @@
         , ["ySuperscriptYOffset", SHORT, "", 0]
         , ["yStrikeoutSize", SHORT, "", 0]
         , ["yStrikeoutPosition", SHORT, "", 0]
+          // standard font = font classification 0 ("Regular")
         , ["sFamilyClass", SHORT, "sFamilyClass", 0]
         , ["panose", [
           , ["bFamilyType", BYTE, "", 0]
@@ -716,8 +718,8 @@
       ],
       "hhea": [
           ["version", FIXED, "table version", 0x00010000]
-        , ["Ascender", FWORD, "typographic ascender", options.yMax]
-        , ["Descender", FWORD, "typographic descender", -options.ymin]
+        , ["Ascender", FWORD, "typographic ascender", Math.max(options.yMax, 1)]    // ascender should be greater than 0
+        , ["Descender", FWORD, "typographic descender", Math.min(options.yMin, -1)] // descender should be less than 0
         , ["LineGap", UFWORD, "Typographic line gap", options.yMax - options.yMin]
         , ["advanceWidthMax", FWORD, "Maximum advance width value in 'hmtx' table.", options.xMax - options.xMin]
         , ["minLeftSideBearing", FWORD, "Minimum left sidebearing value in 'hmtx' table.", 0]
