@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html>
+  <meta charset="utf-8">
+  <title>Embedded OpenType (EOT) File Format</title>
+  <style type="text/css">
+    code           { font-family: monospace; }
+
+    div.constraint,
+    div.issue,
+    div.note,
+    div.notice     { margin-left: 2em; }
+
+    ol.enumar      { list-style-type: decimal; }
+    ol.enumla      { list-style-type: lower-alpha; }
+    ol.enumlr      { list-style-type: lower-roman; }
+    ol.enumua      { list-style-type: upper-alpha; }
+    ol.enumur      { list-style-type: upper-roman; }
+
+
+    div.exampleInner pre { margin-left: 1em;
+                           margin-top: 0em; margin-bottom: 0em}
+    div.exampleOuter {border: 4px double gray;
+                      margin: 0em; padding: 0em}
+    div.exampleInner { background-color: #d5dee3;
+                       border-top-width: 4px;
+                       border-top-style: double;
+                       border-top-color: #d3d3d3;
+                       border-bottom-width: 4px;
+                       border-bottom-style: double;
+                       border-bottom-color: #d3d3d3;
+                       padding: 4px; margin: 0em }
+    div.exampleWrapper { margin: 4px }
+    div.exampleHeader { font-weight: bold;
+                        margin: 4px}
+    .style1
+    {
+        width: 122px;
+    }
+  </style>
+</head>
+
+<body>
+<div class="head">
+<h1><a id="title" name="title"></a>Embedded OpenType (EOT) File Format</h1>
+<h2><a id="w3c-doctype" name="w3c-doctype"></a>W3C Member Submission 5 March 2008</h2>
+<dl>
+  <dt>This version:</dt>
+  <dd> <a href="http://www.w3.org/Submission/2008/SUBM-EOT-20080305">http://www.w3.org/Submission/2008/SUBM-EOT-20080305</a>
+  </dd>
+  <dt>Latest version:</dt>
+  <dd> <a href="http://www.w3.org/Submission/EOT">http://www.w3.org/Submission/EOT</a>
+  </dd>
+  <dt>Authors:</dt>
+  <dd>Paul Nelson (Microsoft Corporation)</dd>
+</dl>
+Copyright © 2008 <a href="http://www.microsoft.com/">Microsoft</a>, <a href="http://www.monotypeimaging.com/">Monotype Imaging</a>. All rights reserved. This
+document is available under the <a href="http://www.w3.org/Consortium/Legal/copyright-documents">W3C
+Document License</a>. See the <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">W3C
+Intellectual Rights Notice and Legal Disclaimers</a> for additional
+information. </div>
+<hr>
+<div>
+<h2>Abstract</h2>
+<p> The Embedded OpenType File Format (EOT) was developed by Microsoft to enable TrueType and
+OpenType fonts to be linked to web pages for download to render the web
+page with the font the author desired. This appendix specifies the format
+of the EOT file so that 1) authoring tools can create embedded or linked fonts
+and add them to a page, 2) servers serving web content can serve font content
+with web pages, and 3) User Agents may download, extract and temporarily
+install fonts of the EOT file suffix that are included in the @font-face
+definition of a CSS style sheet. Example pages can be found at the Microsoft
+Typography site on
+<a href="http://www.microsoft.com/typography/web/embedding/default.aspx">Font
+Embedding for the Web</a>.</p>
+</div>
+<div>
+<h2><a id="status" name="status"></a>Status of this Document</h2>
+<p> <em>This section describes the status of this document at the time
+of its publication. Other documents may supersede this document. A list
+of current W3C publications can be found in the <a href="http://www.w3.org/TR/">W3C technical reports index</a> at
+http://www.w3.org/TR/.</em> </p>
+<p>By publishing this document, W3C acknowledges that the <a href="http://www.w3.org/Submission/2008/01">Submitting Members</a>
+have made a formal Submission request to W3C for discussion.
+Publication of this document by W3C indicates no endorsement of its
+content by W3C, nor that W3C has, is, or will be allocating any
+resources to the issues addressed by it. This document is not the
+product of a chartered W3C group, but is published as potential input
+to the <a href="http://www.w3.org/2005/10/Process-20051014/">W3C
+Process</a>. A <a href="http://www.w3.org/Submission/2008/01/Comment">W3C
+Team Comment</a> has been published in conjunction with this Member
+Submission. Publication of acknowledged Member Submissions at the W3C
+site is one of the benefits of <a href="http://www.w3.org/Consortium/join">W3C Membership</a>. Please
+consult the requirements associated with Member Submissions of <a href="http://www.w3.org/Consortium/Patent-Policy-20030520.html#sec-submissions">section
+3.3 of the W3C Patent Policy</a>. Please consult the complete list of
+acknowledged <a href="http://www.w3.org/Submission">W3C Member
+Submissions</a>. </p>
+</div>
+<div class="toc">
+<h2><a id="contents" name="contents"></a>Table of Contents</h2>
+<p class="toc">1 <a href="./Embedded OpenType (EOT) File Format_files/Embedded OpenType (EOT) File Format.htm">Introduction</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;1.1 <a href="http://www.w3.org/Submission/EOT/#notational">Notational
+Conventions</a><br>
+2 <a href="http://www.w3.org/Submission/EOT/#Responsibilities">Responsibilies and Expectations</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;2.1 <a href="http://www.w3.org/Submission/EOT/#AuthoringTools">Authoring Tools</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;2.2 <a href="http://www.w3.org/Submission/EOT/#Servers">Servers</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;2.3 <a href="http://www.w3.org/Submission/EOT/#UserAgents">User Agents</a><br>
+3 <a href="http://www.w3.org/Submission/EOT/#FileFormat">EOT File Format</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;3.1 <a href="http://www.w3.org/Submission/EOT/#Version1">Version 0x00010000</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;3.2 <a href="http://www.w3.org/Submission/EOT/#Version21">Version 0x00020001</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;3.3 <a href="http://www.w3.org/Submission/EOT/#Version22">Version 0x00020002</a><br>
+4 <a href="http://www.w3.org/Submission/EOT/#Implementation">Implementation Information</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;4.1 <a href="http://www.w3.org/Submission/EOT/#EmbeddingLevel">Font Embedding Levels</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;4.2 <a href="http://www.w3.org/Submission/EOT/#Flags">Processing Flags</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.2.1 <a href="http://www.w3.org/Submission/EOT/#RuntimeProcessing">Flags used at loading time</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.2.2 <a href="http://www.w3.org/Submission/EOT/#CreationProcessing">Flags used when creating embedded font</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;4.3 <a href="http://www.w3.org/Submission/EOT/#RootString">RootString</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.3.1 <a href="http://www.w3.org/Submission/EOT/#RootStringUsage">RootString Usage</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.3.2 <a href="http://www.w3.org/Submission/EOT/#RootStringChecksum">RootString Checksum Calculation</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;4.4 <a href="http://www.w3.org/Submission/EOT/#Processing">Processing Font Data</a><br>
+5 <a href="http://www.w3.org/Submission/2008/SUBM-MTX-20080305">MicroType® Express Font Format Specification Version 1.2</a><br>
+</p>
+</div>
+<hr>
+<div class="body">
+<div class="div1">
+<h2><a id="introduction" name="introduction"></a>1 Introduction</h2>
+<p>Most commercial fonts have an end user license agreement (EULA) which specifies
+    the rights a person who has purchased a license to use the font may enjoy. As
+    the right to freely distribute the font to others is not normally granted, being
+    restricted to installing within a limited set of parameters, there exists a
+    need for a mechanism to allow people who have licensed the font for use with their
+    documents a way to also use the font for their web content without violating the
+    EULA agreement which they have accepted. The EOT file format was developed by
+    Microsoft in cooperation with font creators for just that reason. The technology
+    has been accepted for use by font makers for over 10 years.
+</p>
+
+<p>This submission sets forth the responsibilities and expectations for the
+following classes of implementers/users of the EOT file format:</p>
+<ol>
+ <li>Authoring tools</li>
+ <li>Servers of web content</li>
+ <li>User agents</li>
+</ol>
+<p>
+    This submission also provides the EOT file format.
+</p>
+
+<div class="div2">
+<h3><a id="notational" name="notational"></a>1.1 Notational Conventions</h3>
+<p>The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+    "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+    document are to be interpreted as described in <a href="http://www.w3.org/Submission/EOT/#rfc2119">[IETF
+    RFC 2119]</a>.
+</p>
+</div>
+</div>
+
+<div class="div1">
+<h2><a id="Responsibilities" name="Responsibilities"></a>2 Responsibilities and Expectations</h2>
+
+<div class="div2">
+<h3><a id="AuthoringTools" name="AuthoringTools"></a>2.1 Authoring Tools</h3>
+<p>Authoring tools are defined as software programs that automate the process of
+    creating web content. If the tool is capable of generating EOT files, the tool must get
+    input from the user to verify that the font EULA allows this type of embedding or
+    associating with the web content before generating an EOT font. The user should also
+    verify that the embedding bits in the font
+    file indicate the same level of embedding rights as the EULA. If there is a discrepancy,
+    the font licensee should contact the font vendor and ask to have the font
+    embedding bits changed to match the EULA.
+</p>
+
+<p>The RootString in the EOT file must be set by the authoring tool in a manner
+    consistent with the EULA permissions. A null RootString, indicating the font may
+    be used for any site, must only be used if the font's owner gives permission to
+    all people everywhere to use the font for embedding.
+</p>
+
+<p>Authoring tools should compress TrueType and OpenType fonts with TrueType outlines to
+    to reduce the size of the font that needs to be transmitted over the wire to rendering
+    user agents. Authoring tools should not compress OpenType fonts with CFF (Adobe Composite Font Format)
+    outlines using MicroType® Express.
+</p>
+
+</div>
+
+<div class="div2">
+<h3><a id="Servers" name="Servers"></a>2.2 Servers</h3>
+<p>Servers are not used to process Embedded OpenType fonts directly. However, server
+    owners should not assume that it is permissible for font files to be stored on
+    their server to share out to whichever person wants to use them. It is
+    recommended that server owners understand the scope of the privileges of use for
+    all font files stored on their server, as defined by the font EULAs.</p>
+</div>
+
+<div class="div2">
+<h3><a id="UserAgents" name="UserAgents"></a>2.3 User Agents</h3>
+<p>Whether the font associated with web content is or is not of an EOT file format,
+    user agents must verify and honor the embedding bits of font files. The font
+    designer has set the embedding privileges as part of the font manufacturing
+    process to state the permissions they would like attributed to the font for
+    embedding/associating with documents.
+</p>
+
+<p>If the font embedding bits do not provide permissions for embedding, the user
+    agent shall not use the font.
+</p>
+
+<p>If the font embedding bits do not allow for the font to be used for editing
+    purposes, the user agent shall ensure the document is in read only mode and
+    shall use a font other than the non-editable font in form elements where text
+    may be input.
+</p>
+
+<p>If the font does not have an 'OS2' table in it, as is the case with a few older
+    fonts, the least restrictive privileges should be applied. Thus, the font should
+    be embeddable.
+</p>
+
+<p>User Agents must validate that the page using the embedded font is within the
+    list of URLs in the RootString from which the embedded font object may be
+    legitimately referenced.
+</p>
+
+<p>The use of MicroType® Express font compression has been the default form to create
+    EOT fonts for many years. Therefore, user agents supporting EOT must implement support
+    for decompressing EOT files to have the ability render web content commonly used on
+    the world wide web today.
+</p>
+
+</div>
+</div>
+
+<div class="div1">
+<h2><a id="FileFormat" name="FileFormat"></a>3 EOT File Format</h2>
+<p>The EOT file format consists of a single EMBEDDEDFONT structure. The
+    EMBEDDEDFONT structure provides sufficient basic information about the font
+    name and characters supported in the font so that the User Agent does not
+    need to unpack, decompress or install the font if the font is already
+    installed on the machine/device, or does not have sufficient licensing
+    rights.
+</p>
+
+<p>Three versions of the EMBEDDEDFONT have been defined to this point.
+    The second and third add additional data at the end of the structure,
+    just before the "FontData" entry.
+</p>
+
+<p>OpenType/TrueType font data should be compressed to reduce the size of the file download
+    using the MicroType® Express compression technology. The reference to MicroType®
+    Express is normative.</p>
+
+<p>FontData points to a TrueType or OpenType font whose format is specified in The Open Font Format (ISO/IEC 14496-22).</p>
+
+<p><em>IMPORTANT NOTE:</em> All values in the EMBEDDEDFONT structure,
+with the exception of FontData and EUDCFontData are in Intel (little-endian)
+format. In contrast, the embedded OpenType font data contained in FontData
+and EUDCFontData uses Motorola (big-endian) format.</p>
+
+<div class="div2">
+<p>&nbsp;</p>
+    <h3><a id="Version1" name="Version1"></a>3.1 Version 0x00010000</h3>
+    <table border="1" style="background-color: #F0F0F0;">
+      <tbody><tr>
+        <th style="background-color: #C0C0C0; width: 25%;">Data Type</th>
+        <th style="background-color: #C0C0C0; width: 25%;">Entry Name</th>
+        <th style="background-color: #C0C0C0; width: 50%;">Description</th>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>EOTSize</td>
+        <td>Total structure length in bytes (including string and font data)</td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>FontDataSize</td>
+        <td>Length of the OpenType font (FontData) in bytes</td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>Version</td>
+        <td>Version number of this format - 0x00010000</td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>Flags</td>
+        <td>Processing Flags</td>
+      </tr>
+      <tr>
+        <td>byte[10]</td>
+        <td>FontPANOSE</td>
+        <td>The PANOSE value for this font - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#pan">http://www.microsoft.com/typography/otspec/os2.htm#pan</a></td>
+      </tr>
+      <tr>
+        <td>byte</td>
+        <td>Charset</td>
+        <td>In Windows this is derived from TEXTMETRIC.tmCharSet. This value specifies the character set of the font. <a href="http://support.microsoft.com/kb/165478">DEFAULT_CHARSET (0x01)</a> indicates no preference. - See <a href="http://msdn2.microsoft.com/en-us/library/ms534202.aspx">http://msdn2.microsoft.com/en-us/library/ms534202.aspx</a></td>
+      </tr>
+      <tr>
+        <td>byte</td>
+        <td>Italic</td>
+        <td>If the bit for ITALIC is set in OS/2.fsSelection, the value will be 0x01 - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#fss">http://www.microsoft.com/typography/otspec/os2.htm#fss</a></td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>Weight</td>
+        <td>The weight value for this font - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#wtc">http://www.microsoft.com/typography/otspec/os2.htm#wtc</a></td>
+      </tr>
+      <tr>
+        <td>unsigned short</td>
+        <td>fsType</td>
+        <td>Type flags that provide information about embedding permissions - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#fst">http://www.microsoft.com/typography/otspec/os2.htm#fst</a></td>
+      </tr>
+      <tr>
+        <td>unsigned short</td>
+        <td>MagicNumber</td>
+        <td>Magic number for EOT file - 0x504C. Used to check for data corruption.</td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>UnicodeRange1</td>
+        <td>os/2.UnicodeRange1 (bits 0-31) - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#ur">http://www.microsoft.com/typography/otspec/os2.htm#ur</a></td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>UnicodeRange2</td>
+        <td>os/2.UnicodeRange2 (bits 32-63) - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#ur">http://www.microsoft.com/typography/otspec/os2.htm#ur</a></td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>UnicodeRange3</td>
+        <td>os/2.UnicodeRange3 (bits 64-95) - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#ur">http://www.microsoft.com/typography/otspec/os2.htm#ur</a></td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>UnicodeRange4</td>
+        <td>os/2.UnicodeRange4 (bits 96-127) - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#ur">http://www.microsoft.com/typography/otspec/os2.htm#ur</a></td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>CodePageRange1</td>
+        <td>CodePageRange1 (bits 0-31) - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#cpr">http://www.microsoft.com/typography/otspec/os2.htm#cpr</a></td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>CodePageRange2</td>
+        <td>CodePageRange2 (bits 32-63) - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#cpr">http://www.microsoft.com/typography/otspec/os2.htm#cpr</a></td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>CheckSumAdjustment</td>
+        <td>head.CheckSumAdjustment - See <a href="http://www.microsoft.com/typography/otspec/head.htm">http://www.microsoft.com/typography/otspec/head.htm</a></td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>Reserved1</td>
+        <td>Reserved - must be 0</td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>Reserved2</td>
+        <td>Reserved - must be 0</td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>Reserved3</td>
+        <td>Reserved - must be 0</td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>Reserved4</td>
+        <td>Reserved - must be 0</td>
+      </tr>
+      <tr>
+        <td>unsigned short</td>
+        <td>Padding1</td>
+        <td>Padding to maintain long alignment. Padding value must always be set to 0x0000.</td>
+      </tr>
+      <tr>
+        <td>unsigned short</td>
+        <td>FamilyNameSize</td>
+        <td>Number of bytes used by the FamilyName array</td>
+      </tr>
+      <tr>
+        <td>byte</td>
+        <td>FamilyName[FamilyNameSize]</td>
+        <td>Array of UTF-16 characters the length of FamilyNameSize bytes. This is the English language Font Family string found in the name table of the font (name ID = 1) - See <a href="http://www.microsoft.com/typography/otspec/name.htm">http://www.microsoft.com/typography/otspec/name.htm</a></td>
+      </tr>
+      <tr>
+        <td>unsigned short</td>
+        <td>Padding2</td>
+        <td>Padding value must always be set to 0x0000.</td>
+      </tr>
+      <tr>
+        <td>unsigned short</td>
+        <td>StyleNameSize</td>
+        <td>Number of bytes used by the StyleName</td>
+      </tr>
+      <tr>
+        <td>byte</td>
+        <td>StyleName[StyleNameSize]</td>
+        <td>Array of UTF-16 characters the length of StyleNameSize bytes. This is the English language Font Subfamily string found in the name table of the font (name ID = 2) - See <a href="http://www.microsoft.com/typography/otspec/name.htm">http://www.microsoft.com/typography/otspec/name.htm</a></td>
+      </tr>
+      <tr>
+        <td>unsigned short</td>
+        <td>Padding3</td>
+        <td>Padding value must always be set to 0x0000.</td>
+      </tr>
+      <tr>
+        <td>unsigned short</td>
+        <td>VersionNameSize</td>
+        <td>Number of bytes used by the VersionName</td>
+      </tr>
+      <tr>
+        <td>bytes</td>
+        <td>VersionName[VersionNameSize]</td>
+        <td>Array of UTF-16 characters the length of VersionNameSize bytes. This is the English language version string found in the name table of the font (name ID = 5) - See <a href="http://www.microsoft.com/typography/otspec/name.htm">http://www.microsoft.com/typography/otspec/name.htm</a></td>
+      </tr>
+      <tr>
+        <td>unsigned short</td>
+        <td>Padding4</td>
+        <td>Padding value must always be set to 0x0000.</td>
+      </tr>
+      <tr>
+        <td>unsigned short</td>
+        <td>FullNameSize</td>
+        <td>Number of bytes used by the FullName</td>
+      </tr>
+      <tr>
+        <td>byte</td>
+        <td>FullName[FullNameSize]</td>
+        <td>Array of UTF-16 characters the length of FullNameSize bytes. This is the English language full name string found in the name table of the font (name ID = 4) - See <a href="http://www.microsoft.com/typography/otspec/name.htm">http://www.microsoft.com/typography/otspec/name.htm</a></td>
+      </tr>
+      <tr>
+        <td>byte</td>
+        <td>FontData[FontDataSize]</td>
+        <td>The font data for this EOT file. The data may be compressed or XOR encrypted as indicated by the processing flags.</td>
+      </tr>
+    </tbody></table>
+
+</div>
+
+<div class="div2">
+<p><a id="Version21" name="Version21"></a></p>
+    <h3 id="version32">3.2 Version 0x00020001</h3>
+    <table border="1" style="background-color: #F0F0F0;">
+      <tbody><tr>
+        <th style="background-color: #C0C0C0; width: 25%;">Data Type</th>
+        <th style="background-color: #C0C0C0; width: 25%;">Entry Name</th>
+        <th style="background-color: #C0C0C0; width: 50%;">Description</th>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>EOTSize</td>
+        <td>Total structure length in bytes (including string and font data)</td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>FontDataSize</td>
+        <td>Length of the OpenType font (FontData) in bytes</td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>Version</td>
+        <td>Version number of this format - 0x00020001</td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>Flags</td>
+        <td>Processing Flags</td>
+      </tr>
+      <tr>
+        <td>byte[10]</td>
+        <td>FontPANOSE</td>
+        <td>The PANOSE value for this font - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#pan">http://www.microsoft.com/typography/otspec/os2.htm#pan</a></td>
+      </tr>
+      <tr>
+        <td>byte</td>
+        <td>Charset</td>
+        <td>In Windows this is derived from TEXTMETRIC.tmCharSet. This value specifies the character set of the font. <a href="http://support.microsoft.com/kb/165478">DEFAULT_CHARSET (0x01)</a> indicates no preference. - See <a href="http://msdn2.microsoft.com/en-us/library/ms534202.aspx">http://msdn2.microsoft.com/en-us/library/ms534202.aspx</a></td>
+      </tr>
+      <tr>
+        <td>byte</td>
+        <td>Italic</td>
+        <td>If the bit for ITALIC is set in OS/2.fsSelection, the value will be 0x01 - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#fss">http://www.microsoft.com/typography/otspec/os2.htm#fss</a></td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>Weight</td>
+        <td>The weight value for this font - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#wtc">http://www.microsoft.com/typography/otspec/os2.htm#wtc</a></td>
+      </tr>
+      <tr>
+        <td>unsigned short</td>
+        <td>fsType</td>
+        <td>Type flags that provide information about embedding permissions - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#fst">http://www.microsoft.com/typography/otspec/os2.htm#fst</a></td>
+      </tr>
+      <tr>
+        <td>unsigned short</td>
+        <td>MagicNumber</td>
+        <td>Magic number for EOT file - 0x504C. Used to check for data corruption.</td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>UnicodeRange1</td>
+        <td>os/2.UnicodeRange1 (bits 0-31) - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#ur">http://www.microsoft.com/typography/otspec/os2.htm#ur</a></td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>UnicodeRange2</td>
+        <td>os/2.UnicodeRange2 (bits 32-63) - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#ur">http://www.microsoft.com/typography/otspec/os2.htm#ur</a></td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>UnicodeRange3</td>
+        <td>os/2.UnicodeRange3 (bits 64-95) - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#ur">http://www.microsoft.com/typography/otspec/os2.htm#ur</a></td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>UnicodeRange4</td>
+        <td>os/2.UnicodeRange4 (bits 96-127) - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#ur">http://www.microsoft.com/typography/otspec/os2.htm#ur</a></td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>CodePageRange1</td>
+        <td>CodePageRange1 (bits 0-31) - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#cpr">http://www.microsoft.com/typography/otspec/os2.htm#cpr</a></td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>CodePageRange2</td>
+        <td>CodePageRange2 (bits 32-63) - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#cpr">http://www.microsoft.com/typography/otspec/os2.htm#cpr</a></td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>CheckSumAdjustment</td>
+        <td>head.CheckSumAdjustment - See <a href="http://www.microsoft.com/typography/otspec/head.htm">http://www.microsoft.com/typography/otspec/head.htm</a></td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>Reserved1</td>
+        <td>Reserved - must be 0</td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>Reserved2</td>
+        <td>Reserved - must be 0</td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>Reserved3</td>
+        <td>Reserved - must be 0</td>
+      </tr>
+      <tr>
+        <td>unsigned long</td>
+        <td>Reserved4</td>
+        <td>Reserved - must be 0</td>
+      </tr>
+      <tr>
+        <td>unsigned short</td>
+        <td>Padding1</td>
+        <td>Padding to maintain long alignment. Padding value must always be set to 0x0000.</td>
+      </tr>
+      <tr>
+        <td>unsigned short</td>
+        <td>FamilyNameSize</td>
+        <td>Number of bytes used by the FamilyName array</td>
+      </tr>
+      <tr>
+        <td>byte</td>
+        <td>FamilyName[FamilyNameSize]</td>
+        <td>Array of UTF-16 characters the length of FamilyNameSize bytes. This is the English language Font Family string found in the name table of the font (name ID = 1) - See <a href="http://www.microsoft.com/typography/otspec/name.htm">http://www.microsoft.com/typography/otspec/name.htm</a></td>
+      </tr>
+      <tr>
+        <td>unsigned short</td>
+        <td>Padding2</td>
+        <td>Padding value must always be set to 0x0000.</td>
+      </tr>
+      <tr>
+        <td>unsigned short</td>
+        <td>StyleNameSize</td>
+        <td>Number of bytes used by the StyleName</td>
+      </tr>
+      <tr>
+        <td>byte</td>
+        <td>StyleName[StyleNameSize]</td>
+        <td>Array of UTF-16 characters the length of StyleNameSize bytes. This is the English language Font Subfamily string found in the name table of the font (name ID = 2) - See <a href="http://www.microsoft.com/typography/otspec/name.htm">http://www.microsoft.com/typography/otspec/name.htm</a></td>
+      </tr>
+      <tr>
+        <td>unsigned short</td>
+        <td>Padding3</td>
+        <td>Padding value must always be set to 0x0000.</td>
+      </tr>
+      <tr>
+        <td>unsigned short</td>
+        <td>VersionNameSize</td>
+        <td>Number of bytes used by the VersionName</td>
+      </tr>
+      <tr>
+        <td>bytes</td>
+        <td>VersionName[VersionNameSize]</td>
+        <td>Array of UTF-16 characters the length of VersionNameSize bytes. This is the English language version string found in the name table of the font (name ID = 5) - See <a href="http://www.microsoft.com/typography/otspec/name.htm">http://www.microsoft.com/typography/otspec/name.htm</a></td>
+      </tr>
+      <tr>
+        <td>unsigned short</td>
+        <td>Padding4</td>
+        <td>Padding value must always be set to 0x0000.</td>
+      </tr>
+      <tr>
+        <td>unsigned short</td>
+        <td>FullNameSize</td>
+        <td>Number of bytes used by the FullName</td>
+      </tr>
+      <tr>
+        <td>byte</td>
+        <td>FullName[FullNameSize]</td>
+        <td>Array of UTF-16 characters the length of FullNameSize bytes. This is the English language full name string found in the name table of the font (name ID = 4) - See <a href="http://www.microsoft.com/typography/otspec/name.htm">http://www.microsoft.com/typography/otspec/name.htm</a></td>
+      </tr>
+
+      <!-- Additional fields added to version 0x00020001 -->
+      <tr>
+        <td>unsigned short</td>
+        <td>Padding5</td>
+        <td>Padding value must always be set to 0x0000.</td>
+      </tr>
+      <tr>
+        <td>unsigned short</td>
+        <td>RootStringSize</td>
+        <td>Number of bytes used by the RootString array</td>
+      </tr>
+      <tr>
+        <td>byte</td>
+        <td>RootString[RootStringSize]</td>
+        <td>Array of UTF-16 characters the length of RootStringSize bytes. </td>
+      </tr>
+
+      <tr>
+        <td>byte</td>
+        <td>FontData[FontDataSize]</td>
+        <td>The font data for this EOT file. The data may be compressed or XOR encrypted as indicated by the processing flags.</td>
+      </tr>
+    </tbody></table>
+
+</div>
+
+<div class="div2">
+<p><a id="Version22" name="Version22"></a></p>
+    <h3 id="version33">3.3 Version 0x00020002</h3>
+    <table border="1" style="background-color: #F0F0F0;">
+      <tbody><tr>
+        <th style="background-color: #C0C0C0; " class="style1">Data Type</th>
+        <th style="background-color: #C0C0C0; width: 25%;">Entry Name</th>
+        <th style="background-color: #C0C0C0; width: 50%;">Description</th>
+      </tr>
+      <tr>
+        <td class="style1">unsigned long</td>
+        <td>EOTSize</td>
+        <td>Total structure length in bytes (including string and font data)</td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned long</td>
+        <td>FontDataSize</td>
+        <td>Length of the OpenType font (FontData) in bytes</td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned long</td>
+        <td>Version</td>
+        <td>Version number of this format - 0x00020002</td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned long</td>
+        <td>Flags</td>
+        <td>Processing Flags</td>
+      </tr>
+      <tr>
+        <td class="style1">byte[10]</td>
+        <td>FontPANOSE</td>
+        <td>The PANOSE value for this font - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#pan">http://www.microsoft.com/typography/otspec/os2.htm#pan</a></td>
+      </tr>
+      <tr>
+        <td class="style1">byte</td>
+        <td>Charset</td>
+        <td>In Windows this is derived from TEXTMETRIC.tmCharSet. This value specifies the character set of the font. <a href="http://support.microsoft.com/kb/165478">DEFAULT_CHARSET (0x01)</a> indicates no preference. - See <a href="http://msdn2.microsoft.com/en-us/library/ms534202.aspx">http://msdn2.microsoft.com/en-us/library/ms534202.aspx</a></td>
+      </tr>
+      <tr>
+        <td class="style1">byte</td>
+        <td>Italic</td>
+        <td>If the bit for ITALIC is set in OS/2.fsSelection, the value will be 0x01 - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#fss">http://www.microsoft.com/typography/otspec/os2.htm#fss</a></td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned long</td>
+        <td>Weight</td>
+        <td>The weight value for this font - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#wtc">http://www.microsoft.com/typography/otspec/os2.htm#wtc</a></td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned short</td>
+        <td>fsType</td>
+        <td>Type flags that provide information about embedding permissions - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#fst">http://www.microsoft.com/typography/otspec/os2.htm#fst</a></td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned short</td>
+        <td>MagicNumber</td>
+        <td>Magic number for EOT file - 0x504C. Used to check for data corruption.</td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned long</td>
+        <td>UnicodeRange1</td>
+        <td>os/2.UnicodeRange1 (bits 0-31) - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#ur">http://www.microsoft.com/typography/otspec/os2.htm#ur</a></td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned long</td>
+        <td>UnicodeRange2</td>
+        <td>os/2.UnicodeRange2 (bits 32-63) - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#ur">http://www.microsoft.com/typography/otspec/os2.htm#ur</a></td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned long</td>
+        <td>UnicodeRange3</td>
+        <td>os/2.UnicodeRange3 (bits 64-95) - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#ur">http://www.microsoft.com/typography/otspec/os2.htm#ur</a></td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned long</td>
+        <td>UnicodeRange4</td>
+        <td>os/2.UnicodeRange4 (bits 96-127) - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#ur">http://www.microsoft.com/typography/otspec/os2.htm#ur</a></td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned long</td>
+        <td>CodePageRange1</td>
+        <td>CodePageRange1 (bits 0-31) - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#cpr">http://www.microsoft.com/typography/otspec/os2.htm#cpr</a></td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned long</td>
+        <td>CodePageRange2</td>
+        <td>CodePageRange2 (bits 32-63) - See <a href="http://www.microsoft.com/typography/otspec/os2.htm#cpr">http://www.microsoft.com/typography/otspec/os2.htm#cpr</a></td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned long</td>
+        <td>CheckSumAdjustment</td>
+        <td>head.CheckSumAdjustment - See <a href="http://www.microsoft.com/typography/otspec/head.htm">http://www.microsoft.com/typography/otspec/head.htm</a></td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned long</td>
+        <td>Reserved1</td>
+        <td>Reserved - must be 0</td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned long</td>
+        <td>Reserved2</td>
+        <td>Reserved - must be 0</td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned long</td>
+        <td>Reserved3</td>
+        <td>Reserved - must be 0</td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned long</td>
+        <td>Reserved4</td>
+        <td>Reserved - must be 0</td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned short</td>
+        <td>Padding1</td>
+        <td>Padding to maintain long alignment. Padding value must always be set to 0x0000.</td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned short</td>
+        <td>FamilyNameSize</td>
+        <td>Number of bytes used by the FamilyName array</td>
+      </tr>
+      <tr>
+        <td class="style1">byte</td>
+        <td>FamilyName[FamilyNameSize]</td>
+        <td>Array of UTF-16 characters the length of FamilyNameSize bytes. This is the English language Font Family string found in the name table of the font (name ID = 1) - See <a href="http://www.microsoft.com/typography/otspec/name.htm">http://www.microsoft.com/typography/otspec/name.htm</a></td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned short</td>
+        <td>Padding2</td>
+        <td>Padding value must always be set to 0x0000.</td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned short</td>
+        <td>StyleNameSize</td>
+        <td>Number of bytes used by the StyleName</td>
+      </tr>
+      <tr>
+        <td class="style1">byte</td>
+        <td>StyleName[StyleNameSize]</td>
+        <td>Array of UTF-16 characters the length of StyleNameSize bytes. This is the English language Font Subfamily string found in the name table of the font (name ID = 2) - See <a href="http://www.microsoft.com/typography/otspec/name.htm">http://www.microsoft.com/typography/otspec/name.htm</a></td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned short</td>
+        <td>Padding3</td>
+        <td>Padding value must always be set to 0x0000.</td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned short</td>
+        <td>VersionNameSize</td>
+        <td>Number of bytes used by the VersionName</td>
+      </tr>
+      <tr>
+        <td class="style1">bytes</td>
+        <td>VersionName[VersionNameSize]</td>
+        <td>Array of UTF-16 characters the length of VersionNameSize bytes. This is the English language version string found in the name table of the font (name ID = 5) - See <a href="http://www.microsoft.com/typography/otspec/name.htm">http://www.microsoft.com/typography/otspec/name.htm</a></td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned short</td>
+        <td>Padding4</td>
+        <td>Padding value must always be set to 0x0000.</td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned short</td>
+        <td>FullNameSize</td>
+        <td>Number of bytes used by the FullName</td>
+      </tr>
+      <tr>
+        <td class="style1">byte</td>
+        <td>FullName[FullNameSize]</td>
+        <td>Array of UTF-16 characters the length of FullNameSize bytes. This is the English language full name string found in the name table of the font (name ID = 4) - See <a href="http://www.microsoft.com/typography/otspec/name.htm">http://www.microsoft.com/typography/otspec/name.htm</a></td>
+      </tr>
+
+      <!-- Additional fields added to version 0x00020001 -->
+      <tr>
+        <td class="style1">unsigned short</td>
+        <td>Padding5</td>
+        <td>Padding value must always be set to 0x0000.</td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned short</td>
+        <td>RootStringSize</td>
+        <td>Number of bytes used by the RootString array</td>
+      </tr>
+      <tr>
+        <td class="style1">byte</td>
+        <td>RootString[RootStringSize]</td>
+        <td>Array of UTF-16 characters the length of RootStringSize bytes.</td>
+      </tr>
+
+      <!-- Additional fields added to version 0x00020002 -->
+      <tr>
+        <td class="style1">unsigned long</td>
+        <td>RootStringCheckSum</td>
+        <td>RootString CheckSum value. See algorithm to process RootStringChecksum below.</td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned long</td>
+        <td>EUDCCodePage</td>
+        <td>Codepage value needed for EUDC font support.</td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned short</td>
+        <td>Padding6</td>
+        <td>Padding value must always be set to 0x0000.</td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned short</td>
+        <td>SignatureSize</td>
+        <td>Number of bytes used by the Signature array. Currently reserved and should be set to 0x0000.</td>
+      </tr>
+      <tr>
+        <td class="style1">byte</td>
+        <td>Signature[SignatureSize]</td>
+        <td>Currently reserved. If the SignatureSize is 0x0000 there is no length to this array.</td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned long</td>
+        <td>EUDCFlags</td>
+        <td>Processing flags for the EUDC font. Typical values might be TTEMBED_XORENCRYPTDATA and TTEMBED_TTCOMPRESSED.</td>
+      </tr>
+      <tr>
+        <td class="style1">unsigned long</td>
+        <td>EUDCFontSize</td>
+        <td>Number of bytes used by the Signature array.</td>
+      </tr>
+      <tr>
+        <td class="style1">byte</td>
+        <td>EUDCFontData[EUDCFontSize]</td>
+        <td>Number of bytes used for the EUDC font data. If the EUDCFontSize is 0x00000000 there is no length to this array.</td>
+      </tr>
+
+      <tr>
+        <td class="style1">byte</td>
+        <td>FontData[FontDataSize]</td>
+        <td>The font data for this EOT file. The data may be compressed or XOR encrypted as indicated by the processing flags.</td>
+      </tr>
+    </tbody></table>
+
+</div>
+</div>
+
+<div class="div1">
+<p>&nbsp;</p>
+    <h2><a id="Implementation" name="Implementation"></a>4 Implementation Information</h2>
+
+<div class="div2">
+<h3><a id="EmbeddingLevel" name="EmbeddingLevel"></a>4.1 Font Embedding Levels</h3>
+                <p>
+                    The "fsType" entry of the EMBEDDEDFONT structure provides an easily accessible
+                    copy of the font embedding licensing rights for the font in the .EOT file. This
+                    allows User Agents the ability to verify licensing privileges for using the
+                    embedded font before unpacking and installing the font.</p>
+                <p>
+                    Applications that implement support for font embedding must not embed fonts
+                    which are not licensed to permit embedding. Further, applications loading
+                    embedded fonts for temporary use (see Preview &amp; Print and Editable embedding
+                    below) must delete the fonts from the device when the document containing the
+                    embedded font is closed.</p>
+                <p>
+                    NOTE: While the current version of the OpenType font specification's OS/2 table
+                    makes bits 0 - 3 a set of mutually exclusive bits, there may be older fonts that
+                    have multiple bits set. In that case the least restrictive bit set is used to
+                    determine the licensing level for font embedding.</p>
+                <p>
+                    <b>0x0000 - Installable Embedding:</b> No fsType bit is set. Thus fsType is
+                    zero. Fonts with this setting indicate that they may be embedded and permanently
+                    installed on the remote system by an application. The user of the remote system
+                    acquires the identical rights, obligations and licenses for that font as the
+                    original purchaser of the font, and is subject to the same end-user license
+                    agreement, copyright, design patent, and/or trademark as was the original
+                    purchaser.</p>
+                <p>
+                    NOTE: It is recommended that User Agents never permanently install embedded
+                    fonts on systems, even when Installable Embedding is set, to mitigate attacks
+                    where a malicious attempt could be made to fill up a machine's memory space with
+                    unwanted fonts without the user being aware.</p>
+                <p>
+                    <b>0x0002 - Restricted License embedding:</b> Fonts that have <b>only</b> this
+                    bit set <b>must not be modified, embedded or exchanged in any manner</b> without
+                    first obtaining permission of the legal owner. Caution: For Restricted License
+                    embedding to take effect, it must be the only level of embedding selected.</p>
+                <p>
+                    <b>0x0004 - Preview &amp; Print embedding:</b> When this bit is set, the font may be
+                    embedded, and temporarily loaded on the remote system. Documents containing
+                    Preview &amp; Print fonts must be opened "read-only;" no edits can be applied to the
+                    document.</p>
+                <p>
+                    <b>0x0008 - Editable embedding:</b> When this bit is set, the font may be
+                    embedded but must only be installed <b>temporarily</b> on other systems. In
+                    contrast to Preview &amp; Print fonts, documents containing Editable fonts may be
+                    opened for reading, editing is permitted, and changes may be saved.</p>
+                <p>
+                    <b>0x0100 - No subsetting:</b> When this bit is set, the font may not be
+                    subsetted prior to embedding. Other embedding restrictions specified in bits 0-3
+                    and 9 also apply.</p>
+                <p>
+                    <b>0x0200 - Bitmap embedding only:</b> When this bit is set, only bitmaps
+                    contained in the font may be embedded. No outline data may be embedded. If there
+                    are no bitmaps available in the font, then the font is considered unembeddable
+                    and the embedding services will fail. Other embedding restrictions specified in
+                    bits 0-3 and 8 also apply.</p>
+</div>
+
+<div class="div2">
+<h3><a id="Flags" name="Flags"></a>4.2 Processing Flags</h3>
+                <p>
+                    The following flags define processing required when loading an embedded font.MBEDDEDFONT structure. Some of the
+                    flags make sense during the process of creating the embedded font, but have no
+                    real value when the font is loaded.</p>
+<pre>#define TTEMBED_SUBSET                     0x00000001
+#define TTEMBED_TTCOMPRESSED               0x00000004
+#define TTEMBED_FAILIFVARIATIONSIMULATED   0x00000010
+#define TTMBED_EMBEDEUDC                   0x00000020
+#define TTEMBED_VALIDATIONTESTS            0x00000040 (Deprecated)
+#define TTEMBED_WEBOBJECT                  0x00000080
+#define TTEMBED_XORENCRYPTDATA             0x10000000
+</pre>
+
+                <h3><a id="RuntimeProcessing" name="RuntimeProcessing">4.2.1 Flags used at loading time</a></h3>
+                <p>
+                    The following flags define processing required when loading an embedded font.</p>
+                <h4 id="ttembed_subset">
+                    TTEMBED_SUBSET</h4>
+                <p>
+                    The font has been subsetted to contain support for only the characters needed to
+                    render the text in the document identified by the RootString entry of the
+                    EMBEDDEDFONT structure.</p>
+                <p>
+                    NOTE: If the font has been subsetted, it is possible that the UnicodeRange and
+                    CodePageRange data has not been updated to correctly reflect the subsetted font
+                    values. Therefore, the values should not be interpreted literally if the font
+                    has been subsetted.</p>
+                <h4 id="ttembed_ttcompressed">
+                    TTEMBED_TTCOMPRESSED</h4>
+                <p>
+                    The font data has been compressed by the MicroType® Express algorithm. The
+                    MicroType® Express algorithm is a lossless compression algorithm for OpenType/TrueType
+                    fonts, which was developed by Monotype Imaging. Monotype Imaging has indicated that
+                    they own one or more patents that relate to the MicroType® Express algorithm.
+                </p>
+                <h4 id="ttembed_embedeudc">
+                    TTEMBED_EMBEDEUDC</h4>
+                <p>
+                    If this flag is set, the font should contain EUDC (<a href="http://blogs.msdn.com/michkap/archive/2005/06/27/433186.aspx">End User
+                    Defined Character</a>) characters. [<a href="http://msdn2.microsoft.com/en-us/library/ms776416.aspx">more
+                    information</a>] Requires version 0x00020001 or higher of EOT file format.</p>
+                <h4 id="ttembed_xorencryptdata">
+                    TTEMBED_XORENCRYPTDATA</h4>
+                <p>
+                    This flag indicates that the FontData array and EUDCFotData array (if present)
+                    has been encrypted using an XOR algorithm using an XOR key of 0x50 on each byte
+                    of the font data. This happens on final data, after compression and subsetting.
+                    The font must be decrypted using the XOR key to accesses the font data.</p>
+                <h3><a id="CreationProcessing" name="CreationProcessing">4.2.2 Flags used when creating embedded font</a></h3>
+                <p>
+                    The following flags are used in some libraries for creating EOT files and are
+                    co-incidentally recorded in the EOT file. No processing is required by a user
+                    agent if these flags are set.</p>
+                <h4 id="ttembed_failifvariationsimulated">
+                    TTEMBED_FAILIFVARIATIONSIMULATED</h4>
+                <p>
+                    If this flag is set, the User Agent must check to see if font is simulated by
+                    comparing weight and italic settings obtained from system with the actual font
+                    data. If values do not match what the client requested in the document then the
+                    font should not be used.</p>
+                <h4 id="ttembed_validationtests">
+                    TTEMBED_VALIDATIONTESTS</h4>
+                <p>
+                    This flag is deprecated. There is no processing to do if this flag is set. The
+                    flag means that some tests may have been run when creating the embedded font.
+                    User agents should not make any assumptions on the basis of this flag.</p>
+                <h4 id="ttembed_webobject">
+                    TTEMBED_WEBOBJECT</h4>
+                <p>
+                    A font with this flag set indicates that it is intended for use on the internet.
+                    However, it does not really mean anything for processing, except if a tool
+                    creating embedded fonts wants to enforce certain settings.</p>
+</div>
+
+<div class="div2">
+<h3><a id="RootString" name="RootString"></a>4.3 RootString</h3>
+<p>The RootString contains one or more full URLs from which the embedded font object
+    may be referenced. Multiple URLs, separated by NULL terminators, can be
+    specified. This allows licensed owners of fonts to honor their license
+    agreements for using the embedded fonts on their pages, while preventing others
+    from using the font for uses for which the font is not licensed. </p>
+</div>
+
+<div class="div3">
+<h4><a id="RootStringUsage" name="RootStringUsage"></a>4.3.1 RootString Usage</h4>
+                <p>
+                    User Agents
+                    must validate that the page using the embedded font is within the list of URLs
+                    from which the embedded font object may be legitimately referenced.</p>
+<p></p>
+</div>
+
+<div class="div3">
+<h4><a id="RootStringChecksum" name="RootStringUsage"></a>4.3.2 RootString Checksum Calculation</h4>
+                <p>
+                    The RootStringCheckSum entry is calculated as the sum of all bytes in the
+                    RootString array, then XORed with a value of 0x50475342. The following algorithm
+                    is used to calculate the checksum value.</p>
+
+<pre>#define CS_XORKEY                   0x50475342
+
+unsigned long GetByteCheckSum( unsigned char* pucBuffer,
+                               unsigned short cbLength )
+{
+    int i;
+    unsigned long ulCS = 0;
+
+    for(i = 0; i &lt; cbLength; i++)
+    {
+        ulCS += pucBuffer[i];
+    }
+
+    return ulCS ^ CS_XORKEY;
+}
+</pre>
+                <p>
+                    When unpacking the .EOT font file, the process should calculate the checksum of
+                    RootString data and then compare to the stored checksum value. If the values do
+                    not match, the font should be viewed as having been tampered with and should not
+                    be used.</p>
+<p></p>
+</div>
+
+<div class="div2">
+<h3><a id="Processing" name="Processing"></a>4.4 Processing Font Data</h3>
+                <p>
+                    When a font is packed into an .EOT file, with the font being both compressed
+                    (TTEMBED_TTCOMPRESSED) and XORed (TTEMBED_XORENCRYPTDATA), the processing is
+                    done in that order (compression followed by XOR). Thus, when the font has
+                    processing flags TTEMBED_TTCOMPRESSED and TTEMBED_XORENCRYPTDATA set, the font
+                    data must be first XORed and then passed through the decompression algorithm.</p>
+                <p>
+                    If the processing flag TTEMBED_XORENCRYPTDATA is set in the Flags entry, the
+                    following algorithm is used to XOR the font data for either the embedded font or
+                    the EUDC font (if present).</p>
+<pre>#define XORKEY                   0x50
+
+void XORBufferData( unsigned char* pucBuffer,
+                    unsigned long ulSize )
+{
+    unsigned long ulIndex;
+
+    for(ulIndex = 0; ulIndex &lt; ulSize; ulIndex++)
+    {
+        pucBuffer[ulIndex] = (unsigned char)(pucBuffer[ulIndex] ^ XORKEY);
+    }
+}
+</pre>
+<p></p>
+</div>
+</div>
+
+</div>
+
+
+
+</body></html>
