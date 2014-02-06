@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <title>Let's make a font</title>
     <link rel="stylesheet" href="style.css">
+    <script src="dataBuilding.js"></script>
     <script src="Tables.js"></script>
     <script>
       NodeList.prototype.array = function() { return Array.prototype.slice.call(this); };
@@ -49,11 +50,10 @@
     value, so actually the decimal value 65) is the letter "A".</p>
 
     <p>So, let's test that font. If all went well, this is a black rectangle:
-    <span style="font-family: 'custom font';">A</span>. If you're using Firefox,
-    there's a good chance it actually is. (Chrome seems to realise this is a font,
-    but doesn't get the outline correct, IE doesn't seem to like this font period),
-    so if it wasn't: let's pretend it was, and now let's figure out
-    <strong><em>WHY</em></strong> you saw a rectangle instead of the capital letter 'A'.</p>
+    <span style="font-family: 'custom font';">A</span>. If you do a view-source on
+    this index.html, you'll see that it's actually the "letter" A, with this
+    tiny font applied to it. So... let's figure out <strong><em>WHY</em></strong>
+    you saw a rectangle instead of the capital letter 'A'.</p>
 
     <h2>Fonts don't contain letters</h2>
 

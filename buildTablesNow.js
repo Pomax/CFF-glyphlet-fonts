@@ -147,7 +147,7 @@
   };
 
   // build the font
-  var font = buildFont(big);
+  var font = buildFont(small);
 
   // convert to legible data
   var binary = font.otf;
@@ -157,6 +157,7 @@
   document.body.appendChild(makeTable(charmap));
   console.log("--- cff ---\n", font.cff.map(asHex).join(" "));
   console.log("--- otf ---\n", hexmap.join(" "));
+  //console.log("--- woff ---\n", font.woff.map(asHex).join(" "));
 
   // generate OFT and CFF region highlighting in the HTML tables
   var otf = font.mappings.filter(function(e) { return e.type !== "cff"; });
@@ -170,9 +171,9 @@
   });
 
   // create stylesheet that uses this font
-  var mime = "font/opentype";
-  var dataurl = "data:" + mime + ";base64," + btoa(charmap.join(''));
-  var fontface = "@font-face {\n  font-family: 'custom font';\n  src: url('" +dataurl+ "') format('opentype');\n}";
+  var mime = "opentype/font-woff";
+  var dataurl = "data:" + mime + ";base64," + btoa(font.woff.map(asChars).join(''));
+  var fontface = "@font-face {\n  font-family: 'custom font';\n  src: url('" +dataurl+ "') format('woff');\n}";
   var sheet = document.createElement("style");
   sheet.innerHTML = fontface;
   document.head.appendChild(sheet);

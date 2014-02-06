@@ -2,146 +2,10 @@
 
   "use strict";
 
-  // Convert ASCII to UTF16, the cheap way.
-  function atou(v) {
-    var pad = String.fromCharCode(0),
-        a = v.split(''),
-        out = [];
-    a.forEach(function(v) {
-      // This works because for the ANSI range 0x00-0xFF,
-      // the equivalent UTF16 code is 0x0000-0x00FF.
-      out.push(pad);
-      out.push(v);
-    })
-    return out.join('');
-  }
-
-  /***
-   *
-   * OpenType data types
-   *
-   ***/
-
-  function BYTE(v) { return [v]; }
-  function CHAR(v) { return [v.charCodeAt(0)]; }
-  function CHARARRAY(v) { return v.split('').map(function(v) { return v.charCodeAt(0); }); }
-  function FIXED(v) { return [(v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF]; }
-  function USHORT(v) { return [(v >> 8) & 0xFF, v & 0xFF]; }
-  function SHORT(v)  {
-    var limit = 32768;
-    if(v >= limit) { v = -(2*limit - v); } // 2's complement
-    return [(v >> 8) & 0xFF, v & 0xFF];
-  }
-  function UINT24(v) { return [(v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF]; }
-  function ULONG(v) { return [(v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF]; }
-  function LONG(v)  {
-    var limit = 2147483648;
-    if(v >= limit) { v = -(2*limit - v); } // 2's complement
-    return [(v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF];
-  }
-
-  function LONGDATETIME(v) {
-    // This doesn't actually work in JS. Then again, these values that use
-    // this are irrelevant, too, so we just return a 64bit "zero"
-    return [0,0,0,0,0,0,0,0];
-  }
-
-
-  // aliased datatypes
-  var FWORD = SHORT,
-      UFWORD = USHORT;
-
-  /***
-   *
-   * CFF data types
-   *
-   ***/
-
-  function NUMBER(v) {
-    if (-107 <= v && v <= 107) {
-      return [v + 139]; }
-    if (108 <= v && v <= 1131) {
-      var b0 = v >> 8,
-          b1 = (v - (b0 << 8)) & 0xFF;
-      return [b0 + 247, b1 - 108]; }
-    if (-1131 <= v && v <= -108) {
-      var v2 = -v - 108,
-          b0 = v2 >> 8,
-          b1 = v2 - (b0 << 8);
-      return [(b0 + 251), b1]; }
-    if (-32768 <= v && v <= 32767) {
-      return [28, (v >> 8) & 0xFF, v & 0xFF]; }
-    return [29, (v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF];
-  }
-
-  function OPERAND(v1, v2) {
-    var opcode = BYTE(v1);
-    if(v2 !== undefined) { opcode.concat(BYTE(v2)); }
-    return opcode;
-  }
-
-  function DICTINSTRUCTION(codes) {
-    var data = [];
-    codes.forEach(function(code) {
-      data = data.concat(code);
-    });
-    return data;
-  }
-
-  /***
-   *
-   * Aliased data types
-   *
-   ***/
-
-  var GlyphID = USHORT,
-      Offset = USHORT,
-      Card8 = BYTE,
-      Card16 = USHORT,
-      SID = USHORT,
-      OffSize = BYTE,
-      OffsetX = [undefined, BYTE, USHORT, UINT24, ULONG];
-
-  /**
-   * Helper function for decoding strings as ULONG
-   */
-  function decodeULONG(ulong) {
-    var b = ulong.split('').map(function(c) { return c.charCodeAt(0); });
-    var val = (b[0] << 24) + (b[1] << 16) + (b[2] << 8) + b[3];
-    if (val < 0 ) { val += Math.pow(2,32); }
-    return val;
-  }
-
-  // const, but const in strict mode is not allowed
-  var LABEL = 0;
-  var READER = 1;
-  var NESTED_RECORD = 1;
-  var DATA = 3;
-
-  /**
-   * Serialise a record structure into byte code
-   */
-  var serialize = function(record) {
-    var data = [];
-    (function _serialize(record) {
-      if (typeof record[LABEL] !== "string") {
-        record.forEach(_serialize);
-      }
-      else if (typeof record[READER] === "function") {
-        data = data.concat(record[READER](record[DATA]));
-      }
-      else {
-        var nested = record[NESTED_RECORD];
-        if(nested instanceof Array) {
-          _serialize(nested);
-        }
-        else {
-          console.error(record);
-          throw new Error("what?");
-        }
-      }
-    }(record));
-    return data;
+  // layout mapping for finding regions of interest in the byte code
+  var mappings = [];
+  function addMapping(name, start, end, type) {
+    mappings.push({name:name, start:start, end:end, type:type});
   };
 
   /**
@@ -168,6 +32,141 @@
   }
 
   /**
+   * Generate the font's binary data
+   */
+  function buildSFNT(numTables, TableModels) {
+    var maxPower = ((Math.log(numTables)/Math.log(2))|0),
+        searchRange = Math.pow(2, maxPower) * 16,
+        entrySelector = maxPower,
+        rangeShift = numTables * 16 - searchRange,
+        opentype = CHARARRAY("OTTO")
+                   .concat(USHORT(numTables))
+                   .concat(USHORT(searchRange))
+                   .concat(USHORT(entrySelector))
+                   .concat(USHORT(rangeShift)),
+        opentype_len = opentype.length,
+        headers = [],
+        headers_len = numTables * 16,
+        fontdata = [],
+        fontchecksum = 0,
+        tabledataoffset = opentype_len + headers_len,
+        checksumoffset = 0;
+
+    /**
+     * This is run once, for each table
+     */
+    var processTag = function(tag) {
+      var table = TableModels[tag];
+      // we're computing offset based on a running tally
+      var offset = fontdata.length;
+      if(tag==="head") {
+        checksumoffset = tabledataoffset + offset + 8;
+      }
+      // serialize all records in the table
+      var data = [];
+      data = data.concat(serialize(table)); //table.forEach(function(e) { data = data.concat(serialize(e)); });
+      var length = data.length;
+      addMapping(tag + " table data", tabledataoffset + offset, tabledataoffset + offset + length, "table");
+
+      // ensure we preserve LONG alignment, by padding tables if need be.
+      while(data.length % 4 !== 0) { data.push(0); }
+      fontdata = fontdata.concat(data);
+
+      // compute the table's checksum as a sum of ULONG values
+      // (which explains why we needed the LONG alignment).
+      var checksum = computeChecksum(data, tag);
+      fontchecksum += checksum;
+
+      // and then update the OpenType header with the table's 16 byte record
+      var table_entry = CHARARRAY(tag)
+                       .concat(ULONG(checksum))
+                       .concat(ULONG(opentype_len + headers_len + offset))
+                      .concat(ULONG(length));
+      //console.log(tag, offset, data)
+      addMapping(tag + " table definition", opentype_len + headers.length, opentype_len + headers.length + 16, "sfnt");
+      headers = headers.concat(table_entry);
+    };
+
+    addMapping("sfnt header", 0, 12, "sfnt");
+    Object.keys(TableModels).forEach(processTag);
+    var data = opentype.concat(headers).concat(fontdata);
+
+    // We're almost done, but we still need to compute the full font's checksum.
+    // This one's tricky, and the algorithm for computing all checksums is:
+    //
+    //  1. Set the checkSumAdjustment to 0.
+    //  2. Calculate the checksum for all the tables including the 'head' table and enter that value into the table directory.
+    //  3. Calculate the checksum for the entire font.
+    //  4. Subtract that value from the hex value B1B0AFBA.
+    //  5. Store the result in checkSumAdjustment
+    //
+
+    // Now, we've already done steps 1 and 2, so, next are steps 3 and 4:
+    var checksum = 0xB1B0AFBA - computeChecksum(data);
+    checksum += Math.pow(2,32); // Add first, because mod on a negative...
+    checksum %= Math.pow(2,32); // ...would yield a negative in JavaScript.
+    checksum = ULONG(checksum);
+
+    // And then step 5:
+    var head = data.slice(0, checksumoffset),
+        tail = data.slice(checksumoffset + 4);
+    return head.concat(checksum).concat(tail);
+  }
+
+  /**
+   * repackage an SFNT block as WOFF
+   */
+  function formWOFF(data, numTables) {
+
+    var HEADER = [
+        ["signature", CHARARRAY, "wOFF", "wOFF"]
+      , ["flavour", CHARARRAY, "The sfnt version of the wrapped font", "OTTO"]
+      , ["length", ULONG, "Total size of the WOFF file.", 0x00000000]
+      , ["numTables", USHORT, "Number of entries in directory of font tables.", numTables]
+      , ["reserved", USHORT, "set to zero", 0]
+      , ["totalSfntSize", ULONG, "Total size needed for the uncompressed font data", data.length]
+      , ["majorVersion", USHORT, "Major version of the WOFF file.", 1]
+      , ["minorVersion", USHORT, "Minor version of the WOFF file.", 0]
+      , ["metaOffset", ULONG, "Offset to metadata block, from beginning of WOFF file.", 0]
+      , ["metaLength", ULONG, "Length of compressed metadata block.", 0]
+      , ["metaOrigLength", ULONG, "Uncompressed size of metadata block.", 0]
+      , ["privOffset", ULONG, "Offset to private data block, from beginning of WOFF file.", 0]
+      , ["privLength", ULONG, "Length of private data block.", 0]
+    ];
+
+    var woff_header = serialize(HEADER),
+        woff_dictionary = [],
+        woff_data = [],
+        woffset = woff_header.length + numTables * 20,
+        woff;
+
+    // build the woff table directory by copying the sfnt table
+    // directory entries and duplicating the length value.
+    for(var i=0, last=numTables, chunk, entry; i<last; i++) {
+      chunk = data.slice(12+i*16, 12 + (i+1)*16);
+      var entry = serialize([
+          ["tag", LITERAL, "tag name", chunk.slice(0,4)]
+        , ["offset", ULONG, "Offset to the data, from beginning of WOFF file", woffset + woff_data.length]
+        , ["compLength", LITERAL, "length of the compressed data table", chunk.slice(12,16)]
+        , ["origLength", LITERAL, "length of the original uncompressed data table", chunk.slice(12,16)]
+        , ["origChecksum", LITERAL, "orginal table checksum", chunk.slice(4,8)]
+      ]);
+      woff_dictionary = woff_dictionary.concat(entry);
+      var otf_offset = decodeULONG(chunk.slice(8,12)),
+          otf_length = decodeULONG(chunk.slice(12,16)),
+          table_data = data.slice(otf_offset, otf_offset+otf_length);
+      woff_data = woff_data.concat(table_data);
+      while(woff_data.length % 4 !== 0) { woff_data.push(0); }
+    }
+
+    // finalise the header by recording the correct length:
+    woff = woff_header.concat(woff_dictionary).concat(woff_data);
+    HEADER[2][3] = woff.length;
+
+    return serialize(HEADER).concat(woff_dictionary).concat(woff_data);
+  }
+
+  /**
    * Create a font. Options:
    * {
    *   name: "glyph name"
@@ -177,12 +176,7 @@
    * }
    */
   var buildFont = function(options) {
-
-    // layout mapping for finding regions of interest in the byte code
-    var mappings = [];
-    var addMapping = function(name, start, end, type) {
-      mappings.push({name:name, start:start, end:end, type:type});
-    };
+    mappings = [];
 
     // make sure the options are good.
     if(!options.outline) { throw new Error("No outline was passed to build a font for"); }
@@ -640,7 +634,7 @@
       "CFF ": createCFF()
       ,
       "OS/2": [
-          ["version", USHORT, "OS/2 table 1", 0x0001]
+          ["version", USHORT, "OS/2 table 1", 0x0004]
         , ["xAvgCharWidth", SHORT, "xAvgCharWidth", 0]
         , ["usWeightClass", USHORT, "usWeightClass", 400]
         , ["usWidthClass", USHORT, "usWidthClass", 1]
@@ -670,7 +664,7 @@
           , ["bMidline", BYTE, "", 0]
           , ["bXHeight", BYTE, "", 0]
         ]]
-        , ["ulUnicodeRange1", ULONG, "", 0]
+        , ["ulUnicodeRange1", ULONG, "", 0x00000001] // basic latin only atm
         , ["ulUnicodeRange2", ULONG, "", 0]
         , ["ulUnicodeRange3", ULONG, "", 0]
         , ["ulUnicodeRange4", ULONG, "", 0]
@@ -681,10 +675,15 @@
         , ["sTypoAscender", SHORT, "typographic ascender", 1024] // currently not based on anything
         , ["sTypoDescender", SHORT, "typographic descender", 0]  // currently not based on anything
         , ["sTypoLineGap", SHORT, "line gap", globals.quadSize]
-        , ["usWinAscent", USHORT, "usWinAscent", options.yMax]
-        , ["usWinDescent", USHORT, , "usWinDescent", -options.yMin]
-        , ["ulCodePageRange1", ULONG, "", 0]
+        , ["usWinAscent", USHORT, "usWinAscent", Math.max(options.yMax, 1)]
+        , ["usWinDescent", USHORT, , "usWinDescent", Math.abs(Math.min(options.yMin, -1))]
+        , ["ulCodePageRange1", ULONG, "", 0x00000001]
         , ["ulCodePageRange2", ULONG, "", 0]
+        , ["sxHeight", SHORT, "", 0]
+        , ["sCapHeight", SHORT, "", 0]
+        , ["usDefaultChar", USHORT, "", 0]
+        , ["usBreakChar", USHORT, "", 0]
+        , ["usMaxContext", USHORT, "", 1]
       ],
       "cmap": [
           ["version", USHORT, "cmap main version", 0]
@@ -775,102 +774,13 @@
       ]
     };
 
-    /**
-     * special marker: we need this to set the full font checksum later.
-     */
-    var fontchecksum = 0,
-        tabledataoffset = 0,
-        checksumoffset = 0;
+    var numTables = Object.keys(TableModels).length;
+    var otf = buildSFNT(numTables, TableModels);
 
-    /**
-     * Generate the font's binary data
-     */
-    function buildFontData() {
-
-      var numTables = Object.keys(TableModels).length,
-          maxPower = ((Math.log(numTables)/Math.log(2))|0),
-          searchRange = Math.pow(2, maxPower) * 16,
-          entrySelector = maxPower,
-          rangeShift = numTables * 16 - searchRange,
-          opentype = CHARARRAY("OTTO")
-                     .concat(USHORT(numTables))
-                     .concat(USHORT(searchRange))
-                     .concat(USHORT(entrySelector))
-                     .concat(USHORT(rangeShift)),
-          opentype_len = opentype.length,
-          headers = [],
-          headers_len = numTables * 16,
-          fontdata = [];
-
-      tabledataoffset = opentype_len + headers_len;
-
-      /**
-       * This is run once, for each table
-       */
-      var processTag = function(tag) {
-        var table = TableModels[tag];
-        // we're computing offset based on a running tally
-        var offset = fontdata.length;
-        if(tag==="head") {
-          checksumoffset = tabledataoffset + offset + 8;
-        }
-        // serialize all records in the table
-        var data = [];
-        data = data.concat(serialize(table)); //table.forEach(function(e) { data = data.concat(serialize(e)); });
-        var length = data.length;
-        addMapping(tag + " table data", tabledataoffset + offset, tabledataoffset + offset + length, "table");
-
-        // ensure we preserve LONG alignment, by padding tables if need be.
-        while(data.length % 4 !== 0) { data.push(0); }
-        fontdata = fontdata.concat(data);
-
-        // compute the table's checksum as a sum of ULONG values
-        // (which explains why we needed the LONG alignment).
-        var checksum = computeChecksum(data, tag);
-        fontchecksum += checksum;
-
-        // and then update the OpenType header with the table's 16 byte record
-        var table_entry = CHARARRAY(tag)
-                         .concat(ULONG(checksum))
-                         .concat(ULONG(opentype_len + headers_len + offset))
-                        .concat(ULONG(length));
-        //console.log(tag, offset, data)
-        addMapping(tag + " table definition", opentype_len + headers.length, opentype_len + headers.length + 16, "sfnt");
-        headers = headers.concat(table_entry);
-      };
-
-      addMapping("sfnt header", 0, 12, "sfnt");
-      Object.keys(TableModels).forEach(processTag);
-      return opentype.concat(headers).concat(fontdata);
-    }
-
-    var data = buildFontData();
-
-    // We're almost done, but we still need to compute the full font's checksum.
-    // This one's tricky, and the algorithm for computing all checksums is:
-    //
-    //  1. Set the checkSumAdjustment to 0.
-    //  2. Calculate the checksum for all the tables including the 'head' table and enter that value into the table directory.
-    //  3. Calculate the checksum for the entire font.
-    //  4. Subtract that value from the hex value B1B0AFBA.
-    //  5. Store the result in checkSumAdjustment
-    //
-
-    // Now, we've already done steps 1 and 2, so, next are steps 3 and 4:
-    var checksum = 0xB1B0AFBA - computeChecksum(data);
-    checksum += Math.pow(2,32); // Add first, because mod on a negative...
-    checksum %= Math.pow(2,32); // ...yields a negative, in JavaScript
-    checksum = ULONG(checksum);
-
-    // And then step 5:
-    var head = data.slice(0, checksumoffset),
-        tail = data.slice(checksumoffset + 4);
-    data = head.concat(checksum).concat(tail);
-
-    // and now we're done.
     return {
-      cff: serialize(["CFF ", TableModels["CFF "]]),
-      otf: data,
+      cff: serialize(TableModels["CFF "]),
+      otf: otf,
+      woff: formWOFF(otf, numTables),
       mappings: mappings
     }
   };
