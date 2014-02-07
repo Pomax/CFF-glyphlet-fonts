@@ -61,7 +61,7 @@
     var fix = function(b) {
       if (b < 0) {
         console.log(b);
-        b = (-b) ^ 255;
+        b = (-b - 1) ^ 255;
         console.log(b);
       }
       return b;
