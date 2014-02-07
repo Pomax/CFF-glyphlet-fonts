@@ -171,19 +171,19 @@
   });
 
   // create stylesheet that uses this font
-/*
+
   var mime = "font/opentype";
   var dataurl = "data:" + mime + ";base64," + btoa(font.otf.map(asChars).join(''));
   var fontface = "@font-face {\n  font-family: 'custom font';\n  src: url('" +dataurl+ "') format('opentype');\n}";
   var sheet = document.createElement("style");
   sheet.innerHTML = fontface;
   document.head.appendChild(sheet);
-*/
+/*
   var mime = "application/font-woff";
   var dataurl = "data:" + mime + ";base64," + btoa(font.woff.map(asChars).join(''));
   var fontface = "@font-face {\n  font-family: 'custom font';\n  src: url('" +dataurl+ "') format('woff');\n}";
   var sheet = document.createElement("style");
   sheet.innerHTML = fontface;
   document.head.appendChild(sheet);
-
+*/
 }());
