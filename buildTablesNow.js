@@ -131,7 +131,7 @@
   // pretty impressive.
 
   var big = {
-    outline: "M 20 -50 L 20 650 700 650 700 -50 Z"
+    outline: "M 0 0 L 0 650 700 650 700 0 0 0"
   };
 
   var small = {

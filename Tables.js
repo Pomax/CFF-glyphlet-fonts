@@ -199,10 +199,18 @@
     // FIXME: this does not generate the most compact charstring at the moment.
     (function convertOutline(options, globals) {
       var outline = options.outline;
-      var sections = outline.match(/[MmLlCcZz]\s*([\-\d]+\s+)*/g).map(function(s){return s.trim()});
+      var sections = outline.match(/[MmLlCcZz]\s*([\-\d]+\s*)*/g).map(function(s){return s.trim()});
       var mx = 99999999, MX=-99999999, my=mx, MY=MX;
       var x=0, y=0, cx=false, cy=false, i=0, last=0;
       var charstring = [];
+      var terminated = false;
+
+      var mark = function(x,y) {
+        if(x < mx) { mx = x; }
+        if(y < my) { my = y; }
+        if(x > MX) { MX = x; }
+        if(y > MY) { MY = x; }
+      }
 
       sections.forEach(function(d) {
         var op = d.substring(0,1);
@@ -214,11 +222,13 @@
           if(op === 'm') {
             values[0] -= x; x += values[0];
             values[1] -= y; y += values[1];
+            mark(x,y);
           }
           else if(op === 'l') {
             for(i=0, last=values.length; i<last; i+=2) {
               values[i+0] -= x; x += values[i+0];
               values[i+1] -= y; y += values[i+1];
+              mark(x,y);
             }
           }
           else if(op === 'c') {
@@ -231,14 +241,10 @@
               values[i+3] -= y;
               values[i+4] -= x; x += values[i+4];
               values[i+5] -= y; y += values[i+5];
+              mark(x,y);
             }
           }
         }
-
-        if(x < mx) { mx = x; }
-        if(y < my) { my = y; }
-        if(x > MX) { MX = x; }
-        if(y > MY) { MY = x; }
 
         // then convert the data to Type2 charstrings
         if(op === 'm') {
@@ -275,6 +281,7 @@
         }
         else if(op === 'z') {
           charstring = charstring.concat(OPERAND(14));
+          terminated = true;
         }
         else {
           // FIXME: add 's' and 'a' support
@@ -282,14 +289,20 @@
         }
       });
 
+      if(!terminated) {
+        charstring = charstring.concat(OPERAND(14));
+      }
+
+      // FIXME: add in the (nominalWidthX - trueWidth) value as width indicator.
+      charstring = NUMBER(MX - mx).concat(charstring);
+
+      options.charString = charstring;
+
       // bounding box
       options.xMin = mx;
       options.yMin = my;
       options.xMax = MX;
       options.yMax = MY;
-
-      // FIXME: add in the (nominalWidthX - trueWidth) value as width indicator.
-      options.charString = charstring;
     }(options, globals));
 
 
@@ -385,6 +398,12 @@
                              ]
                            , ["StdVW", DICTINSTRUCTION, "dominant vertical stem width. We set it to 10",
                                NUMBER(10).concat(OPERAND(11))
+                             ]
+                           , ["defaultWidthX", DICTINSTRUCTION, "default glyph width",
+                               NUMBER(options.xMax).concat(OPERAND(20))
+                             ]
+                           , ["nominalWidthX", DICTINSTRUCTION, "nominal width used in width correction",
+                               NUMBER(options.xMax).concat(OPERAND(20))
                              ]
                          ]];
 
