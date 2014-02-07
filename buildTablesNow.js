@@ -131,7 +131,7 @@
   // pretty impressive.
 
   var big = {
-    outline: "M 0 0 L 0 650 700 650 700 0 0 0"
+    outline: "M 20 -50 L 20 650 700 650 700 -50"
   };
 
   var small = {
@@ -147,7 +147,7 @@
   };
 
   // build the font
-  var font = buildFont(small);
+  var font = buildFont(big);
 
   // convert to legible data
   var binary = font.otf;
