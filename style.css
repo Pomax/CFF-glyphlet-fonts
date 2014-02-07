@@ -1,4 +1,4 @@
-table { width: 40%; float:left; font-family: monospace; border-collapse: collapse; width: auto; }
+table { width: 40%; float:left; font-family: monospace; font-size: 12px; border-collapse: collapse; width: auto; }
 table+table { margin-left: 2em; }
 table, tr, td { padding: 0; margin : 0 0 1em 0; }
 tr { margin: -1px 0; }
