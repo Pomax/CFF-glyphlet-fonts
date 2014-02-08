@@ -84,12 +84,70 @@
 
     <h2>Styling text</h2>
 
-    <p>When the text on this page says <code>"[...] center: A. [...]"</code>, the browser will ask
-    the text engine to actually style the character code sequence <code>"[...] 0x63 0x65 0x6E 0x74
-    0x65 0x72 0x20 0x3A 0x20 0x41 0x2E [...]"</code>, where the letter "c" is actually the code 0x63,
-    "e" is 0x65, etc. </p>
+    <p>When the text on this page says <code>[...] center: A. [...]</code>, the browser will ask
+    the text engine to actually style the character code sequence <code>[...] 0x63 0x65 0x6E 0x74
+    0x65 0x72 0x20 0x3A 0x20 0x41 0x2E [...]</code>, where the letter "c" is actually the code 0x63,
+    "e" is 0x65, etc. Here's where the first "I did not expect that" thing happens. The text engine
+    will not actually give you a picture for a code, and then move on to the next code, it's actually
+    a fairly sophisticated instruction book, and they can come with a section on replacing more than
+    one code with another. For instance, it might receive "c", then "e", and then n", and for each
+    of these three it might give the text engine a picture (usually, a 'c', an 'e', and an 'n').
+    However, if it then encounters the code for "t", and it has an entry that says "if you see 'cent',
+    give the cent-as-currentcy picture" it will actually cause the text engine to throw away the things
+    it got for "c", "e", and "n", and instead replace the entire sequence "cent" with this single
+    picture. This is something you might expect your word processor to do, but in fact fonts fully
+    have this capability built in.</p>
 
+    <p>In this particular case, we're just giving it a single code, so no substitution is going to
+    occur, but that doesn't mean it never will: we could have a font that has rules that say "when
+    you see the code for A, replace that with the code for F, before continuing with finding the
+    correct picture". You could have a font that has replacements for every letter so that if you
+    write a normal text, it'll look like gibberish. Or, conversely, have a text that looks like
+    gibberish, but when styled with that font is actually legible. You can do some pretty neat
+    things with these substitution rules.</p>
 
+    <p>In this case, our font is asked to style 0x41, the capital letter A. It has no substitution
+    rules, so it has to look for the picture associated with code 0x41. But first it has to find out
+    which internal code 0x41 maps to. There are quite a lot of different ways fonts can describe the
+    mappings between "from the computer" codes and "internal to the font" codes; some of these are
+    very simple, going "computer code X maps to internal code Y, and just assume that X+1 maps to
+    Y+1 etc.", but others are really smart and complex for fonts that have lots of letters that
+    don't have consecutive character code. This particular font uses one of the more complex
+    character mappings, but for only a single letter, so it's not actually that difficult to find
+    what the font's internal code is: the charactar map is one with multiple "segments" that each
+    describes a mapping for a range of characters in such a way that even if the character codes
+    aren't sequential, the internal codes will be. However, we only have one letter, which means
+    we only have one segment, and it only has one rule: "segment 1 starts with character code 0x41,
+    and maps to internal code 1."</p>
+
+    <p>With this internal code, the font can actually look up the picture that belongs to our
+    letter A. This is where design choice comes in: there are two "flavours" of opentype fonts,
+    namely "truetype" fonts, and "type 2" (or "cff") fonts. The difference between the two is
+    that the first uses a relatively simple way to find the pictures associated with internal
+    codes, but the pictures use a fairly simple set of set of graphics instructions, so making
+    beautiful or very precise shapes requires a lot of instructions per letter, making truetype
+    fonts pretty big. The second kind has a more complicated way of dictating what pictures belong
+    to internal codes, but the graphics instruction set is much richer, leading to much smaller
+    fonts. The font we're using on this page is one of these "type 2" fonts. (note that they're
+    called type 2 not because they are usually the second in the list of available flavours, but
+    because they use Adobe's "type 2 charstring" format for the graphics instructions.)</p>
+
+<!--
+<pre>
+    - glyph resolution
+      - cff
+        - font-in-a-font
+          - charstrings
+            - .notdef
+            - our glyph
+    - rendering
+      - the picture isn't the metrics
+        - height/width
+        - line heights
+          - overlaps
+          - quad sizes
+</pre>
+-->
   </body>
 
 </html>

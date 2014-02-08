@@ -1,4 +1,4 @@
-(function() {
+(function(context) {
 
   "use strict";
 
@@ -22,7 +22,7 @@
   /**
    * Helper function for computing ULONG checksums for data blocks
    */
-  function computeChecksum(chunk, name) {
+  function computeChecksum(chunk) {
     var tally = 0;
     for(var i=0, last=chunk.length; i<last; i+=4) {
       tally += (chunk[i] << 24) + (chunk[i + 1] << 16) + (chunk[i + 2] << 8) + (chunk[i + 3]);
@@ -74,15 +74,15 @@
 
       // compute the table's checksum as a sum of ULONG values
       // (which explains why we needed the LONG alignment).
-      var checksum = computeChecksum(data, tag);
+      var checksum = computeChecksum(data);
       fontchecksum += checksum;
 
       // and then update the OpenType header with the table's 16 byte record
       var table_entry = CHARARRAY(tag)
                        .concat(ULONG(checksum))
                        .concat(ULONG(opentype_len + headers_len + offset))
-                      .concat(ULONG(length));
-      //console.log(tag, offset, data)
+                       .concat(ULONG(length));
+
       addMapping(tag + " table definition", opentype_len + headers.length, opentype_len + headers.length + 16, "sfnt");
       headers = headers.concat(table_entry);
     };
@@ -101,7 +101,7 @@
     //  5. Store the result in checkSumAdjustment
     //
 
-    // Now, we've already done steps 1 and 2, so, next are steps 3 and 4:
+    // Now, we've already done steps 1 and 2, so: next are steps 3 and 4:
     var checksum = 0xB1B0AFBA - computeChecksum(data);
     checksum += Math.pow(2,32); // Add first, because mod on a negative...
     checksum %= Math.pow(2,32); // ...would yield a negative in JavaScript.
@@ -119,19 +119,19 @@
   function formWOFF(data, numTables) {
 
     var HEADER = [
-        ["signature", CHARARRAY, "wOFF", "wOFF"]
+        ["signature", CHARARRAY, "this has to be the string 'wOFF'...", "wOFF"]
       , ["flavour", CHARARRAY, "The sfnt version of the wrapped font", "OTTO"]
-      , ["length", ULONG, "Total size of the WOFF file.", 0x00000000]
-      , ["numTables", USHORT, "Number of entries in directory of font tables.", numTables]
-      , ["reserved", USHORT, "set to zero", 0]
-      , ["totalSfntSize", ULONG, "Total size needed for the uncompressed font data", data.length]
-      , ["majorVersion", USHORT, "Major version of the WOFF file.", 1]
-      , ["minorVersion", USHORT, "Minor version of the WOFF file.", 0]
-      , ["metaOffset", ULONG, "Offset to metadata block, from beginning of WOFF file.", 0]
-      , ["metaLength", ULONG, "Length of compressed metadata block.", 0]
-      , ["metaOrigLength", ULONG, "Uncompressed size of metadata block.", 0]
-      , ["privOffset", ULONG, "Offset to private data block, from beginning of WOFF file.", 0]
-      , ["privLength", ULONG, "Length of private data block.", 0]
+      , ["length", ULONG, "Total size of the WOFF file (placeholder, we compute this later).", 0x00000000]
+      , ["numTables", USHORT, "Number of entries in the directory of font tables.", numTables]
+      , ["reserved", USHORT, "this must be set to zero", 0]
+      , ["totalSfntSize", ULONG, "Total size needed for the uncompressed original font", data.length]
+      , ["majorVersion", USHORT, "Major version of the WOFF file (1 in this case).", 1]
+      , ["minorVersion", USHORT, "Minor version of the WOFF file (0 in this case).", 0]
+      , ["metaOffset", ULONG, "Offset to metadata block, from beginning of WOFF file. We don't use one", 0]
+      , ["metaLength", ULONG, "Length of compressed metadata block. This is obviously 0", 0]
+      , ["metaOrigLength", ULONG, "Uncompressed size of metadata block. Also 0, of course.", 0]
+      , ["privOffset", ULONG, "Offset to private data block, from beginning of WOFF file. We don't use one", 0]
+      , ["privLength", ULONG, "Length of private data block. Also obviously 0", 0]
     ];
 
     var woff_header = serialize(HEADER),
@@ -141,7 +141,8 @@
         woff;
 
     // build the woff table directory by copying the sfnt table
-    // directory entries and duplicating the length value.
+    // directory entries and duplicating the length value: we
+    // are allowed to form uncompressed WOFF files, and do so.
     for(var i=0, last=numTables, chunk, entry; i<last; i++) {
       chunk = data.slice(12+i*16, 12 + (i+1)*16);
       var entry = serialize([
@@ -159,10 +160,12 @@
       while(woff_data.length % 4 !== 0) { woff_data.push(0); }
     }
 
-    // finalise the header by recording the correct length:
+    // finalise the header by recording the correct length for the font
+    // (note that changing the value won't change the number of bytes).
     woff = woff_header.concat(woff_dictionary).concat(woff_data);
     HEADER[2][3] = woff.length;
 
+    // done. WOFF is thankfully fairly straight-forward
     return serialize(HEADER).concat(woff_dictionary).concat(woff_data);
   }
 
@@ -209,7 +212,8 @@
         if(x < mx) { mx = x; }
         if(y < my) { my = y; }
         if(x > MX) { MX = x; }
-        if(y > MY) { MY = x; }
+        if(y > MY) { MY = y; }
+        console.log(x,y);
       }
 
       sections.forEach(function(d) {
@@ -295,8 +299,8 @@
 
       // FIXME: add in the (nominalWidthX - trueWidth) value as width indicator.
       charstring = NUMBER(MX - mx).concat(charstring);
-
       options.charString = charstring;
+//      console.log(charstring.map(function(v) { return v.toString(16).toUpperCase(); }).join(','));
 
       // bounding box
       options.xMin = mx;
@@ -339,73 +343,73 @@
       }
     };
 
-    // for validation purposes, print the CFF block as hex data to the console before returning
-    var printAsHexcode = function(cff) {
-      console.log("--- cff ---\n", serialize(cff).map(function(v) {
-        v = v.toString(16).toUpperCase();
-        if(v.length === 1) v = "0" + v;
-        return v;
-      }).join(" "));
-    };
-
     /**
      * This part sets up data that, as it is inserted, may require more
      * bytes to encode than initially guessed, and as such requires updating
      * the values already found in the Top DICT.
      */
     var processDynamicCFFData = function(cff) {
-      var top_dict_data = cff[2][1][3][1];
+
       var cff_end = serialize(cff).length;
+      var top_dict_data = cff[2][1][3][1];
 
       var charset = ["charset", [
-                        ["format", BYTE, "we use the simplest format", 0]
-                      , ["glyphs", [
-                          , ["0", SID, "single entry array for our glyph, which is custom SID 4", 394]
-                        ]]
-                    ]];
+        ["format", BYTE, "we use the simplest format", 0]
+      , ["glyphs", [
+          , ["0", SID, "single entry array for our glyph, which is custom SID 4", 394]
+        ]]
+      ]];
 
       var encoding = ["encoding", [
-                         ["format", BYTE, "we use the encoding best suited for randomly ordered glyphs", 0]
-                       , ["nCodes", BYTE, "number of encoded glyphs (not counting .notdef)", 1]
-                       , ["codes", [
-                           ["0", BYTE, "encoding for glyph 0", 0]
-                       ]]
-                     ]];
+        ["format", BYTE, "we use the encoding best suited for randomly ordered glyphs", 0]
+      , ["nCodes", BYTE, "number of encoded glyphs (not counting .notdef)", 1]
+      , ["codes", [
+          ["0", BYTE, "encoding for glyph 0", 0]
+        ]]
+      ]];
 
       var dim = (globals.quadSize * 0.7)|0;
-      var charstrings = [ [".notdef", DICTINSTRUCTION, "the outline for .notdef", OPERAND(14)]
-                        , ["our letter", DICTINSTRUCTION, "the outline for our own glyph", options.charString]
-                        ];
 
+      var charstrings = [
+        [".notdef", DICTINSTRUCTION, "the outline for .notdef", OPERAND(14)]
+      , ["our letter", DICTINSTRUCTION, "the outline for our own glyph", options.charString]
+      ];
+
+      var charstring_raw = serialize(charstrings);
+      var charstring_offsize = charstring_raw.length > 255 ? 2 : 1;
       var charstring_index = ["charstring index", [
-                                 // this is the part that actually contains the characters outline data,
-                                 // encoded as Type 2 charstrings (one charstring per glyph).
-                                 ["count", Card16, "two charstrings; .notdef and our glyph", 2],
-                               , ["offSize", OffSize, "offsets use 1 byte", 1]
-                               , ["offset", generateOffsets(charstrings, 1)]
-                               , ["charstrings", charstrings]
-                             ]];
+         // this is the part that actually contains the characters outline data,
+         // encoded as Type 2 charstrings (one charstring per glyph).
+         ["count", Card16, "two charstrings; .notdef and our glyph", 2],
+      , ["offSize", OffSize, "how many bytes do we need for offsets?", charstring_offsize]
+      , ["offset", generateOffsets(charstrings, charstring_offsize)]
+      , ["charstrings", charstrings]
+      ]];
 
       var private_dict = ["private dict", [
-                             ["BlueValues", DICTINSTRUCTION, "empty array (see Type 1 font format, pp 37)",
-                               NUMBER(0).concat(NUMBER(0)).concat(OPERAND(6))
-                             ]
-                           , ["FamilyBlues", DICTINSTRUCTION, "idem dito",
-                               NUMBER(0).concat(NUMBER(0)).concat(OPERAND(8))
-                             ]
-                           , ["StdHW", DICTINSTRUCTION, "dominant horizontal stem width. We set it to 10",
-                               NUMBER(10).concat(OPERAND(10))
-                             ]
-                           , ["StdVW", DICTINSTRUCTION, "dominant vertical stem width. We set it to 10",
-                               NUMBER(10).concat(OPERAND(11))
-                             ]
-                           , ["defaultWidthX", DICTINSTRUCTION, "default glyph width",
-                               NUMBER(options.xMax).concat(OPERAND(20))
-                             ]
-                           , ["nominalWidthX", DICTINSTRUCTION, "nominal width used in width correction",
-                               NUMBER(options.xMax).concat(OPERAND(20))
-                             ]
-                         ]];
+        ["BlueValues", DICTINSTRUCTION, "empty array (see Type 1 font format, pp 37)",
+          NUMBER(0).concat(NUMBER(0)).concat(OPERAND(6))
+        ]
+      , ["FamilyBlues", DICTINSTRUCTION, "idem dito",
+          NUMBER(0).concat(NUMBER(0)).concat(OPERAND(8))
+        ]
+      , ["StdHW", DICTINSTRUCTION, "dominant horizontal stem width. We set it to 10",
+          NUMBER(10).concat(OPERAND(10))
+        ]
+      , ["StdVW", DICTINSTRUCTION, "dominant vertical stem width. We set it to 10",
+          NUMBER(10).concat(OPERAND(11))
+        ]
+        // forgetting the following two versions breaks Chrome. This is quite
+        // interesting, as Chrome and Firefox both supposedl use OTS for their
+        // sanitization. This is, in fact, so interesting that it gives us a
+        // good test case for font-compatibility of browsers.
+      , ["defaultWidthX", DICTINSTRUCTION, "default glyph width",
+          NUMBER(options.xMax).concat(OPERAND(20))
+        ]
+      , ["nominalWidthX", DICTINSTRUCTION, "nominal width used in width correction",
+          NUMBER(options.xMax).concat(OPERAND(20))
+        ]
+      ]];
 
       var private_dict_length = serialize(private_dict).length;
 
@@ -489,6 +493,7 @@
         , ["private", DICTINSTRUCTION, "'size of', then 'offset to' (from start of file) the private dict", [0x00, 0x00, 0x00]
       ]];
 
+      // our main CFF block
       var cff = [
         ["header", [
             ["major", Card8, "major version", 1]
@@ -551,17 +556,18 @@
      * the data in windows's amazing UTF16 encoding scheme. Those bytes add up.
      */
     function setupNameTableData() {
-      window.NAMESTRINGS = [];
+      context.NAMESTRINGS = [];
 
-      // See the 'Name IDs' section on http://www.microsoft.com/typography/otspec/name.htm for details
+      // See the 'Name IDs' section on http://www.microsoft.com/typography/otspec/name.htm for
+      // the details on which strings we can encode, and what their associated ID must be.
       var strings = {
-                                  //  "0" = copyright text
+                                  //  "0" = copyright text (irrelevant for our purpose)
         "1": globals.fontFamily,  //      = font name
         "2": globals.subfamily,   //      = font subfamily name
                                   //  "3" = the unique font identifier (irrelevant for our purpose)
         "4": globals.fontName,    //      = full font name
         "5": globals.fontVersion, //      = font version. "Preferred" format is "Version \d+.\d+; specifics"
-                                  //  "7" = trademark text
+                                  //  "7" = trademark text (irrelevant for our purpose)
                                   // "13" = a tl;dr. version of the font's license (irrelevant for our purpose)
       };
 
@@ -595,6 +601,9 @@
         offset += string.length;
 
         // And encode the same string but then in UTF16 for windows.
+        // This leads to name data that is 300% the size of what it
+        // could be if Windows would simply read the Mac records
+        // in absence of windows records. But that is too good to happen.
         string = atou(string);
         nameRecordPartial = [
             ["recordID", USHORT, "See the 'Name IDs' section on http://www.microsoft.com/typography/otspec/name.htm for details", recordId]
@@ -607,15 +616,22 @@
       });
 
       NAMESTRINGS = NAMESTRINGS.join('');
-      window.NAMERECORDS = macRecords.concat(winRecords);
+      context.NAMERECORDS = macRecords.concat(winRecords);
       return NAMERECORDS.length;
     }
 
     function setupCmapFormat4() {
-      window.SUBTABLE4 = [
+      // Note that normally, we would not be hardcoding a cmap table like this.
+      // However, since we know exactly what we want to do, in this instance we can.
+      context.SUBTABLE4 = [
           ["format", USHORT, "format 4 subtable", 4]
         , ["length", USHORT, "table length in bytes", 32 + (2 * 2)]
         , ["language", USHORT, "language", 0]
+          // The following four values all derive from an implicitly
+          // encoded value called "segCount", representing the number
+          // of segments that this subtable format 4 cmap has.
+          // Silly as it may seem, these values must be 100% correct,
+          // and cannot, in any way, be omitted. I don't like it.
         , ["segCountX2", USHORT, "2x segment count; we only have one segment", 4]
         , ["searchRange", USHORT, "search range: 2 * (2^floor(log2(segCount)))", 4]
         , ["entrySelector", USHORT, "entry selector: log2(searchRange/2)", 1]
@@ -645,6 +661,7 @@
           , ["1", USHORT, "Our second glyphId points to our own glyph", 1]
         ]]
       ];
+      // we call this function expecting it to report how many subtables are used in the font.
       return 1;
     }
 
@@ -683,7 +700,7 @@
           , ["bMidline", BYTE, "", 0]
           , ["bXHeight", BYTE, "", 0]
         ]]
-        , ["ulUnicodeRange1", ULONG, "", 0x00000001] // basic latin only atm
+        , ["ulUnicodeRange1", ULONG, "", 0x00000001] // basic latin only = bit 1 is high.
         , ["ulUnicodeRange2", ULONG, "", 0]
         , ["ulUnicodeRange3", ULONG, "", 0]
         , ["ulUnicodeRange4", ULONG, "", 0]
@@ -694,10 +711,16 @@
         , ["sTypoAscender", SHORT, "typographic ascender", 1024] // currently not based on anything
         , ["sTypoDescender", SHORT, "typographic descender", 0]  // currently not based on anything
         , ["sTypoLineGap", SHORT, "line gap", globals.quadSize]
+          // Spec contradiction time: These values should correspond to the
+          // ascent/descent values from the hhea table, except they can't:
+          // the hhea table allows for 0 and negative values, these fields do not.
         , ["usWinAscent", USHORT, "usWinAscent", Math.max(options.yMax, 1)]
         , ["usWinDescent", USHORT, , "usWinDescent", Math.abs(Math.min(options.yMin, -1))]
         , ["ulCodePageRange1", ULONG, "", 0x00000001]
         , ["ulCodePageRange2", ULONG, "", 0]
+          // In order for the font to work in browsers, the OS/2 table needs to be version
+          // 3 or higher. In a bizar twist of "why?", this means we NEED to specify the following
+          // five values, except we are allowed to set them to 0 to indicate we don't care about them.
         , ["sxHeight", SHORT, "", 0]
         , ["sCapHeight", SHORT, "", 0]
         , ["usDefaultChar", USHORT, "", 0]
@@ -707,12 +730,12 @@
       "cmap": [
           ["version", USHORT, "cmap main version", 0]
         , ["numTables", USHORT, "number of subtables",setupCmapFormat4()]
-        // Note that we're hard-wiring cmap here for a single table.
-        // this is NOT the usual layout for a cmap table!
+          // Note that we're hard-wiring cmap here for a single table.
+          // this is NOT the usual layout for a cmap table!
         , ["platformID", USHORT, "platform", 3] // windows
         , ["encodingID", USHORT, "encoding", 1] // default Unicode BMP (UCS-2)
         , ["offset", ULONG, "table offset from cmap-start", 12]
-        // subtable start
+          // subtable start
         , ["subtable format 4", SUBTABLE4]
       ],
       "head": [
@@ -753,7 +776,9 @@
         , ["metricDataFormat", SHORT, "metricDataFormat, 0 for current format", 0]
         , ["numberOfHMetrics", USHORT, "number of hMetric entries. We only encode 1 glyph, so there are 2: one for .notdef, and one for our real glyph", 2]
       ],
-      "hmtx": [ // uses struct longHorMetric{USHORT advanceWidth, SHORT lsb}. NOTE: we do not encode any lsb values (which would be SHORT[])
+      "hmtx": [
+        // uses struct longHorMetric{USHORT advanceWidth, SHORT lsb}.
+        // NOTE: we do not encode any lsb values (which would be SHORT[], if we did)
         ["hMetrics", [
           // first entry longHorMetric (notdef)
           ["0", [
@@ -772,15 +797,18 @@
           ["format", USHORT, "format 0", 0]
         , ["count", USHORT, "number of name records", setupNameTableData()]
         , ["stringOffset", USHORT, "offset for the string data, relative to the table start", 6 + serialize(NAMERECORDS).length],
-        // name records: {platform/encoding/language, nameid, length, offset}
+          // name records: {platform/encoding/language, nameid, length, offset}
         , ["NameRecord", NAMERECORDS]
-        // and the string data is a single null character
+          // and the string data is a single null character
         , ["stringData", CHARARRAY, "The font's strings", NAMESTRINGS]
       ],
 
       "post": [
-        // I hate this table. It's only relevant to printing, which we don't care about,
-        // and for CFF only version 3 is a legal version, so it needs those 8 values.
+          // I hate this table. It's only relevant to printing, which we don't care about,
+          // and for CFF only version 3 is a legal version, so it needs those 8 values.
+          // I really hope the next version of opentype makes this table optional, rather
+          // than mandatory... 32 bytes may not seem like match, but when you care about
+          // the smallest possible font to get a specific job done, 32 bytes is massive.
           ["version", FIXED, "most recent post table format", 0x00030000]
         , ["italicAngle", FIXED, "", 0]
         , ["underlinePosition", FWORD, "", 0]
@@ -804,6 +832,6 @@
     }
   };
 
-  window.buildFont = buildFont;
+  context.buildFont = buildFont;
 
-}());
+}(this));

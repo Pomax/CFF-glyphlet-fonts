@@ -15,3 +15,5 @@ tr:nth-child(2) { border-top: 1px solid black; }
 tr:nth-last-child(2) { border-bottom: 1px solid black; }
 tr:nth-last-child(1) { background: inherit!important; }
 th { color: rgb(200,200,220); }
+
+code { font-family: monospace; color: dark-gray; background: rgba(0,0,0,0.1); }

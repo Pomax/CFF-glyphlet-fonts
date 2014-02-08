@@ -1,8 +1,8 @@
-(function() {
+(function(context) {
   "use strict";
 
   // Convert ASCII to UTF16, the cheap way.
-  window.atou = function atou(v) {
+  context.atou = function atou(v) {
     var pad = String.fromCharCode(0),
         a = v.split(''),
         out = [];
@@ -21,25 +21,25 @@
    *
    ***/
 
-  window.BYTE = function BYTE(v) { return [v]; };
-  window.CHAR = function CHAR(v) { return [v.charCodeAt(0)]; };
-  window.CHARARRAY = function CHARARRAY(v) { return v.split('').map(function(v) { return v.charCodeAt(0); }); };
-  window.FIXED = function FIXED(v) { return [(v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF]; };
-  window.USHORT = function USHORT(v) { return [(v >> 8) & 0xFF, v & 0xFF]; };
-  window.SHORT = function SHORT(v)  {
+  context.BYTE = function BYTE(v) { return [v]; };
+  context.CHAR = function CHAR(v) { return [v.charCodeAt(0)]; };
+  context.CHARARRAY = function CHARARRAY(v) { return v.split('').map(function(v) { return v.charCodeAt(0); }); };
+  context.FIXED = function FIXED(v) { return [(v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF]; };
+  context.USHORT = function USHORT(v) { return [(v >> 8) & 0xFF, v & 0xFF]; };
+  context.SHORT = function SHORT(v)  {
     var limit = 32768;
     if(v >= limit) { v = -(2*limit - v); } // 2's complement
     return [(v >> 8) & 0xFF, v & 0xFF];
   };
-  window.UINT24 = function UINT24(v) { return [(v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF]; };
-  window.ULONG = function ULONG(v) { return [(v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF]; };
-  window.LONG = function LONG(v)  {
+  context.UINT24 = function UINT24(v) { return [(v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF]; };
+  context.ULONG = function ULONG(v) { return [(v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF]; };
+  context.LONG = function LONG(v)  {
     var limit = 2147483648;
     if(v >= limit) { v = -(2*limit - v); } // 2's complement
     return [(v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF];
   };
 
-  window.LONGDATETIME = function LONGDATETIME(v) {
+  context.LONGDATETIME = function LONGDATETIME(v) {
     // This doesn't actually work in JS. Then again, these values that use
     // this are irrelevant, too, so we just return a 64bit "zero"
     return [0,0,0,0,0,0,0,0];
@@ -47,9 +47,9 @@
 
 
   // aliased datatypes
-  window.FWORD = SHORT;
-  window.UFWORD = USHORT;
-  window.OFFSET = USHORT;
+  context.FWORD = SHORT;
+  context.UFWORD = USHORT;
+  context.OFFSET = USHORT;
 
   /***
    *
@@ -57,7 +57,7 @@
    *
    ***/
 
-  window.NUMBER = function NUMBER(v) {
+  context.NUMBER = function NUMBER(v) {
     var fix = function(b) {
       if (b < 0) { b = (-b) ^ 255; }
       return b;
@@ -86,13 +86,13 @@
     return [29, (v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF];
   };
 
-  window.OPERAND = function OPERAND(v1, v2) {
+  context.OPERAND = function OPERAND(v1, v2) {
     var opcode = BYTE(v1);
     if(v2 !== undefined) { opcode.concat(BYTE(v2)); }
     return opcode;
   };
 
-  window.DICTINSTRUCTION = function DICTINSTRUCTION(codes) {
+  context.DICTINSTRUCTION = function DICTINSTRUCTION(codes) {
     var data = [];
     codes.forEach(function(code) {
       data = data.concat(code);
@@ -106,25 +106,25 @@
    *
    ***/
 
-  window.GlyphID = USHORT;
-  window.Offset = USHORT;
-  window.Card8 = BYTE;
-  window.Card16 = USHORT;
-  window.SID = USHORT;
-  window.OffSize = BYTE;
-  window.OffsetX = [undefined, BYTE, USHORT, UINT24, ULONG];
+  context.GlyphID = USHORT;
+  context.Offset = USHORT;
+  context.Card8 = BYTE;
+  context.Card16 = USHORT;
+  context.SID = USHORT;
+  context.OffSize = BYTE;
+  context.OffsetX = [undefined, BYTE, USHORT, UINT24, ULONG];
 
   /**
    * Helper function for copying data regions
    */
-  window.LITERAL = function LITERAL(array) {
+  context.LITERAL = function LITERAL(array) {
     return array;
   };
 
   /**
    * Helper function for decoding strings as ULONG
    */
-  window.decodeULONG = function decodeULONG(ulong) {
+  context.decodeULONG = function decodeULONG(ulong) {
     var b = ulong.split ? ulong.split('').map(function(c) { return c.charCodeAt(0); }) : ulong;
     var val = (b[0] << 24) + (b[1] << 16) + (b[2] << 8) + b[3];
     if (val < 0 ) { val += Math.pow(2,32); }
@@ -140,7 +140,7 @@
   /**
    * Serialise a record structure into byte code
    */
-  window.serialize = function serialize(record) {
+  context.serialize = function serialize(record) {
     var data = [];
     (function _serialize(record) {
       if (typeof record[LABEL] !== "string") {
@@ -163,4 +163,4 @@
     return data;
   };
 
-}());
+}(this));

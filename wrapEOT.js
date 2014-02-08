@@ -1,4 +1,4 @@
-(function() {
+(function(context) {
 
   // Convert ASCII to UTF16, the cheap way.
   function atou(v) {
@@ -30,7 +30,7 @@
    * little ending. So we can't just copy, we have to copy and
    * reverse each more-than-one-byte value.
    */
-	window.wrapEOT = function wrapEOT(options, tables, otfdata) {
+	context.wrapEOT = function wrapEOT(options, tables, otfdata) {
     var OS2 = tables["OS/2"];
     var head = tables["head"];
 
@@ -89,4 +89,4 @@
     return eotData.concat(otfdata);
 	};
 
-}());
+}(this));

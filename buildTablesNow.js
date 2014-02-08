@@ -1,4 +1,4 @@
-(function() {
+(function(context) {
   "use strict";
 
   // array to hex filter
@@ -132,7 +132,7 @@
 
   var big = {
 //    FIXME: Why can the second bar not use "220" instead of 190? Somehow, the values go wrong.
-//    outline: "M 20 -50 L 20 650 700 650 700 -50 600 -50 600 400 120 400 120 -50 M 500 190 L 500 100 220 100 220 190"
+//    outline: "M 20 -50 L 20 650 700 650 700 -50 600 -50 600 400 120 400 120 -50 M 500 205 L 500 100 220 100 220 205"
     outline: "M 20 -50 L 20 650 700 650 700 -50 20 -50 " + "M 170 100 L 550 100 550 500 170 500"
   };
 
@@ -154,8 +154,9 @@
   var charmap = binary.map(asChars);
   document.body.appendChild(makeTable(hexmap));
   document.body.appendChild(makeTable(charmap));
-  console.log("--- cff ---\n", font.cff.map(asHex).join(" "));
-  console.log("--- otf ---\n", hexmap.join(" "));
+
+  //console.log("--- cff ---\n", font.cff.map(asHex).join(" "));
+  //console.log("--- otf ---\n", hexmap.join(" "));
   //console.log("--- woff ---\n", font.woff.map(asHex).join(" "));
 
   // generate OFT and CFF region highlighting in the HTML tables
@@ -171,18 +172,22 @@
 
   // create stylesheet that uses this font
 
+/*
   var mime = "font/opentype";
   var dataurl = "data:" + mime + ";base64," + btoa(font.otf.map(asChars).join(''));
   var fontface = "@font-face {\n  font-family: 'custom font';\n  src: url('" +dataurl+ "') format('opentype');\n}";
   var sheet = document.createElement("style");
   sheet.innerHTML = fontface;
   document.head.appendChild(sheet);
-/*
+*/
+
+///*
   var mime = "application/font-woff";
   var dataurl = "data:" + mime + ";base64," + btoa(font.woff.map(asChars).join(''));
   var fontface = "@font-face {\n  font-family: 'custom font';\n  src: url('" +dataurl+ "') format('woff');\n}";
   var sheet = document.createElement("style");
   sheet.innerHTML = fontface;
   document.head.appendChild(sheet);
-*/
-}());
+//*/
+
+}(this));
