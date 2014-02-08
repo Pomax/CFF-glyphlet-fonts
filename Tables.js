@@ -470,7 +470,7 @@
       // be mindful of the fact that there are 390 predefined strings (see appendix A, pp 29)
       var strings = [
           ["version", CHARARRAY, "font version string; string id 391", globals.fontVersion]
-        , ["full name", CHARARRAY, "the font's full name  (id 392)", globals.fontName]
+        , ["full name", CHARARRAY, "the font's full name (id 392)", globals.fontName]
         , ["family name", CHARARRAY, "the font family name (id 393)", globals.fontFamily]
         , ["custom glyph", CHARARRAY, "custom glyph name, for charset/encoding", globals.glyphName]
       ];
@@ -486,12 +486,14 @@
             NUMBER(options.xMin).concat(NUMBER(options.yMin)).concat(NUMBER(options.xMax)).concat(NUMBER(options.yMax)).concat(OPERAND(5))
           ]
 
-          // these two instruction can't be properly asserted until after we pack up the CFF, so we use placeholder values
+          // these instruction can't be properly asserted until after we pack up the CFF, so we use placeholder values
         , ["charset", DICTINSTRUCTION, "offset to charset (from start of file)", [0x00, 0x00]]
         , ["encoding", DICTINSTRUCTION, "offset to encoding (from start of file)", [0x00, 0x00]]
         , ["charstrings", DICTINSTRUCTION, "offset to charstrings (from start of file)", [0x00, 0x00]]
         , ["private", DICTINSTRUCTION, "'size of', then 'offset to' (from start of file) the private dict", [0x00, 0x00, 0x00]
       ]];
+
+      var top_dict_offsize = serialize(top_dict_data).length < 255 ? 1 : 2;
 
       // our main CFF block
       var cff = [
@@ -514,10 +516,10 @@
         ]],
         ["top dict index", [
             ["count", Card16, "top dicts store one 'thing' by definition", 1]
-          , ["offSize", OffSize, "offsets use 1 bytes in this index", 1]
+          , ["offSize", OffSize, "offsets use 1 bytes in this index", top_dict_offsize]
           , ["offset", [
-              ["0", OffsetX[1], "first offset", 1]
-            , ["1", OffsetX[1], "end of data black", 1 + serialize(top_dict_data).length]
+              ["0", OffsetX[top_dict_offsize], "first offset", 1]
+            , ["1", OffsetX[top_dict_offsize], "end of data black", 1 + serialize(top_dict_data).length]
           ]]
           , ["top dict data", top_dict_data]
         ]],
@@ -708,9 +710,9 @@
         , ["fsSelection", USHORT, "font selection flag: bit 6 (lsb=0) is high, to indicate 'regular font'.", 0x40]
         , ["usFirstCharIndex", USHORT, "first character to be in this font. We claim 'A'.", 0x41]
         , ["usLastCharIndex", USHORT, "last character to be in this font. We again claim 'A'.", 0x41]
-        , ["sTypoAscender", SHORT, "typographic ascender", 1024] // currently not based on anything
-        , ["sTypoDescender", SHORT, "typographic descender", 0]  // currently not based on anything
-        , ["sTypoLineGap", SHORT, "line gap", globals.quadSize]
+        , ["sTypoAscender", SHORT, "typographic ascender", options.yMax]
+        , ["sTypoDescender", SHORT, "typographic descender", options.yMin]
+        , ["sTypoLineGap", SHORT, "line gap", -2000]
           // Spec contradiction time: These values should correspond to the
           // ascent/descent values from the hhea table, except they can't:
           // the hhea table allows for 0 and negative values, these fields do not.
@@ -754,6 +756,7 @@
         , ["macStyle", USHORT, "font style, according to old Apple mac rules", 0]
         , ["lowestRecPPEM", USHORT, "smallest readable size in pixels. We claim 8px for no real reason", 8]
         , ["fontDirectionHint", SHORT, "deprecated value (font direction hint). must be 0x0002", 2]
+          // these two values do not apply to CFF fonts, yet are necessary for some reason
         , ["indexToLocFormat", SHORT, "offset datatype (we use 0, for SHORT offsets", 0]
         , ["glyphDataFormat", SHORT, "glyph data format. default value = 0", 0]
       ],

@@ -133,7 +133,7 @@
   var big = {
 //    FIXME: Why can the second bar not use "220" instead of 190? Somehow, the values go wrong.
 //    outline: "M 20 -50 L 20 650 700 650 700 -50 600 -50 600 400 120 400 120 -50 M 500 205 L 500 100 220 100 220 205"
-    outline: "M 20 -50 L 20 650 700 650 700 -50 20 -50 " + "M 170 100 L 550 100 550 500 170 500"
+    outline: "M 20 -50 L 20 650 700 650 700 -50 360 -150 20 -50 " + "M 170 50 L 360 0 550 50 550 500 170 500"
   };
 
   var small = {
