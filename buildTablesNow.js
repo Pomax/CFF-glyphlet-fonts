@@ -193,8 +193,8 @@
   });
 
   // create stylesheet that uses this font
-  mime = "application/font-woff";
-  dataurl = "data:" + mime + ";base64," + btoa(font.woff.map(asChars).join(''));
+  var mime = "application/font-woff";
+  var dataurl = "data:" + mime + ";base64," + btoa(font.woff.map(asChars).join(''));
   var fontface = "@font-face {\n  font-family: 'custom font';\n  src: url('" +dataurl+ "') format('woff');\n}";
   var sheet = document.createElement("style");
   sheet.innerHTML = fontface;
