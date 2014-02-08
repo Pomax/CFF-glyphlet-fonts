@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <title>Font tests</title>
+    <link rel="stylesheet" href="style.css">
+    <style>td { padding: 0 0 0 10px; text-align: right; }</style>
+    <script src="dataBuilding.js"></script>
+    <script src="Tables.js"></script>
+    <script>NodeList.prototype.array = function() { return Array.prototype.slice.call(this); };</script>
+  </head>
+
+  <body>
+    <h2>NUMBER tests</h2>
+    <table id="number"></table>
+
+    <script>
+      var asHex = function(v) { return v.toString(16).toUpperCase(); };
+
+      var render = function(v, id) {
+        var row = "<tr><td>" + v + "</td><td>" + NUMBER(v).join(',') + "</td><td>" + NUMBER(v).map(asHex) + "</td></tr>\n";
+        document.getElementById(id).innerHTML += row;
+      };
+
+      (function testNumber(id) {
+        render(- 10000, id);
+        render(-  1000, id);
+        render(-   220, id);
+        render(-   150, id);
+        render(-   100, id);
+        render(-    10, id);
+        render(      1, id);
+        render(     10, id);
+        render(    100, id);
+        render(    150, id);
+        render(    220, id);
+        render(   1000, id);
+        render(  10000, id);
+
+        render(   180, id);
+        render(   110, id);
+        render(    90, id);
+        render(   540, id);
+        render(   490, id);
+      }("number"));
+    </script>
+  </body>
+
+</html>

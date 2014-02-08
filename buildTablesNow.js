@@ -133,14 +133,11 @@
   var big = {
 //    FIXME: Why can the second bar not use "220" instead of 190? Somehow, the values go wrong.
 //    outline: "M 20 -50 L 20 650 700 650 700 -50 600 -50 600 400 120 400 120 -50 M 500 190 L 500 100 220 100 220 190"
-    outline: "M 20 -50 L 20 650 700 650 700 -50 20 -50 " + "M 120 50 L 600 50 600 550 120 550"
+    outline: "M 20 -50 L 20 650 700 650 700 -50 20 -50 " + "M 170 100 L 550 100 550 500 170 500"
   };
 
   var small = {
       outline: big.outline
-    , quadSize: 1024
-    , glyphName: "A"
-    , vendorId: "****"
     , fontFamily: "c"
     , subfamily: "c"
     , fontName: "c"
@@ -149,7 +146,7 @@
   };
 
   // build the font
-  var font = buildFont(big);
+  var font = buildFont(small);
 
   // convert to legible data
   var binary = font.otf;

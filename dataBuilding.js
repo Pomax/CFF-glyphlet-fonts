@@ -59,14 +59,9 @@
 
   window.NUMBER = function NUMBER(v) {
     var fix = function(b) {
-      if (b < 0) {
-        console.log(b);
-        b = (-b - 1) ^ 255;
-        console.log(b);
-      }
+      if (b < 0) { b = (-b) ^ 255; }
       return b;
     }
-
 
     if (-107 <= v && v <= 107) {
       return [v + 139]; }
