@@ -213,7 +213,6 @@
         if(y < my) { my = y; }
         if(x > MX) { MX = x; }
         if(y > MY) { MY = y; }
-        console.log(x,y);
       }
 
       sections.forEach(function(d) {
@@ -256,18 +255,7 @@
         }
         else if(op === 'l') {
           for(i=0, last=values.length; i<last; i+=2) {
-            // vline
-            if(values[i] === x) {
-              charstring = charstring.concat( NUMBER(values[i+1]).concat(OPERAND(7)) );
-            }
-            // hline
-            else if(values[i+1] === y) {
-              charstring = charstring.concat( NUMBER(values[i]).concat(OPERAND(6)) );
-            }
-            // rline
-            else {
-              charstring = charstring.concat( NUMBER(values[i]).concat(NUMBER(values[i+1])).concat(OPERAND(5)) );
-            }
+            charstring = charstring.concat( NUMBER(values[i]).concat(NUMBER(values[i+1])).concat(OPERAND(5)) );
           }
         }
         else if(op === 'c') {
@@ -297,16 +285,18 @@
         charstring = charstring.concat(OPERAND(14));
       }
 
-      // FIXME: add in the (nominalWidthX - trueWidth) value as width indicator.
-      charstring = NUMBER(MX - mx).concat(charstring);
-      options.charString = charstring;
-//      console.log(charstring.map(function(v) { return v.toString(16).toUpperCase(); }).join(','));
-
       // bounding box
       options.xMin = mx;
       options.yMin = my;
       options.xMax = MX;
       options.yMax = MY;
+
+      // If the glyph is wider than the default width, we can note this
+      // by recording [nominal - true] width as first charstring value.
+      // Note: both default and nominal width are defined as options.xMax in this font.
+      if(MX != options.xMax) { charstring = NUMBER(options.xMax - MX).concat(charstring); }
+      options.charString = charstring;
+
     }(options, globals));
 
 
@@ -452,10 +442,10 @@
 
       // With our stable offsets, update the charset, charstrings, and
       // private dict offset values in the top dict data block
-      top_dict_data[ 6][3] = NUMBER(charset_offset).concat(OPERAND(15));
-      top_dict_data[ 7][3] = NUMBER(encoding_offset).concat(OPERAND(16));
-      top_dict_data[ 8][3] = NUMBER(charstring_index_offset).concat(OPERAND(17));
-      top_dict_data[ 9][3] = NUMBER(private_dict_length).concat(NUMBER(private_dict_offset)).concat(OPERAND(18));
+      top_dict_data[6][3] = NUMBER(charset_offset).concat(OPERAND(15));
+      top_dict_data[7][3] = NUMBER(encoding_offset).concat(OPERAND(16));
+      top_dict_data[8][3] = NUMBER(charstring_index_offset).concat(OPERAND(17));
+      top_dict_data[9][3] = NUMBER(private_dict_length).concat(NUMBER(private_dict_offset)).concat(OPERAND(18));
 
       // and of course, also update the top dict index's "last" offset, as that might be invalid now, too.
       cff[2][1][2][1][1][3] += bytediff;
@@ -672,7 +662,7 @@
       "CFF ": createCFF()
       ,
       "OS/2": [
-          ["version", USHORT, "OS/2 table 1", 0x0004]
+          ["version", USHORT, "OS/2 table 4", 0x0004]
         , ["xAvgCharWidth", SHORT, "xAvgCharWidth", 0]
         , ["usWeightClass", USHORT, "usWeightClass", 400]
         , ["usWidthClass", USHORT, "usWidthClass", 1]
@@ -690,6 +680,10 @@
         , ["yStrikeoutPosition", SHORT, "", 0]
           // standard font = font classification 0 ("Regular")
         , ["sFamilyClass", SHORT, "sFamilyClass", 0]
+          // Oh look! A trademarked classification system the bytes
+          // for which cannot be legally set unless you pay HP.
+          // Why this is part of the OS/2 table instead of its own
+          // proprietary table I will likely never truly know. 
         , ["panose", [
           , ["bFamilyType", BYTE, "", 0]
           , ["bSerifStyle", BYTE, "", 0]
@@ -702,27 +696,29 @@
           , ["bMidline", BYTE, "", 0]
           , ["bXHeight", BYTE, "", 0]
         ]]
-        , ["ulUnicodeRange1", ULONG, "", 0x00000001] // basic latin only = bit 1 is high.
+        // we only encode the letter 'A' in the latin block,
+        // so we set bit 1 of a 128 bit sequence
+        , ["ulUnicodeRange1", ULONG, "", 0x00000001]
         , ["ulUnicodeRange2", ULONG, "", 0]
         , ["ulUnicodeRange3", ULONG, "", 0]
         , ["ulUnicodeRange4", ULONG, "", 0]
         , ["achVendID", CHARARRAY, "vendor id (http://www.microsoft.com/typography/links/vendorlist.aspx for the 'real' list)", globals.vendorId]
+          // bit 6 is high for 'Regular font'
         , ["fsSelection", USHORT, "font selection flag: bit 6 (lsb=0) is high, to indicate 'regular font'.", 0x40]
         , ["usFirstCharIndex", USHORT, "first character to be in this font. We claim 'A'.", 0x41]
         , ["usLastCharIndex", USHORT, "last character to be in this font. We again claim 'A'.", 0x41]
+          // vertical metrics: see http://typophile.com/node/13081 for how the hell these work.
+          // (short version: they don't, it's an amazing mess)
         , ["sTypoAscender", SHORT, "typographic ascender", options.yMax]
         , ["sTypoDescender", SHORT, "typographic descender", options.yMin]
-        , ["sTypoLineGap", SHORT, "line gap", -2000]
-          // Spec contradiction time: These values should correspond to the
-          // ascent/descent values from the hhea table, except they can't:
-          // the hhea table allows for 0 and negative values, these fields do not.
-        , ["usWinAscent", USHORT, "usWinAscent", Math.max(options.yMax, 1)]
-        , ["usWinDescent", USHORT, , "usWinDescent", Math.abs(Math.min(options.yMin, -1))]
+        , ["sTypoLineGap", SHORT, "line gap", globals.quadSize - options.yMax + options.yMin]
+        , ["usWinAscent", USHORT, "usWinAscent", globals.quadSize + options.yMin]
+        , ["usWinDescent", USHORT, "usWinDescent", (globals.quadSize - options.yMax)]
         , ["ulCodePageRange1", ULONG, "", 0x00000001]
         , ["ulCodePageRange2", ULONG, "", 0]
           // In order for the font to work in browsers, the OS/2 table needs to be version
-          // 3 or higher. In a bizar twist of "why?", this means we NEED to specify the following
-          // five values, except we are allowed to set them to 0 to indicate we don't care about them.
+          // 4. In a bizar twist of "why?", this means we NEED to specify the following five
+          // values, except we are allowed to set them to 0 to indicate we don't care about them.
         , ["sxHeight", SHORT, "", 0]
         , ["sCapHeight", SHORT, "", 0]
         , ["usDefaultChar", USHORT, "", 0]
@@ -746,7 +742,7 @@
         , ["checkSumAdjustment", ULONG, "0xB1B0AFBA minus (sum of entire font as ULONGs)", 0]
         , ["magicNumber", ULONG, "OpenType magic number, used to verify this is, in fact, an OpenType font", 0x5F0F3CF5]
         , ["flags", USHORT, "flags, see http://www.microsoft.com/typography/otspec/head.htm", 0]
-        , ["unitsPerEm", USHORT, "units per EM, we go with 1024 (ttf default. cff is usually 2000 instead)", 1024]
+        , ["unitsPerEM", USHORT, "units per EM, we go with 1024 (ttf default. cff is usually 2000 instead)", globals.quadSize]
         , ["created", LONGDATETIME, "date created", 0]
         , ["modified", LONGDATETIME, "date modified", 0]
         , ["xMin", SHORT, "global xMin", options.xMin]
@@ -762,9 +758,9 @@
       ],
       "hhea": [
           ["version", FIXED, "table version", 0x00010000]
-        , ["Ascender", FWORD, "typographic ascender", Math.max(options.yMax, 1)]    // ascender should be greater than 0
-        , ["Descender", FWORD, "typographic descender", Math.min(options.yMin, -1)] // descender should be less than 0
-        , ["LineGap", UFWORD, "Typographic line gap", options.yMax - options.yMin]
+        , ["Ascender", FWORD, "typographic ascender", globals.quadSize + options.yMin]
+        , ["Descender", FWORD, "typographic descender", -(globals.quadSize - options.yMax)]
+        , ["LineGap", UFWORD, "Typographic line gap", 0]
         , ["advanceWidthMax", FWORD, "Maximum advance width value in 'hmtx' table.", options.xMax - options.xMin]
         , ["minLeftSideBearing", FWORD, "Minimum left sidebearing value in 'hmtx' table.", 0]
         , ["minRightSideBearing", FWORD, "Minimum right sidebearing value; calculated as Min(aw - lsb - (xMax - xMin)).", 0]
@@ -823,6 +819,20 @@
         , ["maxMemType1", ULONG, "", 0]
       ]
     };
+
+    [
+        , ["sTypoAscender", SHORT, "typographic ascender", options.yMax]
+        , ["sTypoDescender", SHORT, "typographic descender", options.yMin]
+        , ["sTypoLineGap", SHORT, "line gap", globals.quadSize - options.yMax + options.yMin]
+        , ["usWinAscent", USHORT, "usWinAscent", globals.quadSize + options.yMin]
+        , ["usWinDescent", USHORT, "usWinDescent", -(globals.quadSize - options.yMax)]
+        , ["Ascender", FWORD, "typographic ascender", globals.quadSize + options.yMin]
+        , ["Descender", FWORD, "typographic descender", -(globals.quadSize - options.yMax)]
+        , ["LineGap", UFWORD, "Typographic line gap", 0]
+    ].map(function(v) {
+      console.log(v[0], v[3]);
+    })
+
 
     var numTables = Object.keys(TableModels).length;
     var otf = buildSFNT(numTables, TableModels);

@@ -124,16 +124,12 @@
     };
   }
 
-  // Using "small" rather than "big" yields a 640 byte font,
-  // as opposed to a 784 bytes font! That's almost 20% smaller!
-  // Of course, most values from the "small" props object are
-  // not very useful for explaining how a font works, but it's
-  // pretty impressive.
+
+  var y = -120;
 
   var big = {
-//    FIXME: Why can the second bar not use "220" instead of 190? Somehow, the values go wrong.
-//    outline: "M 20 -50 L 20 650 700 650 700 -50 600 -50 600 400 120 400 120 -50 M 500 205 L 500 100 220 100 220 205"
-    outline: "M 20 -50 L 20 650 700 650 700 -50 360 -150 20 -50 " + "M 170 50 L 360 0 550 50 550 500 170 500"
+    outline: "M  20 "+(100 + y) + " L 20 "+(800 + y) + " 700 "+(800 + y) + " 700 "+(100 + y) + " 20 "+(100 + y)
+           + "M 170 "+(120 + y) + " L 550 "+(120 + y) + " 550 "+(750 + y) + " 170 "+(750 + y)
   };
 
   var small = {
@@ -146,7 +142,7 @@
   };
 
   // build the font
-  var font = buildFont(small);
+  var font = buildFont(big);
 
   // convert to legible data
   var binary = font.otf;
