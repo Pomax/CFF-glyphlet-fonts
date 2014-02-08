@@ -17,3 +17,6 @@ tr:nth-last-child(1) { background: inherit!important; }
 th { color: rgb(200,200,220); }
 
 code { font-family: monospace; color: dark-gray; background: rgba(0,0,0,0.1); }
+.tables { margin: auto; width: 85%; }
+.downloads { clear: both; font-size: 80%; margin-bottom: 3em; text-align: center; text-indent: -18em; }
+.downloads a + a { margin-left: 10px; }

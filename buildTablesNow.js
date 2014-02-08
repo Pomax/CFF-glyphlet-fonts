@@ -152,12 +152,34 @@
   var binary = font.otf;
   var hexmap = binary.map(asHex);
   var charmap = binary.map(asChars);
-  document.body.appendChild(makeTable(hexmap));
-  document.body.appendChild(makeTable(charmap));
 
-  //console.log("--- cff ---\n", font.cff.map(asHex).join(" "));
-  //console.log("--- otf ---\n", hexmap.join(" "));
-  //console.log("--- woff ---\n", font.woff.map(asHex).join(" "));
+  (function formTables() {
+    var representation = document.createElement("div");
+    representation.classList.add("tables");
+    representation.appendChild(makeTable(hexmap));
+    representation.appendChild(makeTable(charmap));
+
+    var downloads = document.createElement("div");
+    downloads.classList.add("downloads");
+
+    var a = document.createElement("a");
+    a.innerHTML = "download opentype font";
+    a.href = "data:application/octet-stream;base64," + btoa(font.otf.map(asChars).join(''));
+    downloads.appendChild(a);
+
+    a = document.createElement("a");
+    a.innerHTML = "download as WOFF";
+    a.href = "data:application/octet-stream;base64," + btoa(font.woff.map(asChars).join(''));
+    downloads.appendChild(a);
+
+    a = document.createElement("a");
+    a.innerHTML = "download cff block";
+    a.href = "data:application/octet-stream;base64," + btoa(font.cff.map(asChars).join(''));
+    downloads.appendChild(a);
+
+    representation.appendChild(downloads);
+    document.body.appendChild(representation);
+  }());
 
   // generate OFT and CFF region highlighting in the HTML tables
   var otf = font.mappings.filter(function(e) { return e.type !== "cff"; });
@@ -171,23 +193,14 @@
   });
 
   // create stylesheet that uses this font
-
-/*
-  var mime = "font/opentype";
-  var dataurl = "data:" + mime + ";base64," + btoa(font.otf.map(asChars).join(''));
-  var fontface = "@font-face {\n  font-family: 'custom font';\n  src: url('" +dataurl+ "') format('opentype');\n}";
-  var sheet = document.createElement("style");
-  sheet.innerHTML = fontface;
-  document.head.appendChild(sheet);
-*/
-
-///*
-  var mime = "application/font-woff";
-  var dataurl = "data:" + mime + ";base64," + btoa(font.woff.map(asChars).join(''));
+  mime = "application/font-woff";
+  dataurl = "data:" + mime + ";base64," + btoa(font.woff.map(asChars).join(''));
   var fontface = "@font-face {\n  font-family: 'custom font';\n  src: url('" +dataurl+ "') format('woff');\n}";
   var sheet = document.createElement("style");
   sheet.innerHTML = fontface;
   document.head.appendChild(sheet);
-//*/
 
+  //console.log("--- cff ---\n", font.cff.map(asHex).join(" "));
+  //console.log("--- otf ---\n", hexmap.join(" "));
+  //console.log("--- woff ---\n", font.woff.map(asHex).join(" "));
 }(this));
