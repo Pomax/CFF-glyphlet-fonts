@@ -661,6 +661,37 @@
     var TableModels = {
       "CFF ": createCFF()
       ,
+/*
+      "GSUB": [
+          ["Version", FIXED, "", 0x00010000]
+        , ["ScriptList", OFFSET, "Offset to ScriptList table-from beginning of GSUB table", 0x00000000]
+        , ["FeatureList", OFFSET, "Offset to FeatureList table-from beginning of GSUB table", 0x00000000]
+        , ["LookupList", OFFSET, "Offset to LookupList table-from beginning of GSUB table", 0x00000000]
+        , ["Script List table", [
+            ["ScriptCount", USHORT, "Number of ScriptRecords", 1]
+          , ["ScriptRecord", [
+              ["ScriptTag", CHARARRAY, "", 'cstm']
+            , ["Script", OFFSET, "Offset to Script table-from beginning of ScriptList", 0x0000]
+          ]]
+          , ["Script table", [
+              ["defaultLangSys", OFFSET, '', 0x0000]
+            , ["LangSysCount", USHORT, "this font's not language specific", 0]
+          ]]
+          , ["Default LangSys table", [
+              ["LookupOrder", OFFSET, "reserved", 0]
+            , ["ReqFeatureIndex", USHORT, "no required features", 0xFFFF]
+            , ["FeatureCount", USHORT, "Number of FeatureIndex values for this language system", 1]
+            , ["FeatureIndex", [
+              ['0', USHORT, "first index is the only index", 0]
+            ]]
+          ]]
+        ]]
+        , ["Feature List table", [
+        ]]
+        , ["Lookup List table", [
+        ]]
+      ],
+*/
       "OS/2": [
           ["version", USHORT, "OS/2 table 4", 0x0004]
         , ["xAvgCharWidth", SHORT, "xAvgCharWidth", 0]
@@ -683,7 +714,7 @@
           // Oh look! A trademarked classification system the bytes
           // for which cannot be legally set unless you pay HP.
           // Why this is part of the OS/2 table instead of its own
-          // proprietary table I will likely never truly know. 
+          // proprietary table I will likely never truly know.
         , ["panose", [
           , ["bFamilyType", BYTE, "", 0]
           , ["bSerifStyle", BYTE, "", 0]
@@ -819,19 +850,6 @@
         , ["maxMemType1", ULONG, "", 0]
       ]
     };
-
-    [
-        , ["sTypoAscender", SHORT, "typographic ascender", options.yMax]
-        , ["sTypoDescender", SHORT, "typographic descender", options.yMin]
-        , ["sTypoLineGap", SHORT, "line gap", globals.quadSize - options.yMax + options.yMin]
-        , ["usWinAscent", USHORT, "usWinAscent", globals.quadSize + options.yMin]
-        , ["usWinDescent", USHORT, "usWinDescent", -(globals.quadSize - options.yMax)]
-        , ["Ascender", FWORD, "typographic ascender", globals.quadSize + options.yMin]
-        , ["Descender", FWORD, "typographic descender", -(globals.quadSize - options.yMax)]
-        , ["LineGap", UFWORD, "Typographic line gap", 0]
-    ].map(function(v) {
-      console.log(v[0], v[3]);
-    })
 
 
     var numTables = Object.keys(TableModels).length;

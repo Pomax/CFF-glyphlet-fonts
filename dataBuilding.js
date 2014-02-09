@@ -58,25 +58,24 @@
    ***/
 
   context.NUMBER = function NUMBER(v) {
-
     if (-107 <= v && v <= 107) {
-      return [v + 139]; }
-
+      return [v + 139];
+    }
     if (108 <= v && v <= 1131) {
       var v2 = v - 108;
       var b0 = (v2 >> 8) & 0xFF,
           b1 = v2 - (b0 << 8);
-      return [b0 + 247, b1]; }
-
+      return [b0 + 247, b1];
+    }
     if (-1131 <= v && v <= -108) {
       var v2 = -v - 108,
           b0 = (v2 >> 8) & 0xFF,
           b1 = v2 - (b0 << 8);
-      return [b0 + 251, b1]; }
-
+      return [b0 + 251, b1];
+    }
     if (-32768 <= v && v <= 32767) {
-      return [28, (v >> 8) & 0xFF, v & 0xFF]; }
-
+      return [28, (v >> 8) & 0xFF, v & 0xFF];
+    }
     return [29, (v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF];
   };
 

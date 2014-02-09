@@ -69,6 +69,40 @@
     return table;
   }
 
+  function formTables(font, hexmap, charmap) {
+    var representation = document.createElement("div");
+    representation.classList.add("tables");
+    representation.appendChild(makeTable(hexmap));
+    representation.appendChild(makeTable(charmap));
+
+    var downloads = document.createElement("div");
+    downloads.classList.add("downloads");
+
+    // plain .otf file
+    var a = document.createElement("a");
+    a.innerHTML = "download opentype font";
+    a.download = "customfont.otf";
+    a.href = "data:application/octet-stream;base64," + btoa(font.otf.map(asChars).join(''));
+    downloads.appendChild(a);
+
+    // browser-specific .wiff version
+    a = document.createElement("a");
+    a.innerHTML = "download as WOFF";
+    a.download = "customfont.woff";
+    a.href = "data:application/octet-stream;base64," + btoa(font.woff.map(asChars).join(''));
+    downloads.appendChild(a);
+
+    // for data enthusiasts, the .cff block without sfnt wrapper
+    a = document.createElement("a");
+    a.innerHTML = "download cff block";
+    a.download = "customfont.cff";
+    a.href = "data:application/octet-stream;base64," + btoa(font.cff.map(asChars).join(''));
+    downloads.appendChild(a);
+
+    representation.appendChild(downloads);
+    document.body.appendChild(representation);
+  }
+
   // create a query selector based on a mapping region
   function formQuery(mapping) {
     var qs = [];
@@ -124,20 +158,28 @@
     };
   }
 
-
+  // outline
   var y = -120;
+  var outline = "M  20 "+(100 + y) + " L  20 "+(800 + y) + " 700 "+(800 + y) + " 700 "+(100 + y) + " 20 "+(100 + y)
+              + "M 170 "+(250 + y) + " L 170 "+(650 + y) + " 550 "+(650 + y) + " 550 "+(250 + y);
 
+  // normal full string version
   var big = {
-    outline: "M  20 "+(100 + y) + " L 20 "+(800 + y) + " 700 "+(800 + y) + " 700 "+(100 + y) + " 20 "+(100 + y)
-           + "M 170 "+(120 + y) + " L 550 "+(120 + y) + " 550 "+(750 + y) + " 170 "+(750 + y)
-  };
+      outline: outline
+    , fontFamily: "Custom Font"
+    , subfamily: "Regular"
+    , fontName: "Custom Glyph Font"
+    , compactFontName: "customfont"
+    , fontVersion: "Version 1.0"
+  }
 
+  // near-illegally-short string version (~170 bytes smaller)
   var small = {
-      outline: big.outline
+      outline: outline
     , fontFamily: "c"
     , subfamily: "c"
     , fontName: "c"
-    , compactFontName: "fontnamexx"
+    , compactFontName: "cf"
     , fontVersion: "1"
   };
 
@@ -148,34 +190,7 @@
   var binary = font.otf;
   var hexmap = binary.map(asHex);
   var charmap = binary.map(asChars);
-
-  (function formTables() {
-    var representation = document.createElement("div");
-    representation.classList.add("tables");
-    representation.appendChild(makeTable(hexmap));
-    representation.appendChild(makeTable(charmap));
-
-    var downloads = document.createElement("div");
-    downloads.classList.add("downloads");
-
-    var a = document.createElement("a");
-    a.innerHTML = "download opentype font";
-    a.href = "data:application/octet-stream;base64," + btoa(font.otf.map(asChars).join(''));
-    downloads.appendChild(a);
-
-    a = document.createElement("a");
-    a.innerHTML = "download as WOFF";
-    a.href = "data:application/octet-stream;base64," + btoa(font.woff.map(asChars).join(''));
-    downloads.appendChild(a);
-
-    a = document.createElement("a");
-    a.innerHTML = "download cff block";
-    a.href = "data:application/octet-stream;base64," + btoa(font.cff.map(asChars).join(''));
-    downloads.appendChild(a);
-
-    representation.appendChild(downloads);
-    document.body.appendChild(representation);
-  }());
+  formTables(font, hexmap, charmap);
 
   // generate OFT and CFF region highlighting in the HTML tables
   var otf = font.mappings.filter(function(e) { return e.type !== "cff"; });
@@ -189,14 +204,16 @@
   });
 
   // create stylesheet that uses this font
-  var mime = "application/font-woff";
-  var dataurl = "data:" + mime + ";base64," + btoa(font.woff.map(asChars).join(''));
-  var fontface = "@font-face {\n  font-family: 'custom font';\n  src: url('" +dataurl+ "') format('woff');\n}";
+  var mime_woff = "application/font-woff";
+  var dataurl_woff = "data:" + mime_woff + ";base64," + btoa(font.woff.map(asChars).join(''));
+  var mime_otf = "font/opentype";
+  var dataurl_otf = "data:" + mime_otf + ";base64," + btoa(font.otf.map(asChars).join(''));
+
+  var fontface = ["@font-face {\n  font-family: 'custom font';"
+                 ,"  src: url('" +dataurl_otf+ "') format('otf');"
+                 ,"  src: url('" +dataurl_woff+ "') format('woff');"
+                 ,"}"].join("\n");
   var sheet = document.createElement("style");
   sheet.innerHTML = fontface;
   document.head.appendChild(sheet);
-
-  //console.log("--- cff ---\n", font.cff.map(asHex).join(" "));
-  //console.log("--- otf ---\n", hexmap.join(" "));
-  //console.log("--- woff ---\n", font.woff.map(asHex).join(" "));
 }(this));
