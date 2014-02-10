@@ -661,37 +661,6 @@
     var TableModels = {
       "CFF ": createCFF()
       ,
-/*
-      "GSUB": [
-          ["Version", FIXED, "", 0x00010000]
-        , ["ScriptList", OFFSET, "Offset to ScriptList table-from beginning of GSUB table", 0x00000000]
-        , ["FeatureList", OFFSET, "Offset to FeatureList table-from beginning of GSUB table", 0x00000000]
-        , ["LookupList", OFFSET, "Offset to LookupList table-from beginning of GSUB table", 0x00000000]
-        , ["Script List table", [
-            ["ScriptCount", USHORT, "Number of ScriptRecords", 1]
-          , ["ScriptRecord", [
-              ["ScriptTag", CHARARRAY, "", 'cstm']
-            , ["Script", OFFSET, "Offset to Script table-from beginning of ScriptList", 0x0000]
-          ]]
-          , ["Script table", [
-              ["defaultLangSys", OFFSET, '', 0x0000]
-            , ["LangSysCount", USHORT, "this font's not language specific", 0]
-          ]]
-          , ["Default LangSys table", [
-              ["LookupOrder", OFFSET, "reserved", 0]
-            , ["ReqFeatureIndex", USHORT, "no required features", 0xFFFF]
-            , ["FeatureCount", USHORT, "Number of FeatureIndex values for this language system", 1]
-            , ["FeatureIndex", [
-              ['0', USHORT, "first index is the only index", 0]
-            ]]
-          ]]
-        ]]
-        , ["Feature List table", [
-        ]]
-        , ["Lookup List table", [
-        ]]
-      ],
-*/
       "OS/2": [
           ["version", USHORT, "OS/2 table 4", 0x0004]
         , ["xAvgCharWidth", SHORT, "xAvgCharWidth", 0]
@@ -850,6 +819,86 @@
         , ["maxMemType1", ULONG, "", 0]
       ]
     };
+
+    /**
+     * Do we need substitution rules in this font so that we can use word -> icon functionality?
+     */
+    if (options.substitution) {
+      TableModels["GSUB"] = [
+          // GSUB header
+          ["Version", FIXED, "", 0x00010000]
+        , ["ScriptListOffset",  OFFSET, "Offset to ScriptList table, from beginning of GSUB table",  0x00000000]
+        , ["FeatureListOffset", OFFSET, "Offset to FeatureList table, from beginning of GSUB table", 0x00000000]
+        , ["LookupListOffset",  OFFSET, "Offset to LookupList table, from beginning of GSUB table",  0x00000000]
+
+          // Scripts
+        , ["Script List", [
+            ["ScriptCount", USHORT, "Number of ScriptRecords", 1]
+          , ["ScriptRecord", [
+              ["ScriptTag", CHARARRAY, "We only use the default script", "DFLT"]
+            , ["ScriptTableOffset", OFFSET, "Offset to Script table-from beginning of ScriptList", 0x0000]
+          ]]
+          , ["Script table", [
+              ["defaultLangSys", OFFSET, "the langsys record to use in absence of a specific language", 0x0000]
+            , ["LangSysCount", USHORT, "this font is not language specific, so has no langsys records beyond default", 0]
+          ]]
+          , ["Default LangSys table", [
+              ["LookupOrder", OFFSET, "reserved value. Because why not", 0]
+            , ["ReqFeatureIndex", USHORT, "We require the first (and only) feature. It must always kick in.", 0]
+            , ["FeatureCount", USHORT, "Number of FeatureIndex values for this language system", 1]
+            , ["FeatureIndex", [
+                ['0', USHORT, "first index is the only index", 0]
+            ]]
+          ]]
+        ]]
+
+          // Features
+        , ["Feature List", [
+             ["FeatureCount", USHORT, "One feature record only", 1]
+           , ["FeatureRecords", [
+                ["Tag", CHARARRAY, "we use the ... feature", '????']
+              , ["Offset", OFFSET, "Offset to Feature table, from beginning of FeatureList", 0x0000]
+           ]]
+           , ["Feature table", [
+                ["FeatureParams", OFFSET, "reserved. Again.", 0]
+              , ["LookupCount", USHORT, "how many lookups does this feature use?", 1]
+              , ["LookupListIndex", [
+                  ["0", USHORT, "first index is for first lookuplist entry", 0]
+              ]]
+           ]]
+        ]]
+
+          // Lookup
+        , ["Lookup List", [
+            ["LookupCount", USHORT, "number of lookups", 1]
+          , ["Lookups", [
+            , ["0", OFFSET, "offset to first lookup that we need", 0]
+          ]]
+          , ["Lookup table", [
+              // see http://fontforge.org/gposgsub.html, "the GSUB table"
+              ["LookupType", USHORT, "GSUB many-to-one substitution", 5]
+            , ["LookupFlag", USHORT, "lookup qualifiers - we don't have any", 0]
+            , ["SubtableCount", USHORT, "we use have subtable", 1]
+            , ["Subtable offsets", [
+              ["0", OFFSET, "index for first subtable", 0]
+            ]]
+            // if flags indicates filtering, there is one more USHORT record here
+          ]]
+        ]]
+
+          // coverage subtable for our substitution. we need coverage format
+          // 2, since more than one "glyph" is involved.
+        , ["Coverage table", [
+            ["CoverageFormat", USHORT, "format 2", 2]
+          , ["RangeCount", USHORT, "how many distinct ranges?", 1]
+          , ["RangeRecords", [
+              ["Start", GLYPHID, "first glyph", 0x0000]
+            , ["End", GLYPHIG, "last glyph", 0xFFFF]
+            , ["StartCoverageIndex", USHORT, "Coverage Index of first GlyphID in range", 0x0000]
+          ]]
+        ]]
+      ];
+    }
 
 
     var numTables = Object.keys(TableModels).length;
