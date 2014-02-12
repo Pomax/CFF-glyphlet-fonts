@@ -210,8 +210,8 @@
   var dataurl_otf = "data:" + mime_otf + ";base64," + btoa(font.otf.map(asChars).join(''));
 
   var fontface = ["@font-face {\n  font-family: 'custom font';"
-                 ,"  src: url('" +dataurl_otf+ "') format('otf');"
-                 ,"  src: url('" +dataurl_woff+ "') format('woff');"
+                 ,"  src: url('" +dataurl_otf+ "') format('otf'),"
+                 ,"       url('" +dataurl_woff+ "') format('woff');"
                  ,"}"].join("\n");
   var sheet = document.createElement("style");
   sheet.innerHTML = fontface;

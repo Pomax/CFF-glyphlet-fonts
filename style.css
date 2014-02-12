@@ -1,4 +1,4 @@
-table { width: 40%; float:left; font-family: monospace; font-size: 12px; border-collapse: collapse; width: auto; }
+table { margin: auto; width: 40%; display: inline-block; font-family: monospace; font-size: 12px; border-collapse: collapse; width: auto; }
 table+table { margin-left: 2em; }
 table, tr, td { padding: 0; margin : 0 0 1em 0; }
 tr { margin: -1px 0; }
@@ -17,6 +17,6 @@ tr:nth-last-child(1) { background: inherit!important; }
 th { color: rgb(200,200,220); }
 
 code { font-family: monospace; color: dark-gray; background: rgba(0,0,0,0.1); }
-.tables { margin: auto; width: 81%; }
-.downloads { clear: both; font-size: 80%; margin-bottom: 3em; text-align: center; text-indent: -18em; }
+.tables { width: 100%; text-align: center; }
+.downloads { clear: both; font-size: 80%; margin-bottom: 3em; text-align: center; text-indent: -2em; }
 .downloads a + a { margin-left: 10px; }
