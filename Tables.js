@@ -895,10 +895,8 @@
 
             , ["Default LangSys table", [
                 ["LookupOrder", OFFSET, "reserved value. Because why not", 0]
-//              , ["ReqFeatureIndex", USHORT, "We require the first (and only) feature. It must always kick in.", 0]
-//              , ["FeatureCount", USHORT, "Number of FeatureIndex values for this language system, excluding required", 0]
-              , ["ReqFeatureIndex", USHORT, "We require the first (and only) feature. It must always kick in.", 0xFFFF]
-              , ["FeatureCount", USHORT, "Number of FeatureIndex values for this language system, excluding required", 1]
+              , ["ReqFeatureIndex", USHORT, "We require the first (and only) feature. It must always kick in.", 0]
+              , ["FeatureCount", USHORT, "Number of FeatureIndex values for this language system, excluding required", 0]
               , ["FeatureIndex", [
                   ['0', USHORT, "first index is the only index", 0]
               ]]
