@@ -32,6 +32,39 @@
   }
 
   /**
+   * Get optimized ordering for the table data blocks
+   */
+  function getOptimizedTableOrder(sorted) {
+    var preferred = ["head", "hhea", "maxp", "OS/2", "name", "cmap", "post", "CFF "],
+        filtered = sorted.filter(function(v) {
+          return preferred.indexOf(v) === -1;
+        }),
+        keys = preferred.concat(filtered);
+    return keys;
+  }
+
+  /**
+   * Helper function for optimizing the table directory for binary searches
+   */
+  function optimizeTableDirectory(data, TableModels, ordering, optimizedOrdering) {
+    var numTables = optimizedOrdering.length,
+        start = 12,
+        end = start + numTables * 16,
+        directoryBlock = data.slice(start, end),
+        directoryBlocks = directoryBlock.join(",").match(/[^,]+(,[^,]+){15}/g).map(function(v) { return v.split(","); }),
+        optimized = [];
+
+    optimizedOrdering.forEach(function(tag) {
+      var mapping = mappings.filter(function(r) { return r.name === tag + " table definition"})[0];
+      mapping.start = 12 + optimized.length;
+      optimized = optimized.concat(directoryBlocks[ordering.indexOf(tag)].map(function(v) { return parseInt(v); }));
+      mapping.end = 12 + optimized.length;
+    });
+
+    return data.slice(0,start).concat(optimized).concat(data.slice(end));
+  }
+
+  /**
    * Generate the font's binary data
    */
   function buildSFNT(numTables, TableModels) {
@@ -88,8 +121,20 @@
     };
 
     addMapping("sfnt header", 0, 12, "sfnt");
-    Object.keys(TableModels).forEach(processTag);
-    var data = opentype.concat(headers).concat(fontdata);
+
+    // custom-order the tables, see "Optimized Table Ordering" at
+    // http://www.microsoft.com/typography/otspec140/recom.htm
+    var sorted = Object.keys(TableModels).sort(),
+        optimized = getOptimizedTableOrder(sorted);
+
+    // build the fontdata by running through all tables
+    var data = (function(){
+      optimized.forEach(processTag);
+      var data = opentype.concat(headers).concat(fontdata);
+      // Also, for binary searching the table directory, reorder the directory
+      // in ASCII-alphabetical order (capital A-Z first, lowercase a-z second).
+      return optimizeTableDirectory(data, TableModels, optimized, sorted);
+    }());
 
     // We're almost done, but we still need to compute the full font's checksum.
     // This one's tricky, and the algorithm for computing all checksums is:
@@ -662,7 +707,7 @@
       "CFF ": createCFF()
       ,
       "OS/2": [
-          ["version", USHORT, "OS/2 table 4", 0x0004]
+          ["version", USHORT, "OS/2 table version 3 (to pass MS Font Validator)", 0x0003]
         , ["xAvgCharWidth", SHORT, "xAvgCharWidth", 0]
         , ["usWeightClass", USHORT, "usWeightClass", 400]
         , ["usWidthClass", USHORT, "usWidthClass", 1]
@@ -704,7 +749,7 @@
         , ["ulUnicodeRange4", ULONG, "", 0]
         , ["achVendID", CHARARRAY, "vendor id (http://www.microsoft.com/typography/links/vendorlist.aspx for the 'real' list)", globals.vendorId]
           // bit 6 is high for 'Regular font'
-        , ["fsSelection", USHORT, "font selection flag: bit 6 (lsb=0) is high, to indicate 'regular font'.", 0x40]
+        , ["fsSelection", USHORT, "font selection flag: bit 6 (lsb=0) is high, to indicate 'regular font'.", 0x0040]
         , ["usFirstCharIndex", USHORT, "first character to be in this font. We claim 'A'.", 0x41]
         , ["usLastCharIndex", USHORT, "last character to be in this font. We again claim 'A'.", 0x41]
           // vertical metrics: see http://typophile.com/node/13081 for how the hell these work.
@@ -722,8 +767,11 @@
         , ["sxHeight", SHORT, "", 0]
         , ["sCapHeight", SHORT, "", 0]
         , ["usDefaultChar", USHORT, "", 0]
-        , ["usBreakChar", USHORT, "", 0]
-        , ["usMaxContext", USHORT, "", 1]
+          // we have no break char, but we must point to a "not .notdef" glyphid to
+          // validate as "legal font". Normally this would be the 'space' glyphid.
+        , ["usBreakChar", USHORT, "", 0x41]
+          // We have plain + ligature use, therefore there are 2 contexts
+        , ["usMaxContext", USHORT, "", options.substitution ? 2 : 0]
       ],
       "cmap": [
           ["version", USHORT, "cmap main version", 0]
@@ -821,33 +869,39 @@
     };
 
     /**
-     * Do we need substitution rules in this font so that we can use word -> icon functionality?
+     * OpenType magic: we're using a ligature to turn "AA" into "A".
+     * Once this works, we're going to instead turn 'c,u,s,t,o,m' into glyph "custom"
+     * (where the commas are glyph delimiters, not actual commas).
      */
     if (options.substitution) {
       TableModels["GSUB"] = [
           // GSUB header
           ["Version", FIXED, "", 0x00010000]
-        , ["ScriptListOffset",  OFFSET, "Offset to ScriptList table, from beginning of GSUB table",  0x00000000]
-        , ["FeatureListOffset", OFFSET, "Offset to FeatureList table, from beginning of GSUB table", 0x00000000]
-        , ["LookupListOffset",  OFFSET, "Offset to LookupList table, from beginning of GSUB table",  0x00000000]
+        , ["ScriptListOffset",  OFFSET, "Offset to ScriptList table, from beginning of GSUB table",  0x0000]
+        , ["FeatureListOffset", OFFSET, "Offset to FeatureList table, from beginning of GSUB table", 0x0000]
+        , ["LookupListOffset",  OFFSET, "Offset to LookupList table, from beginning of GSUB table",  0x0000]
 
           // Scripts
         , ["Script List", [
             ["ScriptCount", USHORT, "Number of ScriptRecords", 1]
           , ["ScriptRecord", [
               ["ScriptTag", CHARARRAY, "We only use the default script", "DFLT"]
-            , ["ScriptTableOffset", OFFSET, "Offset to Script table-from beginning of ScriptList", 0x0000]
+            , ["ScriptTableOffset", OFFSET, "Offset to Script table-from beginning of ScriptList", 0x0008] // hardcoded
           ]]
+
           , ["Script table", [
-              ["defaultLangSys", OFFSET, "the langsys record to use in absence of a specific language", 0x0000]
+              ["defaultLangSys", OFFSET, "the langsys record to use in absence of a specific language, from start of script table", 0x0004] // hardcoded
             , ["LangSysCount", USHORT, "this font is not language specific, so has no langsys records beyond default", 0]
-          ]]
-          , ["Default LangSys table", [
-              ["LookupOrder", OFFSET, "reserved value. Because why not", 0]
-            , ["ReqFeatureIndex", USHORT, "We require the first (and only) feature. It must always kick in.", 0]
-            , ["FeatureCount", USHORT, "Number of FeatureIndex values for this language system", 1]
-            , ["FeatureIndex", [
-                ['0', USHORT, "first index is the only index", 0]
+
+            , ["Default LangSys table", [
+                ["LookupOrder", OFFSET, "reserved value. Because why not", 0]
+//              , ["ReqFeatureIndex", USHORT, "We require the first (and only) feature. It must always kick in.", 0]
+//              , ["FeatureCount", USHORT, "Number of FeatureIndex values for this language system, excluding required", 0]
+              , ["ReqFeatureIndex", USHORT, "We require the first (and only) feature. It must always kick in.", 0xFFFF]
+              , ["FeatureCount", USHORT, "Number of FeatureIndex values for this language system, excluding required", 1]
+              , ["FeatureIndex", [
+                  ['0', USHORT, "first index is the only index", 0]
+              ]]
             ]]
           ]]
         ]]
@@ -856,8 +910,8 @@
         , ["Feature List", [
              ["FeatureCount", USHORT, "One feature record only", 1]
            , ["FeatureRecords", [
-                ["Tag", CHARARRAY, "we use the ... feature", '????']
-              , ["Offset", OFFSET, "Offset to Feature table, from beginning of FeatureList", 0x0000]
+                ["Tag", CHARARRAY, "we use the ligature feature", 'liga']
+              , ["Offset", OFFSET, "Offset to Feature table, from beginning of FeatureList", 0x0008] // hardcoded
            ]]
            , ["Feature table", [
                 ["FeatureParams", OFFSET, "reserved. Again.", 0]
@@ -872,32 +926,85 @@
         , ["Lookup List", [
             ["LookupCount", USHORT, "number of lookups", 1]
           , ["Lookups", [
-            , ["0", OFFSET, "offset to first lookup that we need", 0]
+            , ["0", OFFSET, "offset to first lookup that we need, relative to start of lookup list", 0x0004] // hardcoded
           ]]
           , ["Lookup table", [
               // see http://fontforge.org/gposgsub.html, "the GSUB table"
-              ["LookupType", USHORT, "GSUB many-to-one substitution", 5]
+              ["LookupType", USHORT, "GSUB ligature substitution is lookuptype 4", 4]
             , ["LookupFlag", USHORT, "lookup qualifiers - we don't have any", 0]
             , ["SubtableCount", USHORT, "we use have subtable", 1]
             , ["Subtable offsets", [
-              ["0", OFFSET, "index for first subtable", 0]
+                ["0", OFFSET, "index for first subtable, relative to start of lookup table", 0x0008] //hardcoded
             ]]
-            // if flags indicates filtering, there is one more USHORT record here
-          ]]
-        ]]
 
-          // coverage subtable for our substitution. we need coverage format
-          // 2, since more than one "glyph" is involved.
-        , ["Coverage table", [
-            ["CoverageFormat", USHORT, "format 2", 2]
-          , ["RangeCount", USHORT, "how many distinct ranges?", 1]
-          , ["RangeRecords", [
-              ["Start", GLYPHID, "first glyph", 0x0000]
-            , ["End", GLYPHIG, "last glyph", 0xFFFF]
-            , ["StartCoverageIndex", USHORT, "Coverage Index of first GlyphID in range", 0x0000]
+            // If flags indicates filtering, there is one more USHORT record here
+            // Since flags is 0, that record has been omitted.
+
+              // LookupType 4: Ligature Substitution Subtable.
+            , ["Ligature Substitution Subtable, Format 1", [
+                ["SubstFormat", USHORT, "format 1", 1]
+              , ["Coverage", OFFSET, "Offset to Coverage table-from beginning of Substitution table", 0x0008] // hardcoded
+              , ["LigSetCount", USHORT, "Number of ligature sets", 1]
+              , ["LigatureSet Offsets", [
+                  ["0", OFFSET, "offset to first ligature set, from beginning of Substitution table", 0x0008 + 10] // start of coverage + length of coverage
+              ]]
+
+                // Coverage table for our ligature: we cover the glyph "A" only (for now)
+              , ["Coverage table", [
+                  ["CoverageFormat", USHORT, "format 2", 2]
+                , ["RangeCount", USHORT, "number of ranges covered", 1]
+                , ["RangeRecords", [
+                    ["0", [
+                        ["Start", GlyphID, "first glyph in the range, id=1", 1]
+                      , ["End", GlyphID, "last glyph in the range, id=1", 1]
+                      , ["StartCoverageIndex", USHORT, "Coverage Index of first GlyphID in range", 0]
+                    ]]
+                ]]
+              ]]
+
+                // Our ligature sets (we only have one)
+              , ["first ligature set", [
+                  ["LigatureCount", USHORT, "Number of Ligature tables in this set", 1]
+
+                , ["Ligature offsets", [
+                    ["0", OFFSET, "offset to first ligature, from beginning of LigatureSet table", 0x0004] // hardcoded
+                ]]
+
+                  // Our first and only ligature: (A,A) -> (A)
+                , ["first ligature", [
+                    ["LigGlyph", GlyphID, "the substitution glyph id (our A = id 1)", 1]
+                  , ["CompCount", USHORT, "Number of components in the ligature (i.e. how many letter to replace) ", 2]
+                    // The Component array is basically a char array, except each letter is identified by
+                    // font-internal GlyphID, rather than by some external codepage. Note: the first glyph
+                    // is defined by the coverage table already, so we only encode "letters" 2 and on.
+                  , ["Components", [
+                      ["0", GlyphID, "second letter in the ligature", 1]
+                  ]]
+                ]]
+              ]]
+            ]]
           ]]
         ]]
       ];
+
+      // hook up all offsets correctly
+      var binary = serialize(TableModels["GSUB"]),
+          headerSize = 10,
+          scriptList = serialize(TableModels["GSUB"][4]),
+          scriptListOffset = headerSize,
+          featureList = serialize(TableModels["GSUB"][5]),
+          featureListOffset = scriptListOffset + scriptList.length,
+          lookupList = serialize(TableModels["GSUB"][6]),
+          lookupListOffset = featureListOffset + featureList.length;
+
+      // FIXME: offset linking should be automatic. the OFFSET datatype should really
+      //        become an OFFSET("name of field", "name of 'relative to' field")
+      //        function, so that the serialize function can perform the magic for us.
+
+      var headerSize = 10;
+      TableModels["GSUB"][1][3] = scriptListOffset;
+      TableModels["GSUB"][2][3] = featureListOffset;
+      TableModels["GSUB"][3][3] = lookupListOffset;
     }
 
 

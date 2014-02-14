@@ -137,7 +137,10 @@
     var data = [];
     (function _serialize(record) {
       if (typeof record[LABEL] !== "string") {
-        record.forEach(_serialize);
+        try { record.forEach(_serialize); }
+        catch(e) {
+          console.error(record);
+          throw e; }
       }
       else if (typeof record[READER] === "function") {
         data = data.concat(record[READER](record[DATA]));

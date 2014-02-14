@@ -179,12 +179,15 @@
     , fontFamily: "c"
     , subfamily: "c"
     , fontName: "c"
-    , compactFontName: "cf"
     , fontVersion: "1"
   };
 
+  // use GSUB functionality?
+  var options = big;
+  options.substitution = true;
+
   // build the font
-  var font = buildFont(big);
+  var font = buildFont(options);
 
   // convert to legible data
   var binary = font.otf;
