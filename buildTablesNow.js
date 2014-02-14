@@ -207,13 +207,15 @@
   });
 
   // create stylesheet that uses this font
-  var mime_woff = "application/font-woff";
-  var dataurl_woff = "data:" + mime_woff + ";base64," + btoa(font.woff.map(asChars).join(''));
   var mime_otf = "font/opentype";
   var dataurl_otf = "data:" + mime_otf + ";base64," + btoa(font.otf.map(asChars).join(''));
+  var mime_woff = "application/font-woff";
+  var dataurl_woff = "data:" + mime_woff + ";base64," + btoa(font.woff.map(asChars).join(''));
 
   var fontface = ["@font-face {\n  font-family: 'custom font';"
-                 ,"  src: url('" +dataurl_otf+ "') format('otf'),"
+                 ,"  font-weight: normal;"
+                 ,"  font-style: normal;"
+                 ,"  src: url('" +dataurl_otf+ "') format('opentype'),"
                  ,"       url('" +dataurl_woff+ "') format('woff');"
                  ,"}"].join("\n");
   var sheet = document.createElement("style");
