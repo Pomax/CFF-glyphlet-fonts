@@ -1,13 +1,21 @@
-These three files are the most current "working" CFF and OTF
-fonts based on the work on this page. They are unlikely to
-work "as fonts", but they should validate through tx, TTX,
-and Microsoft's "Font Validator" program.
+A brief explanation:
+
+  These three files are the most current "working" CFF and OTF
+  fonts based on the work on this page. They are unlikely to
+  work "as fonts", although they should work as webfonts.
+  They should all validate through tx, TTX, and Microsoft's
+  "Font Validator" utilities.
+
+Files provided:
 
   customfont.cff  - CFF-only data block
   customfont.otf  - OpenType font with embedded CFF data block
+  customfont.ttx  - The .otf unpacked to human-readable XML by TTX
   customfont.woff - WOFF-wrapped version of Customfont.otf
 
-For those burdened by lawyers, these fonts are license-free,
-and supplied as-is. I hold no responsibility for your what
-you do with these files. Although I might like to know about
-it if you do something particularly cool with them.
+Legal nonsense:
+
+  For those burdened by lawyers, these fonts are license-free,
+  and supplied as-is. I am not responsibility for what you do
+  with these files, or what that leads to. Although I might like
+  to know about it if you do something particularly cool with them.
