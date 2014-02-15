@@ -13,6 +13,12 @@ Files provided:
   customfont.ttx  - The .otf unpacked to human-readable XML by TTX
   customfont.woff - WOFF-wrapped version of Customfont.otf
 
+  The "with GSUB" dir contains the same files as generated with
+  GSUB ligature substitution baked in; the font does not implement
+  outlines for the ligature's component glyphs, but implements
+  the ligature glyph, and the rules for performing the ligature
+  substitution.
+
 Legal nonsense:
 
   For those burdened by lawyers, these fonts are license-free,
