@@ -1099,6 +1099,9 @@
       TableModels["GSUB"][3][3] = lookupListOffset;
     }
 
+    var functionsByName = function(key, val) { if (typeof val === 'function') { return val.name; }  return val; }
+    console.log("--- FONT STRUCTURE ---");
+    console.log(JSON.stringify(TableModels, functionsByName, 2));
 
     var numTables = Object.keys(TableModels).length;
     var otf = buildSFNT(numTables, TableModels);
