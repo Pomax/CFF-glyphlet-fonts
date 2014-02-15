@@ -669,25 +669,24 @@
           , ["offset", USHORT, "offset for this string in the string heap", offset]
         ];
         macRecords.push(macHeader.concat(nameRecordPartial));
-        NAMESTRINGS.push(string);
+        NAMESTRINGS.push([string + " (ascii)", CHARARRAY, "mac version of "+string, string]);
         offset += string.length;
 
         // And encode the same string but then in UTF16 for windows.
         // This leads to name data that is 300% the size of what it
         // could be if Windows would simply read the Mac records
         // in absence of windows records. But that is too good to happen.
-        string = atou(string);
+        var ustring = atou(string);
         nameRecordPartial = [
             ["recordID", USHORT, "See the 'Name IDs' section on http://www.microsoft.com/typography/otspec/name.htm for details", recordId]
-          , ["length", USHORT, "the length of this string", string.length]
+          , ["length", USHORT, "the length of this string", ustring.length]
           , ["offset", USHORT, "offset for this string in the string heap", offset]
         ];
         winRecords.push(winHeader.concat(nameRecordPartial));
-        NAMESTRINGS.push(string);
-        offset += string.length;
+        NAMESTRINGS.push([string + " (utf16)", CHARARRAY, "windows version of "+string, ustring]);
+        offset += ustring.length;
       });
 
-      NAMESTRINGS = NAMESTRINGS.join('');
       context.NAMERECORDS = macRecords.concat(winRecords);
       return NAMERECORDS.length;
     }
@@ -935,7 +934,7 @@
           // name records: {platform/encoding/language, nameid, length, offset}
         , ["NameRecord", NAMERECORDS]
           // and the string data is a single null character
-        , ["stringData", CHARARRAY, "The font's strings", NAMESTRINGS]
+        , ["stringData", NAMESTRINGS]
       ],
 
       "post": [

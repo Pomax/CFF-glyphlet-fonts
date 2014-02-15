@@ -137,6 +137,7 @@
     basename = basename || "";
     offset = offset || 0;
     var data = [];
+    var map = mapper ? new Mapper() : false;
     (function _serialize(record, prefix) {
       if(prefix == parseInt(prefix,10)) {
         prefix = "";
@@ -163,10 +164,20 @@
         }
       }
       var end = offset + data.length;
-      if(mapper && typeof record[LABEL] === "string") {
-        mapper.addMapping(prefix + record[LABEL], start, end, "field");
+      if(map && typeof record[LABEL] === "string") {
+        map.addMapping(prefix + record[LABEL], start, end, "field");
       }
     }(base_record, basename));
+
+    if(map) {
+      map.mappings.sort(function(a,b) {
+        if(a.start !== b.start) {
+          return a.start - b.start;
+        }
+        return a.end - b.end;
+      });
+      mapper.mappings = mapper.mappings.concat(map.mappings);
+    }
     return data;
   };
 

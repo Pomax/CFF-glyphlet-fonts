@@ -9,7 +9,10 @@
     <script src="Mapper.js"></script>
     <script src="Tables.js"></script>
     <script>
+      Array.prototype.first = function() { return this[0]; };
+      Array.prototype.last = function() { return this[this.length-1]; };
       NodeList.prototype.array = function() { return Array.prototype.slice.call(this); };
+      NodeList.prototype.forEach = Array.prototype.forEach;
     </script>
   </head>
 

@@ -16,6 +16,7 @@
   // array to HTML table function
   function makeTable(data, limit) {
     limit = limit || 16;
+    var tdCount = 0;
     var table = document.createElement("table");
 
     var toprow = document.createElement("tr");
@@ -42,6 +43,7 @@
         var column = document.createElement("td");
         column.classList.add("b");
         if(entry !== "—") { column.classList.add("p"+pos); }
+        column.classList.add("c"+(tdCount++));
         column.innerHTML = entry;
         row.appendChild(column);
       };
@@ -125,33 +127,46 @@
         }
 
         var nodelist = document.querySelectorAll(query);
-        var highlight = function(e, override) {
-          // TODO: make this nicely bordered looking
+        var highlight = function(e, override, show) {
+          if(!show) return;
           e.style.background = typeof override === "string" ? override : color;
-          e.title = mapping.name;
+          e.title = (mapping.name + " ("+mapping.start+"-"+mapping.end+", hex "+mapping.start.toString(16).toUpperCase()+"-"+mapping.end.toString(16).toUpperCase()+")").replace(/\.+/g,'.').replace(/\.\[/g,'[');
         };
-        var restore = function(e) {
+        var restore = function(e, last) {
           e.style.background = e.getAttribute("data-background");
           e.removeAttribute("title");
         };
         var colorize = function(e) {
+          if(!e.eventListeners) {
+            e.eventListeners = {
+              mouseover: [],
+              mouseout: []
+            };
+          }
+
           e.setAttribute("data-background", e.style.background);
-          e.addEventListener("mouseover", function(evt) {
-            nodelist.array().forEach(highlight);
+          var moverfn = function(evt) {
+            var show = (moverfn === e.eventListeners.mouseover.first() || moverfn === e.eventListeners.mouseover.last());
+            nodelist.array().forEach(function(e) { highlight(e, false, show); });
             if(target) {
               document.querySelectorAll(formQuery(target)).array().forEach(function(e3) {
                 highlight(e3, "rgba(71, 175, 123, 0.2)");
               });
             }
-          });
-          e.addEventListener("mouseout", function(evt) {
-            nodelist.array().forEach(restore);
+          };
+          e.addEventListener("mouseover", moverfn);
+          e.eventListeners.mouseover.push(moverfn);
+
+          var moutfn = function(evt) {
+            nodelist.array().forEach(function(e) { restore(e); });
             if(target) {
               document.querySelectorAll(formQuery(target)).array().forEach(function(e3) {
                 restore(e3);
               });
             }
-          });
+          };
+          e.addEventListener("mouseout", moutfn);
+          e.eventListeners.mouseout.push(moverfn);
         };
         nodelist.array().forEach(colorize);
       };
@@ -197,12 +212,7 @@
     var otf = font.mappings.filter(function(e) { return e.type.indexOf("sfnt") > -1; });
     var cff = font.mappings.filter(function(e) { return e.type === "cff"; });
     otf.forEach(setupMapping("rgba(71, 175, 123, 0.39)"));
-    var cff_offset = otf.filter(function(e) { return e.name.indexOf("CFF") === 0; })[0].start;
-    cff.forEach(function(mapping) {
-      mapping.start += cff_offset;
-      mapping.end += cff_offset;
-      setupMapping("rgba(200,200,0,0.3)")(mapping);
-    });
+
     // the most amazing magic
     var fields = font.mappings.filter(function(e) { return e.type === "field"; });
     fields.forEach(function(mapping) {
