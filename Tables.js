@@ -2,6 +2,9 @@
 
   "use strict";
 
+  // local-global-sort-of-thing-object
+  var globals = {};
+
   // layout mapping for finding regions of interest in the byte code
   var mappings = [];
   function addMapping(name, start, end, type) {
@@ -215,13 +218,7 @@
   }
 
   /**
-   * Create a font. Options:
-   * {
-   *   name: "glyph name"
-   *   outline: "SVG outline string"
-   *   quadSize: <num>
-   *   fontname: "simple font name. No spaces or special characters"
-   * }
+   * Create a font. The options are... pretty self explanatory
    */
   var buildFont = function(options) {
     mappings = [];
@@ -230,19 +227,34 @@
     if(!options.outline) { throw new Error("No outline was passed to build a font for"); }
 
     // Extract the font-global strings
-    var globals = {
-      vendorId: "----",
-      fontFamily: options.fontFamily || "Custom",
-      subfamily: options.subfamily || "Regular",
-      fontName: options.fontName || "Custom Glyph Font",
-      compactFontName: options.compactFontName || "customfont",
-      fontVersion: options.fontVersion || "Version 1.0",
-      copyright: options.copyright || "License-free",
-      trademark: options.trademark || "License-free",
-      license: options.license || "License-free",
-      glyphName: options.glyphName || "A",
-      quadSize: options.quadSize || 1024
+    globals = {
+        vendorId: " =) "
+      , fontFamily: options.fontFamily || "Custom"
+      , subfamily: options.subfamily || "Regular"
+      , fontName: options.fontName || "Custom Glyph Font"
+      , compactFontName: options.compactFontName || "customfont"
+      , fontVersion: options.fontVersion || "Version 1.0"
+      , copyright: options.copyright || "License-free"
+      , trademark: options.trademark || "License-free"
+      , license: options.license || "License-free"
+      , glyphName: options.glyphName || "~"
+      , glyphCode: "~".charCodeAt(0)
+      , quadSize: options.quadSize || 1024
+      , label: options.label || false
     };
+
+    var letters = false;
+    if(globals.label) {
+      letters = [];
+      globals.label.split('').forEach(function(l) {
+        if(letters.indexOf(l) === -1) {
+          letters.push(l);
+        }
+      });
+      letters.push(String.fromCharCode(globals.glyphCode));
+      letters.sort();
+      globals.letters = letters;
+    }
 
     // FIXME: this does not generate the most compact charstring at the moment.
     (function convertOutline(options, globals) {
@@ -388,34 +400,49 @@
       var cff_end = serialize(cff).length;
       var top_dict_data = cff[2][1][3][1];
 
+      var glyphs = [["0", SID, "single entry array for our glyph, which is custom SID 4", 394]];
+      if(globals.letters) {
+        glyphs = globals.letters.map(function(letter, idx) {
+          return [""+idx, SID, "SID for letter "+letter, 394 + idx];
+        });
+      }
+
       var charset = ["charset", [
         ["format", BYTE, "we use the simplest format", 0]
-      , ["glyphs", [
-          , ["0", SID, "single entry array for our glyph, which is custom SID 4", 394]
-        ]]
+      , ["glyphs", glyphs]
       ]];
+
+      var codes = [];//["0", BYTE, "encoding for glyph 0", 0]];
+      if(globals.letters) {
+        codes = codes.concat(globals.letters.map(function(letter, idx) {
+          return [""+idx, BYTE, "encoding for glyph "+idx+" ("+letter+")", idx+1];
+        }));
+      } else { codes.push(["1", BYTE, "encoding for glyph 1", 1]); }
 
       var encoding = ["encoding", [
         ["format", BYTE, "we use the encoding best suited for randomly ordered glyphs", 0]
-      , ["nCodes", BYTE, "number of encoded glyphs (not counting .notdef)", 1]
-      , ["codes", [
-          ["0", BYTE, "encoding for glyph 0", 0]
-        ]]
+      , ["nCodes", BYTE, "number of encoded glyphs (not counting .notdef)", codes.length]
+      , ["codes", codes]
       ]];
 
       var dim = (globals.quadSize * 0.7)|0;
 
-      var charstrings = [
-        [".notdef", DICTINSTRUCTION, "the outline for .notdef", OPERAND(14)]
-      , ["our letter", DICTINSTRUCTION, "the outline for our own glyph", options.charString]
-      ];
+      var charstrings = [[".notdef", DICTINSTRUCTION, "the outline for .notdef", OPERAND(14)]];
+      if(globals.letters) {
+        globals.letters.forEach(function(letter, idx) {
+          if(idx < globals.letters.length-1) {
+            charstrings.push([letter, DICTINSTRUCTION, "the outline for "+letter, OPERAND(14)]);
+          }
+        });
+      }
+      charstrings.push(["our letter", DICTINSTRUCTION, "the outline for our own glyph", options.charString]);
 
       var charstring_raw = serialize(charstrings);
       var charstring_offsize = charstring_raw.length > 255 ? 2 : 1;
       var charstring_index = ["charstring index", [
-         // this is the part that actually contains the characters outline data,
-         // encoded as Type 2 charstrings (one charstring per glyph).
-         ["count", Card16, "two charstrings; .notdef and our glyph", 2],
+        // this is the part that actually contains the characters outline data,
+        // encoded as Type 2 charstrings (one charstring per glyph).
+        ["count", Card16, "how many charstrings? (including .notdef", charstrings.length],
       , ["offSize", OffSize, "how many bytes do we need for offsets?", charstring_offsize]
       , ["offset", generateOffsets(charstrings, charstring_offsize)]
       , ["charstrings", charstrings]
@@ -507,8 +534,15 @@
           ["version", CHARARRAY, "font version string; string id 391", globals.fontVersion]
         , ["full name", CHARARRAY, "the font's full name (id 392)", globals.fontName]
         , ["family name", CHARARRAY, "the font family name (id 393)", globals.fontFamily]
-        , ["custom glyph", CHARARRAY, "custom glyph name, for charset/encoding", globals.glyphName]
       ];
+
+      if(globals.letters) {
+        globals.letters.forEach(function(letter, idx) {
+          if(idx < globals.letters.length) {
+            strings.push([letter, CHARARRAY, "the letter "+letter+ " (id "+(394+idx)+")", letter]);
+          }
+        });
+      } else { strings.push(["our glyph", CHARARRAY, "our custom glyph (id 394)", globals.glyphName]); }
 
       // the top dict contains "global" metadata
       var top_dict_data = [
@@ -520,7 +554,6 @@
         , ["FontBBox", DICTINSTRUCTION, "",
             NUMBER(options.xMin).concat(NUMBER(options.yMin)).concat(NUMBER(options.xMax)).concat(NUMBER(options.yMax)).concat(OPERAND(5))
           ]
-
           // these instruction can't be properly asserted until after we pack up the CFF, so we use placeholder values
         , ["charset", DICTINSTRUCTION, "offset to charset (from start of file)", [0x00, 0x00]]
         , ["encoding", DICTINSTRUCTION, "offset to encoding (from start of file)", [0x00, 0x00]]
@@ -531,12 +564,13 @@
       var top_dict_offsize = serialize(top_dict_data).length < 255 ? 1 : 2;
 
       // our main CFF block
+      var absolute_offset_size = 1; // we set this to the correct value at the end
       var cff = [
         ["header", [
             ["major", Card8, "major version", 1]
           , ["minor", Card8, "minor version", 0]
           , ["length", Card8, "header length in bytes", 4]
-          , ["offSize", OffSize, "how many bytes for an offset value?", 1]
+          , ["offSize", OffSize, "how many bytes for an offset value?", absolute_offset_size]
         ]],
         ["name index", [
             ["count", Card16, "number of stored names (We only have one)", 1]
@@ -571,6 +605,13 @@
 
       processDynamicCFFData(cff);
       recordMappings(cff);
+
+      // fix the "absolute_offset_size" value
+      var serialized = serialize(cff);
+      cff[0][1][3][3] = (function getBytesNeeded(v) {
+        var bits = Math.log(v)/Math.log(2);
+        return Math.ceil(bits/8);
+      }(serialized.length));
 
       return cff;
     };
@@ -657,49 +698,109 @@
       return NAMERECORDS.length;
     }
 
+    /**
+     * define our cmap subtable format 4
+     */
     function setupCmapFormat4() {
-      // Note that normally, we would not be hardcoding a cmap table like this.
-      // However, since we know exactly what we want to do, in this instance we can.
+
+      var segments = (function formSegments() {
+        var endCount = [],
+            startCount = [],
+            idDelta = [],
+            idRangeOffset = [],
+            glyphIdArray = [];
+
+        glyphIdArray.push(["0", USHORT, "Our first glyphId points to .notdef", 0]);
+
+        if(globals.letters) {
+          var codes = globals.letters.map(function(l) {
+            return l.charCodeAt(0);
+          });
+          codes.forEach(function(code, i) {
+            var singleton = ["characterCode ", USHORT, "our glyph", code],
+                idx = 1 + i;
+            endCount.push(singleton);
+            startCount.push(singleton);
+            idDelta.push([""+i, SHORT, "delta for the segment", -(code - idx)]);
+            idRangeOffset.push([""+i, USHORT, "range offset for segment 1", 0]);
+            glyphIdArray.push([""+idx, USHORT, "Our second glyphId points to our own glyph", idx]);
+          });
+        }
+
+        else {
+          var singleton = ["characterCode ", USHORT, "our glyph", globals.glyphCode]
+          endCount.push(singleton);
+          startCount.push(singleton);
+          idDelta.push(["0", SHORT, "delta for segment 1", -(globals.glyphCode - 1)]); // point to glyphid index 1 (0 is .notdef)
+          idRangeOffset.push(["0", USHORT, "range offset for segment 1", 0]);
+          idRangeOffset.push(["0", USHORT, "bogus last segment value", 0]);
+          glyphIdArray.push(["1", USHORT, "Our second glyphId points to our own glyph", 1]);
+        }
+
+        var terminator = ["characterCode ", USHORT, "array terminator 0xFFFF", 0xFFFF];
+        endCount.push(terminator);
+        startCount.push(terminator);
+        idDelta.push(["0", SHORT, "final segment value", 1]);
+        idRangeOffset.push(["last", USHORT, "last range offset", 0]);
+
+        return {
+          endCount: endCount,
+          startCount: startCount,
+          idDelta: idDelta,
+          idRangeOffset: idRangeOffset,
+          glyphIdArray: glyphIdArray
+        }
+      }());
+
+      var segCount = segments.endCount.length,
+          segCountX2 = segCount * 2,
+          searchRange = 2 * Math.pow(2, Math.floor(Math.log(segCount)/Math.log(2))),
+          entrySelector = Math.log(searchRange/2)/Math.log(2),
+          rangeShift = segCountX2 - searchRange;
+
+      // finally, form cmap subtable
       context.SUBTABLE4 = [
           ["format", USHORT, "format 4 subtable", 4]
-        , ["length", USHORT, "table length in bytes", 32 + (2 * 2)]
+        , ["length", USHORT, "table length in bytes", 0x0000]
         , ["language", USHORT, "language", 0]
           // The following four values all derive from an implicitly
           // encoded value called "segCount", representing the number
           // of segments that this subtable format 4 cmap has.
           // Silly as it may seem, these values must be 100% correct,
           // and cannot, in any way, be omitted. I don't like it.
-        , ["segCountX2", USHORT, "2x segment count; we only have one segment", 4]
-        , ["searchRange", USHORT, "search range: 2 * (2^floor(log2(segCount)))", 4]
-        , ["entrySelector", USHORT, "entry selector: log2(searchRange/2)", 1]
-        , ["rangeShift", USHORT, "range shift: 2x segment count - search range", 0]
-        // endCount[segCount]
-        , ["endCount", [
-            ["characterCode ", USHORT, "the letter 'A', for now", 0x41]
-          , ["characterCode ", USHORT, "array terminator 0xFFFF", 0xFFFF]
-        ]]
+        , ["segCountX2", USHORT, "2x segment count", segCountX2]
+        , ["searchRange", USHORT, "search range: 2 * (2^floor(log2(segCount)))", searchRange]
+        , ["entrySelector", USHORT, "entry selector: log2(searchRange/2)", entrySelector]
+        , ["rangeShift", USHORT, "range shift: 2x segment count - search range", rangeShift]
+          // endCount[segCount]
+        , ["endCount", segments.endCount]
         , ["reservedPad", USHORT, "a 'reserve pad' value; must be 0", 0]
-        // startCount[segCount]
-        , ["startCount", [
-            ["characterCode ", USHORT, "the letter 'A', for now", 0x41]
-          , ["characterCode ", USHORT, "array terminator 0xFFFF", 0xFFFF]
-        ]]
-        // the following two values are val[segcount]
-        , ["idDelta", [
-            ["0", SHORT, "delta for segment 1", -0x40] // point to glyphid index 1 (0 is .notdef)
-          , ["0", SHORT, "bogus last segment value", 1]
-        ]]
-        , ["idRangeOffset", [
-            ["0", USHORT, "range offset for segment 1", 0]
-          , ["0", USHORT, "bogus last segment value", 0]
-        ]]
-        , ["glyphIdArray", [
-            ["0", USHORT, "Our first glyphId points to .notdef", 0]
-          , ["1", USHORT, "Our second glyphId points to our own glyph", 1]
-        ]]
+          // startCount[segCount]
+        , ["startCount", segments.startCount]
+          // the following two values are val[segcount]
+        , ["idDelta", segments.idDelta]
+        , ["idRangeOffset", segments.idRangeOffset]
+        , ["glyphIdArray", segments.glyphIdArray]
       ];
+
+      context.SUBTABLE4[1][3] = serialize(context.SUBTABLE4).length;
+
       // we call this function expecting it to report how many subtables are used in the font.
       return 1;
+    }
+
+    function formHMTX() {
+      // first entry longHorMetric (notdef)
+      var hmtx = [  ["0", [["advanceWidth", USHORT, "", 0] , ["lsb", SHORT, "", 0]]]  ];
+      if(globals.letters) {
+        globals.letters.forEach(function(letter, idx) {
+          if(idx < globals.letters.length-1) {
+            hmtx.push( [""+idx, [["advanceWidth", USHORT, "", 0] , ["lsb", SHORT, "", 0]]] );
+          }
+        });
+      }
+      hmtx.push(["glyph", [["advanceWidth", USHORT, "", options.xMax - options.xMin] , ["lsb", SHORT, "", 0]]]);
+      return hmtx;
     }
 
     // OpenType tables
@@ -750,8 +851,8 @@
         , ["achVendID", CHARARRAY, "vendor id (http://www.microsoft.com/typography/links/vendorlist.aspx for the 'real' list)", globals.vendorId]
           // bit 6 is high for 'Regular font'
         , ["fsSelection", USHORT, "font selection flag: bit 6 (lsb=0) is high, to indicate 'regular font'.", 0x0040]
-        , ["usFirstCharIndex", USHORT, "first character to be in this font. We claim 'A'.", 0x41]
-        , ["usLastCharIndex", USHORT, "last character to be in this font. We again claim 'A'.", 0x41]
+        , ["usFirstCharIndex", USHORT, "first character to be in this font.", globals.label ? globals.letters[0].charCodeAt(0) : globals.glyphCode]
+        , ["usLastCharIndex", USHORT, "last character to be in this font.", globals.glyphCode]
           // vertical metrics: see http://typophile.com/node/13081 for how the hell these work.
           // (short version: they don't, it's an amazing mess)
         , ["sTypoAscender", SHORT, "typographic ascender", options.yMax]
@@ -768,10 +869,11 @@
         , ["sCapHeight", SHORT, "", 0]
         , ["usDefaultChar", USHORT, "", 0]
           // we have no break char, but we must point to a "not .notdef" glyphid to
-          // validate as "legal font". Normally this would be the 'space' glyphid.
-        , ["usBreakChar", USHORT, "", 0x41]
+          // validate as "legal font". Normally this would be the 'space' glyphid,
+          // but in this case we're using the space code, 0x20, as our real glyph.
+        , ["usBreakChar", USHORT, "", globals.glyphCode]
           // We have plain + ligature use, therefore there are 2 contexts
-        , ["usMaxContext", USHORT, "", options.substitution ? 2 : 0]
+        , ["usMaxContext", USHORT, "", globals.label !== false ? globals.label.length : 0]
       ],
       "cmap": [
           ["version", USHORT, "cmap main version", 0]
@@ -790,7 +892,7 @@
         , ["checkSumAdjustment", ULONG, "0xB1B0AFBA minus (sum of entire font as ULONGs)", 0]
         , ["magicNumber", ULONG, "OpenType magic number, used to verify this is, in fact, an OpenType font", 0x5F0F3CF5]
         , ["flags", USHORT, "flags, see http://www.microsoft.com/typography/otspec/head.htm", 0]
-        , ["unitsPerEM", USHORT, "units per EM, we go with 1024 (ttf default. cff is usually 2000 instead)", globals.quadSize]
+        , ["unitsPerEM", USHORT, "how big is our quad, in font units", globals.quadSize]
         , ["created", LONGDATETIME, "date created", 0]
         , ["modified", LONGDATETIME, "date modified", 0]
         , ["xMin", SHORT, "global xMin", options.xMin]
@@ -821,24 +923,16 @@
         , ["_reserved3", SHORT, "reserved; must be 0", 0]
         , ["_reserved4", SHORT, "reserved; must be 0", 0]
         , ["metricDataFormat", SHORT, "metricDataFormat, 0 for current format", 0]
-        , ["numberOfHMetrics", USHORT, "number of hMetric entries. We only encode 1 glyph, so there are 2: one for .notdef, and one for our real glyph", 2]
+        , ["numberOfHMetrics", USHORT, "number of hMetric entries.", globals.letters ? 1 + globals.letters.length : 2]
       ],
       "hmtx": [
         // uses struct longHorMetric{USHORT advanceWidth, SHORT lsb}.
         // NOTE: we do not encode any lsb values (which would be SHORT[], if we did)
-        ["hMetrics", [
-          // first entry longHorMetric (notdef)
-          ["0", [
-            ["advanceWidth", USHORT, "", 0]
-          , ["lsb", SHORT, "", 0]]]
-          // second entry longHorMetric (real glyph)
-        , ["1", [
-            ["advanceWidth", USHORT, "", options.xMax - options.xMin]
-          , ["lsb", SHORT, "", 0]]]]]
+        ["hMetrics", formHMTX()]
       ],
       "maxp": [
           ["version", FIXED, "table version. For CFF this must be 0.5, for TTF it must be 1.0", 0x00005000]
-        , ["numGlyphs", USHORT, "number of glyphs in the font", 2]
+        , ["numGlyphs", USHORT, "number of glyphs in the font", globals.letters ? 1 + globals.letters.length : 2]
       ],
       "name": [
           ["format", USHORT, "format 0", 0]
@@ -873,7 +967,7 @@
      * Once this works, we're going to instead turn 'c,u,s,t,o,m' into glyph "custom"
      * (where the commas are glyph delimiters, not actual commas).
      */
-    if (options.substitution) {
+    if (globals.label) {
       TableModels["GSUB"] = [
           // GSUB header
           ["Version", FIXED, "", 0x00010000]
@@ -953,8 +1047,8 @@
                 , ["RangeCount", USHORT, "number of ranges covered", 1]
                 , ["RangeRecords", [
                     ["0", [
-                        ["Start", GlyphID, "first glyph in the range, id=1", 1]
-                      , ["End", GlyphID, "last glyph in the range, id=1", 1]
+                        ["Start", GlyphID, "first glyph in the range", 1]
+                      , ["End", GlyphID, "last glyph in the range", 1]
                       , ["StartCoverageIndex", USHORT, "Coverage Index of first GlyphID in range", 0]
                     ]]
                 ]]
@@ -970,14 +1064,21 @@
 
                   // Our first and only ligature: (A,A) -> (A)
                 , ["first ligature", [
-                    ["LigGlyph", GlyphID, "the substitution glyph id (our A = id 1)", 1]
-                  , ["CompCount", USHORT, "Number of components in the ligature (i.e. how many letter to replace) ", 2]
+                    ["LigGlyph", GlyphID, "the substitution glyph id", globals.letters ? globals.letters.length : 1]
+                  , ["CompCount", USHORT, "Number of components in the ligature (i.e. how many letter to replace) ", globals.letters ? globals.label.length : 2]
                     // The Component array is basically a char array, except each letter is identified by
                     // font-internal GlyphID, rather than by some external codepage. Note: the first glyph
                     // is defined by the coverage table already, so we only encode "letters" 2 and on.
-                  , ["Components", [
-                      ["0", GlyphID, "second letter in the ligature", 1]
-                  ]]
+                  , ["Components", (function() {
+                    if(globals.letters) {
+                      var list = [];
+                      for(var i=1, last=globals.letters.length-1, list=[]; i<last; i++) {
+                        list.push([""+i, GlyphID, "the letter "+globals.label[i], 1 + globals.letters.indexOf(globals.label[i])]);
+                      }
+                      return list;
+                    }
+                    return [["0", GlyphID, "second letter in the ligature", 1]];
+                  }())]
                 ]]
               ]]
             ]]

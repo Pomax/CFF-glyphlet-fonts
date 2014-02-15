@@ -166,6 +166,8 @@
   // normal full string version
   var big = {
       outline: outline
+    , label: "monkey"
+    , glyphName: "custom"
     , fontFamily: "Custom Font"
     , subfamily: "Regular"
     , fontName: "Custom Glyph Font"
@@ -176,6 +178,7 @@
   // near-illegally-short string version (~170 bytes smaller)
   var small = {
       outline: outline
+    , glyphName: "c"
     , fontFamily: "c"
     , subfamily: "c"
     , fontName: "c"
@@ -183,8 +186,8 @@
   };
 
   // use GSUB functionality?
-  var options = big;
-  options.substitution = true;
+  var options = small;
+  window.macroLabel = options.label || "~";
 
   // build the font
   var font = buildFont(options);
