@@ -1,15 +1,9 @@
-(function(context) {
+(function(context, mapper) {
 
   "use strict";
 
   // local-global-sort-of-thing-object
   var globals = {};
-
-  // layout mapping for finding regions of interest in the byte code
-  var mappings = [];
-  function addMapping(name, start, end, type) {
-    mappings.push({name:name, start:start, end:end, type:type});
-  };
 
   /**
    * Turn [[a],[b],[c,d]] into [a.b.c.d]
@@ -58,7 +52,7 @@
         optimized = [];
 
     optimizedOrdering.forEach(function(tag) {
-      var mapping = mappings.filter(function(r) { return r.name === tag + " table definition"})[0];
+      var mapping = mapper.mappings.filter(function(r) { return r.name === tag + " table definition"})[0];
       mapping.start = 12 + optimized.length;
       optimized = optimized.concat(directoryBlocks[ordering.indexOf(tag)].map(function(v) { return parseInt(v); }));
       mapping.end = 12 + optimized.length;
@@ -100,9 +94,10 @@
       }
       // serialize all records in the table
       var data = [];
-      data = data.concat(serialize(table)); //table.forEach(function(e) { data = data.concat(serialize(e)); });
+      var currentOffset = tabledataoffset + offset;
+      data = data.concat(serialize(table, mapper, tag, currentOffset));
       var length = data.length;
-      addMapping(tag + " table data", tabledataoffset + offset, tabledataoffset + offset + length, "table");
+      mapper.addMapping(tag + " table data", currentOffset, currentOffset + length, "sfnt table");
 
       // ensure we preserve LONG alignment, by padding tables if need be.
       while(data.length % 4 !== 0) { data.push(0); }
@@ -119,11 +114,11 @@
                        .concat(ULONG(opentype_len + headers_len + offset))
                        .concat(ULONG(length));
 
-      addMapping(tag + " table definition", opentype_len + headers.length, opentype_len + headers.length + 16, "sfnt");
+      mapper.addMapping(tag + " table definition", opentype_len + headers.length, opentype_len + headers.length + 16, "sfnt");
       headers = headers.concat(table_entry);
     };
 
-    addMapping("sfnt header", 0, 12, "sfnt");
+    mapper.addMapping("sfnt header", 0, 12, "sfnt");
 
     // custom-order the tables, see "Optimized Table Ordering" at
     // http://www.microsoft.com/typography/otspec140/recom.htm
@@ -221,7 +216,6 @@
    * Create a font. The options are... pretty self explanatory
    */
   var buildFont = function(options) {
-    mappings = [];
 
     // make sure the options are good.
     if(!options.outline) { throw new Error("No outline was passed to build a font for"); }
@@ -386,7 +380,7 @@
       for(i=0; i<cff.length; i++) {
         s = e;
         e += serialize(cff[i]).length;
-        addMapping(cff[i][0], s, e, "cff");
+        mapper.addMapping(cff[i][0], s, e, "cff");
       }
     };
 
@@ -1114,10 +1108,10 @@
       cff: serialize(TableModels["CFF "]),
       otf: otf,
       woff: formWOFF(otf, numTables),
-      mappings: mappings
+      mappings: mapper.mappings
     }
   };
 
   context.buildFont = buildFont;
 
-}(this));
+}(this, new Mapper()));

@@ -161,7 +161,7 @@
   // outline
   var y = -120;
   var outline = "M  20 "+(100 + y) + " L  20 "+(800 + y) + " 700 "+(800 + y) + " 700 "+(100 + y) + " 20 "+(100 + y)
-              + "M 170 "+(250 + y) + " L 550 "+(250+y) + " 550 "+(650 + y) + " 170 "+(650 + y);
+              + "M 170 "+(250 + y) + " L 550 "+(250 + y) + " 550 "+(650 + y) + " 170 "+(650 + y);
 
   // normal full string version
   var big = {
@@ -185,45 +185,46 @@
     , fontVersion: "1"
   };
 
-  // use GSUB functionality?
   var options = big;
-  window.macroLabel = options.label || "~";
-
-  // build the font
   var font = buildFont(options);
-
-  // convert to legible data
   var binary = font.otf;
   var hexmap = binary.map(asHex);
   var charmap = binary.map(asChars);
   formTables(font, hexmap, charmap);
 
-  console.log(hexmap.join(' '));
-
   // generate OFT and CFF region highlighting in the HTML tables
-  var otf = font.mappings.filter(function(e) { return e.type !== "cff"; });
-  var cff = font.mappings.filter(function(e) { return e.type === "cff"; });
-  otf.forEach(setupMapping("rgba(71, 175, 123, 0.39)"));
-  var cff_offset = otf.filter(function(e) { return e.name.indexOf("CFF") === 0; })[0].start;
-  cff.forEach(function(mapping) {
-    mapping.start += cff_offset;
-    mapping.end += cff_offset;
-    setupMapping("rgba(200,200,0,0.3)")(mapping);
-  });
+  (function highlightRegions() {
+    var otf = font.mappings.filter(function(e) { return e.type.indexOf("sfnt") > -1; });
+    var cff = font.mappings.filter(function(e) { return e.type === "cff"; });
+    otf.forEach(setupMapping("rgba(71, 175, 123, 0.39)"));
+    var cff_offset = otf.filter(function(e) { return e.name.indexOf("CFF") === 0; })[0].start;
+    cff.forEach(function(mapping) {
+      mapping.start += cff_offset;
+      mapping.end += cff_offset;
+      setupMapping("rgba(200,200,0,0.3)")(mapping);
+    });
+    // the most amazing magic
+    var fields = font.mappings.filter(function(e) { return e.type === "field"; });
+    fields.forEach(function(mapping) {
+      setupMapping("rgba(0,0,200,0.3)")(mapping);
+    });
+  }());
 
   // create stylesheet that uses this font
-  var mime_otf = "font/opentype";
-  var dataurl_otf = "data:" + mime_otf + ";base64," + btoa(font.otf.map(asChars).join(''));
-  var mime_woff = "application/font-woff";
-  var dataurl_woff = "data:" + mime_woff + ";base64," + btoa(font.woff.map(asChars).join(''));
+  (function addStylesheet() {
+    var mime_otf = "font/opentype";
+    var dataurl_otf = "data:" + mime_otf + ";base64," + btoa(font.otf.map(asChars).join(''));
+    var mime_woff = "application/font-woff";
+    var dataurl_woff = "data:" + mime_woff + ";base64," + btoa(font.woff.map(asChars).join(''));
+    var fontface = ["@font-face {\n  font-family: 'custom font';"
+                   , "  font-weight: normal;"
+                   , "  font-style: normal;"
+                   , "  src: url('" +dataurl_otf+ "') format('opentype'),"
+                   , "       url('" +dataurl_woff+ "') format('woff');"
+                   , "}"].join("\n");
+    var sheet = document.createElement("style");
+    sheet.innerHTML = fontface;
+    document.head.appendChild(sheet);
+  }());
 
-  var fontface = ["@font-face {\n  font-family: 'custom font';"
-                 ,"  font-weight: normal;"
-                 ,"  font-style: normal;"
-                 ,"  src: url('" +dataurl_otf+ "') format('opentype'),"
-                 ,"       url('" +dataurl_woff+ "') format('woff');"
-                 ,"}"].join("\n");
-  var sheet = document.createElement("style");
-  sheet.innerHTML = fontface;
-  document.head.appendChild(sheet);
 }(this));

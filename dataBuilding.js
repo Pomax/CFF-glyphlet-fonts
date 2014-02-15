@@ -133,14 +133,21 @@
   /**
    * Serialise a record structure into byte code
    */
-  context.serialize = function serialize(record) {
+  context.serialize = function serialize(base_record, mapper, basename, offset) {
+    basename = basename || "";
+    offset = offset || 0;
     var data = [];
-    (function _serialize(record) {
+    (function _serialize(record, prefix) {
+      if(prefix == parseInt(prefix,10)) {
+        prefix = "";
+      } else if(prefix !== "") { prefix += "."; }
+      var start = offset + data.length;
       if (typeof record[LABEL] !== "string") {
-        try { record.forEach(_serialize); }
-        catch(e) {
-          console.error(record);
-          throw e; }
+        try {
+          record.forEach(function(_r, idx) {
+            _serialize(_r, prefix + "[" + idx + "]");
+          });
+        } catch(e) { console.error(record); throw e; }
       }
       else if (typeof record[READER] === "function") {
         data = data.concat(record[READER](record[DATA]));
@@ -148,15 +155,20 @@
       else {
         var nested = record[NESTED_RECORD];
         if(nested instanceof Array) {
-          _serialize(nested);
+          _serialize(nested, prefix + "." + record[LABEL]);
         }
         else {
           console.error(record);
           throw new Error("what?");
         }
       }
-    }(record));
+      var end = offset + data.length;
+      if(mapper && typeof record[LABEL] === "string") {
+        mapper.addMapping(prefix + record[LABEL], start, end, "field");
+      }
+    }(base_record, basename));
     return data;
   };
 
 }(this));
+
