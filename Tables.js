@@ -1047,8 +1047,8 @@
                 , ["RangeCount", USHORT, "number of ranges covered", 1]
                 , ["RangeRecords", [
                     ["0", [
-                        ["Start", GlyphID, "first glyph in the range", 1]
-                      , ["End", GlyphID, "last glyph in the range", 1]
+                        ["Start", GlyphID, "first glyph in the range", globals.label ? 1 + globals.letters.indexOf(globals.label[0]) : 1]
+                      , ["End", GlyphID, "last glyph in the range", globals.label ? 1 + globals.letters.indexOf(globals.label[0]) : 1]
                       , ["StartCoverageIndex", USHORT, "Coverage Index of first GlyphID in range", 0]
                     ]]
                 ]]
