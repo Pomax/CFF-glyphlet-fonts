@@ -4,14 +4,14 @@
   <GlyphOrder>
     <!-- The 'id' attribute is only for humans; it is ignored when parsed. -->
     <GlyphID id="0" name=".notdef"/>
-    <GlyphID id="1" name="c"/>
+    <GlyphID id="1" name="custom"/>
   </GlyphOrder>
 
   <head>
     <!-- Most of this table will be recalculated by the compiler -->
     <tableVersion value="1.0"/>
     <fontRevision value="1.0"/>
-    <checkSumAdjustment value="0x3922c7b8"/>
+    <checkSumAdjustment value="0x1aeaff64"/>
     <magicNumber value="0x5f0f3cf5"/>
     <flags value="00000000 00000000"/>
     <unitsPerEm value="1024"/>
@@ -106,35 +106,35 @@
 
   <name>
     <namerecord nameID="1" platformID="1" platEncID="32" langID="0x0">
-      c
+      Custom Font
     </namerecord>
     <namerecord nameID="2" platformID="1" platEncID="32" langID="0x0">
-      c
+      Regular
     </namerecord>
     <namerecord nameID="4" platformID="1" platEncID="32" langID="0x0">
-      c
+      Custom Glyph Font
     </namerecord>
     <namerecord nameID="5" platformID="1" platEncID="32" langID="0x0">
-      1
+      Version 1.0
     </namerecord>
     <namerecord nameID="1" platformID="3" platEncID="1" langID="0x409">
-      c
+      Custom Font
     </namerecord>
     <namerecord nameID="2" platformID="3" platEncID="1" langID="0x409">
-      c
+      Regular
     </namerecord>
     <namerecord nameID="4" platformID="3" platEncID="1" langID="0x409">
-      c
+      Custom Glyph Font
     </namerecord>
     <namerecord nameID="5" platformID="3" platEncID="1" langID="0x409">
-      1
+      Version 1.0
     </namerecord>
   </name>
 
   <cmap>
     <tableVersion version="0"/>
     <cmap_format_4 platformID="3" platEncID="1" language="0">
-      <map code="0x7e" name="c"/><!-- TILDE -->
+      <map code="0x7e" name="custom"/><!-- TILDE -->
     </cmap_format_4>
   </cmap>
 
@@ -152,9 +152,9 @@
 
   <CFF>
     <CFFFont name="customfont">
-      <version value="1"/>
-      <FullName value="c"/>
-      <FamilyName value="c"/>
+      <version value="Version 1.0"/>
+      <FullName value="Custom Glyph Font"/>
+      <FamilyName value="Custom Font"/>
       <Weight value="Roman"/>
       <isFixedPitch value="0"/>
       <ItalicAngle value="0"/>
@@ -167,7 +167,7 @@
       <StrokeWidth value="0"/>
       <!-- charset is dumped separately as the 'GlyphOrder' element -->
       <Encoding>
-        <map code="0x1" name="c"/>
+        <map code="0x1" name="custom"/>
       </Encoding>
       <Private>
         <BlueValues value="0 0"/>
@@ -188,7 +188,7 @@
         <CharString name=".notdef">
           endchar
         </CharString>
-        <CharString name="c">
+        <CharString name="custom">
           20 -20 rmoveto
           0 700 rlineto
           680 0 rlineto
@@ -210,7 +210,7 @@
 
   <hmtx>
     <mtx name=".notdef" width="0" lsb="0"/>
-    <mtx name="c" width="680" lsb="0"/>
+    <mtx name="custom" width="680" lsb="0"/>
   </hmtx>
 
 </ttFont>

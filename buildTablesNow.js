@@ -166,7 +166,7 @@
   // normal full string version
   var big = {
       outline: outline
-    , label: "monkey"
+//    , label: "monkey"
     , glyphName: "custom"
     , fontFamily: "Custom Font"
     , subfamily: "Regular"
@@ -186,7 +186,7 @@
   };
 
   // use GSUB functionality?
-  var options = small;
+  var options = big;
   window.macroLabel = options.label || "~";
 
   // build the font
@@ -197,6 +197,8 @@
   var hexmap = binary.map(asHex);
   var charmap = binary.map(asChars);
   formTables(font, hexmap, charmap);
+
+  console.log(hexmap.join(' '));
 
   // generate OFT and CFF region highlighting in the HTML tables
   var otf = font.mappings.filter(function(e) { return e.type !== "cff"; });
