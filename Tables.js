@@ -638,8 +638,8 @@
         "1": globals.fontFamily,     //      = font name
         "2": globals.subfamily,      //      = font subfamily name
         "3": globals.identifier,     //      = the unique font identifier (irrelevant for our purpose)
-//      "4": globals.fontName,       //      = full font name
-//      "5": globals.fontVersion,    //      = font version. "Preferred" format is "Version \d+.\d+; specifics"
+        "4": globals.fontName,       //      = full font name
+        "5": globals.fontVersion,    //      = font version. "Preferred" format is "Version \d+.\d+; specifics"
         "6": globals.compactFontName //      = postscript font name
                                      //  "7" = trademark text (irrelevant for our purpose)
                                      // "13" = a tl;dr. version of the font's license (irrelevant for our purpose)
