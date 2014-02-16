@@ -235,6 +235,7 @@
       , glyphCode: "~".charCodeAt(0)
       , quadSize: options.quadSize || 1024
       , label: options.label || false
+      , identifier: options.identifier || "-"
     };
 
     var letters = false;
@@ -633,14 +634,15 @@
       // See the 'Name IDs' section on http://www.microsoft.com/typography/otspec/name.htm for
       // the details on which strings we can encode, and what their associated ID must be.
       var strings = {
-                                  //  "0" = copyright text (irrelevant for our purpose)
-        "1": globals.fontFamily,  //      = font name
-        "2": globals.subfamily,   //      = font subfamily name
-                                  //  "3" = the unique font identifier (irrelevant for our purpose)
-        "4": globals.fontName,    //      = full font name
-        "5": globals.fontVersion, //      = font version. "Preferred" format is "Version \d+.\d+; specifics"
-                                  //  "7" = trademark text (irrelevant for our purpose)
-                                  // "13" = a tl;dr. version of the font's license (irrelevant for our purpose)
+                                     //  "0" = copyright text (irrelevant for our purpose)
+        "1": globals.fontFamily,     //      = font name
+        "2": globals.subfamily,      //      = font subfamily name
+        "3": globals.identifier,     //      = the unique font identifier (irrelevant for our purpose)
+//      "4": globals.fontName,       //      = full font name
+//      "5": globals.fontVersion,    //      = font version. "Preferred" format is "Version \d+.\d+; specifics"
+        "6": globals.compactFontName //      = postscript font name
+                                     //  "7" = trademark text (irrelevant for our purpose)
+                                     // "13" = a tl;dr. version of the font's license (irrelevant for our purpose)
       };
 
       var macRecords = [],
@@ -871,8 +873,10 @@
       "cmap": [
           ["version", USHORT, "cmap main version", 0]
         , ["numTables", USHORT, "number of subtables",setupCmapFormat4()]
-          // Note that we're hard-wiring cmap here for a single table.
-          // this is NOT the usual layout for a cmap table!
+          // We're using a single cmap. We say it's for windows, but
+          // at this point in history OSX knows better than to insist
+          // there also needs to be an INDENTICAL table but them marked
+          // as "for macintosh". Thank god.
         , ["platformID", USHORT, "platform", 3] // windows
         , ["encodingID", USHORT, "encoding", 1] // default Unicode BMP (UCS-2)
         , ["offset", ULONG, "table offset from cmap-start", 12]
