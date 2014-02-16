@@ -669,7 +669,7 @@
           , ["offset", USHORT, "offset for this string in the string heap", offset]
         ];
         macRecords.push(macHeader.concat(nameRecordPartial));
-        NAMESTRINGS.push([string + " (ascii)", CHARARRAY, "mac version of "+string, string]);
+        NAMESTRINGS.push(["(ascii)", CHARARRAY, "mac version of "+string, string]);
         offset += string.length;
 
         // And encode the same string but then in UTF16 for windows.
@@ -683,7 +683,7 @@
           , ["offset", USHORT, "offset for this string in the string heap", offset]
         ];
         winRecords.push(winHeader.concat(nameRecordPartial));
-        NAMESTRINGS.push([string + " (utf16)", CHARARRAY, "windows version of "+string, ustring]);
+        NAMESTRINGS.push(["(utf16)", CHARARRAY, "windows version of "+string, ustring]);
         offset += ustring.length;
       });
 
@@ -1099,9 +1099,11 @@
       TableModels["GSUB"][3][3] = lookupListOffset;
     }
 
+/*
     var functionsByName = function(key, val) { if (typeof val === 'function') { return val.name; }  return val; }
     console.log("--- FONT STRUCTURE ---");
     console.log(JSON.stringify(TableModels, functionsByName, 2));
+*/
 
     var numTables = Object.keys(TableModels).length;
     var otf = buildSFNT(numTables, TableModels);

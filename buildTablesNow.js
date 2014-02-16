@@ -127,8 +127,7 @@
         }
 
         var nodelist = document.querySelectorAll(query);
-        var highlight = function(e, override, show) {
-          if(!show) return;
+        var highlight = function(e, override) {
           e.style.background = typeof override === "string" ? override : color;
           e.title = (mapping.name + " ("+mapping.start+"-"+mapping.end+", hex "+mapping.start.toString(16).toUpperCase()+"-"+mapping.end.toString(16).toUpperCase()+")").replace(/\.+/g,'.').replace(/\.\[/g,'[');
         };
@@ -137,40 +136,90 @@
           e.removeAttribute("title");
         };
         var colorize = function(e) {
+
+          // specific event tracking
           if(!e.eventListeners) {
             e.eventListeners = {
-              mouseover: [],
-              mouseout: []
+              evtNames: [],
+              add: function(evtName, fn) {
+                if(!this[evtName]) {
+                  this[evtName] = [];
+                  this.evtNames.push(evtName);
+                }
+                e.addEventListener(evtName, fn, false);
+                this[evtName].push(fn);
+              },
+              remove: function(evtName, fn) {
+                e.removeEventListener(evtName, fn, false);
+                this[evtName].splice(this[evtName].indexOf(fn),1);
+                if(this[evtName].length === 0) {
+                  this.evtNames.splice(this.evtNames.indexOf(evtName),1);
+                }
+              },
+              cleanup: function() {
+                var el = this;
+                ["mouseover", "mouseout"].forEach(function(evtName) {
+                  var list = el[evtName];
+                  list.sort(function(a,b) {
+                    a = a.mapping;
+                    b = b.mapping;
+                    return (b.end-b.start) - (a.end-a.start);
+                  });
+                  if(list.length > 2) {
+                    var first = list.first(),
+                       last =  list.last(),
+                       i, fn;
+                    for(i=list.length - 2; i > 0; i--) {
+                      fn = list[i];
+                      e.removeEventListener(evtName, fn);
+                      list.splice(i,1);
+                    }
+                  }
+                });
+              }
             };
           }
 
           e.setAttribute("data-background", e.style.background);
-          var moverfn = function(evt) {
+
+          // mouse-over handling
+          var moverfn = function moverfn(evt) {
             var show = (moverfn === e.eventListeners.mouseover.first() || moverfn === e.eventListeners.mouseover.last());
-            nodelist.array().forEach(function(e) { highlight(e, false, show); });
+            nodelist.array().forEach(function(e2) { highlight(e2); });
             if(target) {
               document.querySelectorAll(formQuery(target)).array().forEach(function(e3) {
-                highlight(e3, "rgba(71, 175, 123, 0.2)");
+                highlight(e3, "rgba(71, 120, 175, 0.3)");
               });
             }
           };
-          e.addEventListener("mouseover", moverfn);
-          e.eventListeners.mouseover.push(moverfn);
+          moverfn.mapping = mapping;
+          e.eventListeners.add("mouseover", moverfn);
 
-          var moutfn = function(evt) {
-            nodelist.array().forEach(function(e) { restore(e); });
+          // mouse-out handling
+          var moutfn = function moutfn(evt) {
+            nodelist.array().forEach(function(e2) { restore(e2); });
             if(target) {
               document.querySelectorAll(formQuery(target)).array().forEach(function(e3) {
                 restore(e3);
               });
             }
           };
-          e.addEventListener("mouseout", moutfn);
-          e.eventListeners.mouseout.push(moverfn);
+          moutfn.mapping = mapping;
+          e.eventListeners.add("mouseout", moutfn);
+
         };
         nodelist.array().forEach(colorize);
       };
     };
+  }
+
+  function cleanupMappings() {
+    var list = document.querySelectorAll(".tables td");
+    list.array().forEach(function(e) {
+      if(e.eventListeners) {
+        e.eventListeners.cleanup();
+      }
+    });
   }
 
   // outline
@@ -218,6 +267,8 @@
     fields.forEach(function(mapping) {
       setupMapping("rgba(0,0,200,0.3)")(mapping);
     });
+    // remove everything except widest/narrowest mapping handlers
+    cleanupMappings();
   }());
 
   // create stylesheet that uses this font
