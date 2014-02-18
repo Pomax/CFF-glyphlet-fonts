@@ -424,8 +424,6 @@
       , ["codes", codes]
       ]];
 
-      var dim = (globals.quadSize * 0.7)|0;
-
       var charstrings = [[".notdef", DICTINSTRUCTION, "the outline for .notdef", OPERAND(14)]];
       if(globals.letters) {
         globals.letters.forEach(function(letter, idx) {
@@ -461,7 +459,7 @@
           NUMBER(10).concat(OPERAND(11))
         ]
         // forgetting the following two versions breaks Chrome. This is quite
-        // interesting, as Chrome and Firefox both supposedl use OTS for their
+        // interesting, as Chrome and Firefox both supposedly use OTS for their
         // sanitization. This is, in fact, so interesting that it gives us a
         // good test case for font-compatibility of browsers.
       , ["defaultWidthX", DICTINSTRUCTION, "default glyph width",
@@ -486,7 +484,7 @@
       // necessary to encode the values also increases the values (since they
       // represent offset) we need to recompute until stable.
       var bytediff = 0;
-      (function() {
+      (function setRecordValues() {
         var byteCount,
             oldCount = 5,
             shift = 0,

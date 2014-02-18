@@ -128,6 +128,7 @@
   var LABEL = 0;
   var READER = 1;
   var NESTED_RECORD = 1;
+  var DESCRIPTION = 2;
   var DATA = 3;
 
   /**
@@ -165,7 +166,11 @@
       }
       var end = offset + data.length;
       if(map && typeof record[LABEL] === "string") {
-        map.addMapping(prefix + record[LABEL], start, end, "field");
+        var value = false;
+        if(typeof record[DATA] === "number" || typeof record[DATA] === "string") {
+          value = record[DATA];
+        }
+        map.addMapping(prefix + record[LABEL], start, end, "field", record[DESCRIPTION], value);
       }
     }(base_record, basename));
 
