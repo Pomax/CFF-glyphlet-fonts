@@ -1025,7 +1025,7 @@
               // see http://fontforge.org/gposgsub.html, "the GSUB table"
               ["LookupType", USHORT, "GSUB ligature substitution is lookuptype 4", 4]
             , ["LookupFlag", USHORT, "lookup qualifiers - we don't have any", 0]
-            , ["SubtableCount", USHORT, "we use have subtable", 1]
+            , ["SubtableCount", USHORT, "we use one subtable", 1]
             , ["Subtable offsets", [
                 ["0", OFFSET, "index for first subtable, relative to start of lookup table", 0x0008] //hardcoded
             ]]
