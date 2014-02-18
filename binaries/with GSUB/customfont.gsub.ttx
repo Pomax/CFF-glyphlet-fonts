@@ -4,14 +4,20 @@
   <GlyphOrder>
     <!-- The 'id' attribute is only for humans; it is ignored when parsed. -->
     <GlyphID id="0" name=".notdef"/>
-    <GlyphID id="1" name="custom"/>
+    <GlyphID id="1" name="c"/>
+    <GlyphID id="2" name="m"/>
+    <GlyphID id="3" name="o"/>
+    <GlyphID id="4" name="s"/>
+    <GlyphID id="5" name="t"/>
+    <GlyphID id="6" name="u"/>
+    <GlyphID id="7" name="~"/>
   </GlyphOrder>
 
   <head>
     <!-- Most of this table will be recalculated by the compiler -->
     <tableVersion value="1.0"/>
     <fontRevision value="1.0"/>
-    <checkSumAdjustment value="0x1aeaff64"/>
+    <checkSumAdjustment value="0x2f4eea07"/>
     <magicNumber value="0x5f0f3cf5"/>
     <flags value="00000000 00000000"/>
     <unitsPerEm value="1024"/>
@@ -45,12 +51,12 @@
     <reserved2 value="0"/>
     <reserved3 value="0"/>
     <metricDataFormat value="0"/>
-    <numberOfHMetrics value="2"/>
+    <numberOfHMetrics value="8"/>
   </hhea>
 
   <maxp>
     <tableVersion value="0x5000"/>
-    <numGlyphs value="2"/>
+    <numGlyphs value="8"/>
   </maxp>
 
   <OS_2>
@@ -88,7 +94,7 @@
     <ulUnicodeRange4 value="00000000 00000000 00000000 00000000"/>
     <achVendID value=" =) "/>
     <fsSelection value="00000000 01000000"/>
-    <fsFirstCharIndex value="126"/>
+    <fsFirstCharIndex value="99"/>
     <fsLastCharIndex value="126"/>
     <sTypoAscender value="680"/>
     <sTypoDescender value="-20"/>
@@ -101,27 +107,42 @@
     <sCapHeight value="0"/>
     <usDefaultChar value="0"/>
     <usBreakChar value="126"/>
-    <usMaxContex value="0"/>
+    <usMaxContex value="6"/>
   </OS_2>
 
   <name>
-    <namerecord nameID="1" platformID="1" platEncID="32" langID="0x0">
+    <namerecord nameID="0" platformID="1" platEncID="0" langID="0x0">
+      License-free
+    </namerecord>
+    <namerecord nameID="1" platformID="1" platEncID="0" langID="0x0">
       Custom Font
     </namerecord>
-    <namerecord nameID="2" platformID="1" platEncID="32" langID="0x0">
-      Regular
+    <namerecord nameID="3" platformID="1" platEncID="0" langID="0x0">
+      -
     </namerecord>
-    <namerecord nameID="4" platformID="1" platEncID="32" langID="0x0">
+    <namerecord nameID="4" platformID="1" platEncID="0" langID="0x0">
       Custom Glyph Font
     </namerecord>
-    <namerecord nameID="5" platformID="1" platEncID="32" langID="0x0">
+    <namerecord nameID="5" platformID="1" platEncID="0" langID="0x0">
       Version 1.0
+    </namerecord>
+    <namerecord nameID="6" platformID="1" platEncID="0" langID="0x0">
+      customfont
+    </namerecord>
+    <namerecord nameID="7" platformID="1" platEncID="0" langID="0x0">
+      License-free
+    </namerecord>
+    <namerecord nameID="13" platformID="1" platEncID="0" langID="0x0">
+      License-free
+    </namerecord>
+    <namerecord nameID="0" platformID="3" platEncID="1" langID="0x409">
+      License-free
     </namerecord>
     <namerecord nameID="1" platformID="3" platEncID="1" langID="0x409">
       Custom Font
     </namerecord>
-    <namerecord nameID="2" platformID="3" platEncID="1" langID="0x409">
-      Regular
+    <namerecord nameID="3" platformID="3" platEncID="1" langID="0x409">
+      -
     </namerecord>
     <namerecord nameID="4" platformID="3" platEncID="1" langID="0x409">
       Custom Glyph Font
@@ -129,12 +150,27 @@
     <namerecord nameID="5" platformID="3" platEncID="1" langID="0x409">
       Version 1.0
     </namerecord>
+    <namerecord nameID="6" platformID="3" platEncID="1" langID="0x409">
+      customfont
+    </namerecord>
+    <namerecord nameID="7" platformID="3" platEncID="1" langID="0x409">
+      License-free
+    </namerecord>
+    <namerecord nameID="13" platformID="3" platEncID="1" langID="0x409">
+      License-free
+    </namerecord>
   </name>
 
   <cmap>
     <tableVersion version="0"/>
     <cmap_format_4 platformID="3" platEncID="1" language="0">
-      <map code="0x7e" name="custom"/><!-- TILDE -->
+      <map code="0x63" name="c"/><!-- LATIN SMALL LETTER C -->
+      <map code="0x6d" name="m"/><!-- LATIN SMALL LETTER M -->
+      <map code="0x6f" name="o"/><!-- LATIN SMALL LETTER O -->
+      <map code="0x73" name="s"/><!-- LATIN SMALL LETTER S -->
+      <map code="0x74" name="t"/><!-- LATIN SMALL LETTER T -->
+      <map code="0x75" name="u"/><!-- LATIN SMALL LETTER U -->
+      <map code="0x7e" name="~"/><!-- TILDE -->
     </cmap_format_4>
   </cmap>
 
@@ -167,7 +203,13 @@
       <StrokeWidth value="0"/>
       <!-- charset is dumped separately as the 'GlyphOrder' element -->
       <Encoding>
-        <map code="0x1" name="custom"/>
+        <map code="0x1" name="c"/>
+        <map code="0x2" name="m"/>
+        <map code="0x3" name="o"/>
+        <map code="0x4" name="s"/>
+        <map code="0x5" name="t"/>
+        <map code="0x6" name="u"/>
+        <map code="0x7" name="~"/>
       </Encoding>
       <Private>
         <BlueValues value="0 0"/>
@@ -188,16 +230,34 @@
         <CharString name=".notdef">
           endchar
         </CharString>
-        <CharString name="custom">
+        <CharString name="c">
+          endchar
+        </CharString>
+        <CharString name="m">
+          endchar
+        </CharString>
+        <CharString name="o">
+          endchar
+        </CharString>
+        <CharString name="s">
+          endchar
+        </CharString>
+        <CharString name="t">
+          endchar
+        </CharString>
+        <CharString name="u">
+          endchar
+        </CharString>
+        <CharString name="~">
           20 -20 rmoveto
           0 700 rlineto
           680 0 rlineto
           0 -700 rlineto
           -680 0 rlineto
           150 150 rmoveto
-          0 400 rlineto
           380 0 rlineto
-          0 -400 rlineto
+          0 400 rlineto
+          -380 0 rlineto
           endchar
         </CharString>
       </CharStrings>
@@ -208,9 +268,55 @@
     </GlobalSubrs>
   </CFF>
 
+  <GSUB>
+    <Version value="1.0"/>
+    <ScriptList>
+      <!-- ScriptCount=1 -->
+      <ScriptRecord index="0">
+        <ScriptTag value="DFLT"/>
+        <Script>
+          <DefaultLangSys>
+            <ReqFeatureIndex value="0"/>
+            <!-- FeatureCount=0 -->
+          </DefaultLangSys>
+          <!-- LangSysCount=0 -->
+        </Script>
+      </ScriptRecord>
+    </ScriptList>
+    <FeatureList>
+      <!-- FeatureCount=1 -->
+      <FeatureRecord index="0">
+        <FeatureTag value="liga"/>
+        <Feature>
+          <!-- LookupCount=1 -->
+          <LookupListIndex index="0" value="0"/>
+        </Feature>
+      </FeatureRecord>
+    </FeatureList>
+    <LookupList>
+      <!-- LookupCount=1 -->
+      <Lookup index="0">
+        <!-- LookupType=4 -->
+        <LookupFlag value="0"/>
+        <!-- SubTableCount=1 -->
+        <LigatureSubst index="0">
+          <LigatureSet glyph="c">
+            <Ligature components="u,s,t,o,m" glyph="~"/>
+          </LigatureSet>
+        </LigatureSubst>
+      </Lookup>
+    </LookupList>
+  </GSUB>
+
   <hmtx>
     <mtx name=".notdef" width="0" lsb="0"/>
-    <mtx name="custom" width="680" lsb="0"/>
+    <mtx name="c" width="0" lsb="0"/>
+    <mtx name="m" width="0" lsb="0"/>
+    <mtx name="o" width="0" lsb="0"/>
+    <mtx name="s" width="0" lsb="0"/>
+    <mtx name="t" width="0" lsb="0"/>
+    <mtx name="u" width="0" lsb="0"/>
+    <mtx name="~" width="680" lsb="0"/>
   </hmtx>
 
 </ttFont>
