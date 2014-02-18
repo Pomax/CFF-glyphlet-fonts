@@ -1,5 +1,9 @@
-(function(context) {
+function buildTables(context, legible, selector, cssFontFamily, tableCaption) {
   "use strict";
+
+  // top element
+  var top = document.querySelector(selector);
+  var create = function(v) { return document.createElement(v); };
 
   // array to hex filter
   function asHex(v) {
@@ -17,22 +21,22 @@
   function makeTable(data, limit) {
     limit = limit || 16;
     var tdCount = 0;
-    var table = document.createElement("table");
+    var table = create("table");
 
-    var toprow = document.createElement("tr");
-    var cornercol = document.createElement("th");
+    var toprow = create("tr");
+    var cornercol = create("th");
     cornercol.style.border =  "none";
     toprow.appendChild(cornercol)
     for(var i=0; i< limit; i++) {
-      var hcol = document.createElement("th");
+      var hcol = create("th");
       hcol.innerHTML = i.toString(16).toUpperCase();
       toprow.appendChild(hcol);
     }
     table.appendChild(toprow);
 
     for(var i=0, end = data.length; i*limit<end; i++) {
-      var row = document.createElement("tr");
-      var prefix = document.createElement("td");
+      var row = create("tr");
+      var prefix = create("td");
       prefix.innerHTML = "0x" + ((i*16)|0).toString(16).toUpperCase();
       prefix.style.background = "rgba(100,180,220,0.3)";
       prefix.style.textAlign = "right";
@@ -40,7 +44,7 @@
 
       var entries = data.slice(limit*i, limit*(i+1));
       var addColumn = function(entry, pos) {
-        var column = document.createElement("td");
+        var column = create("td");
         column.classList.add("b");
         if(entry !== "—") { column.classList.add("p"+pos); }
         column.classList.add("c"+(tdCount++));
@@ -57,12 +61,12 @@
       table.appendChild(row);
     }
 
-    var bottomrow = document.createElement("tr");
-    var cornercol = document.createElement("th");
+    var bottomrow = create("tr");
+    var cornercol = create("th");
     cornercol.style.border =  "none";
     bottomrow.appendChild(cornercol)
     for(var i=0; i< limit; i++) {
-      var hcol = document.createElement("th");
+      var hcol = create("th");
       hcol.innerHTML = i.toString(16).toUpperCase();
       bottomrow.appendChild(hcol);
     }
@@ -72,37 +76,35 @@
   }
 
   function formTables(font, hexmap, charmap) {
-    var representation = document.createElement("div");
-    representation.classList.add("tables");
-    representation.appendChild(makeTable(hexmap));
-    representation.appendChild(makeTable(charmap));
+    top.classList.add("tables");
+    top.appendChild(makeTable(hexmap));
+    top.appendChild(makeTable(charmap));
 
-    var downloads = document.createElement("div");
+    var downloads = create("div");
     downloads.classList.add("downloads");
 
     // plain .otf file
-    var a = document.createElement("a");
+    var a = create("a");
     a.innerHTML = "download opentype font";
     a.download = "customfont.otf";
     a.href = "data:application/octet-stream;base64," + btoa(font.otf.map(asChars).join(''));
     downloads.appendChild(a);
 
     // browser-specific .wiff version
-    a = document.createElement("a");
+    a = create("a");
     a.innerHTML = "download as WOFF";
     a.download = "customfont.woff";
     a.href = "data:application/octet-stream;base64," + btoa(font.woff.map(asChars).join(''));
     downloads.appendChild(a);
 
     // for data enthusiasts, the .cff block without sfnt wrapper
-    a = document.createElement("a");
+    a = create("a");
     a.innerHTML = "download cff block";
     a.download = "customfont.cff";
     a.href = "data:application/octet-stream;base64," + btoa(font.cff.map(asChars).join(''));
     downloads.appendChild(a);
 
-    representation.appendChild(downloads);
-    document.body.appendChild(representation);
+    top.appendChild(downloads);
   }
 
   // create a query selector based on a mapping region
@@ -126,10 +128,14 @@
           })[0];
         }
 
-        var nodelist = document.querySelectorAll(query);
+        var nodelist = top.querySelectorAll(query);
         var highlight = function(e, override) {
           e.style.background = typeof override === "string" ? override : color;
-          e.title = (mapping.name + " ("+mapping.start+"-"+mapping.end+", hex "+mapping.start.toString(16).toUpperCase()+"-"+mapping.end.toString(16).toUpperCase()+")").replace(/\.+/g,'.').replace(/\.\[/g,'[');
+          var name = mapping.name.replace(/\.+/g,'.').replace(/\.\[/g,'[');
+          var value = mapping.value;
+          var dec = mapping.start+"-"+mapping.end;
+          var hex = mapping.start.toString(16).toUpperCase()+"-"+mapping.end.toString(16).toUpperCase();
+          e.title = name + (value? "\nvalue: " + value : '') + "\ndec: " + dec + "\nhex: " + hex;
         };
         var restore = function(e, last) {
           e.style.background = e.getAttribute("data-background");
@@ -187,7 +193,7 @@
             var show = (moverfn === e.eventListeners.mouseover.first() || moverfn === e.eventListeners.mouseover.last());
             nodelist.array().forEach(function(e2) { highlight(e2); });
             if(target) {
-              document.querySelectorAll(formQuery(target)).array().forEach(function(e3) {
+              top.querySelectorAll(formQuery(target)).array().forEach(function(e3) {
                 highlight(e3, "rgba(71, 120, 175, 0.3)");
               });
             }
@@ -199,7 +205,7 @@
           var moutfn = function moutfn(evt) {
             nodelist.array().forEach(function(e2) { restore(e2); });
             if(target) {
-              document.querySelectorAll(formQuery(target)).array().forEach(function(e3) {
+              top.querySelectorAll(formQuery(target)).array().forEach(function(e3) {
                 restore(e3);
               });
             }
@@ -214,7 +220,7 @@
   }
 
   function cleanupMappings() {
-    var list = document.querySelectorAll(".tables td");
+    var list = top.querySelectorAll(".tables td");
     list.array().forEach(function(e) {
       if(e.eventListeners) {
         e.eventListeners.cleanup();
@@ -227,10 +233,10 @@
   var outline = "M  20 "+(100 + y) + " L  20 "+(800 + y) + " 700 "+(800 + y) + " 700 "+(100 + y) + " 20 "+(100 + y)
               + "M 170 "+(250 + y) + " L 550 "+(250 + y) + " 550 "+(650 + y) + " 170 "+(650 + y);
 
-  // normal full string version
+  // normal full string, full table, with-GSUB version
   var big = {
       outline: outline
-//    , label: "monkey"
+    , label: "custom"
     , glyphName: "custom"
     , fontFamily: "Custom Font"
     , subfamily: "Regular"
@@ -239,7 +245,7 @@
     , fontVersion: "Version 1.0"
   }
 
-  // near-illegally-short string version (~170 bytes smaller)
+  // near-illegally-short version
   var small = {
       outline: outline
     , glyphName: "c"
@@ -247,17 +253,24 @@
     , subfamily: "c"
     , fontName: "c"
     , fontVersion: "1"
+    , copyright: -1
+    , trademark: -1
+    , license: -1
   };
 
-  var options = big;
+  var options = legible ? big : small;
   var font = buildFont(options);
-  var binary = font.otf;
-  var hexmap = binary.map(asHex);
-  var charmap = binary.map(asChars);
-  formTables(font, hexmap, charmap);
+
+  // work with resulting font:
+  (function render() {
+    var binary = font.otf;
+    var hexmap = binary.map(asHex);
+    var charmap = binary.map(asChars);
+    formTables(font, hexmap, charmap);
+  }());
 
   // generate OFT and CFF region highlighting in the HTML tables
-  (function highlightRegions() {
+  (function setupRegionHighlighting() {
     var otf = font.mappings.filter(function(e) { return e.type.indexOf("sfnt") > -1; });
     var cff = font.mappings.filter(function(e) { return e.type === "cff"; });
     otf.forEach(setupMapping("rgba(71, 175, 123, 0.39)"));
@@ -272,20 +285,20 @@
   }());
 
   // create stylesheet that uses this font
-  (function addStylesheet() {
+  (function addStylesheetToPage() {
+    cssFontFamily = cssFontFamily || "custom font";
     var mime_otf = "font/opentype";
     var dataurl_otf = "data:" + mime_otf + ";base64," + btoa(font.otf.map(asChars).join(''));
     var mime_woff = "application/font-woff";
     var dataurl_woff = "data:" + mime_woff + ";base64," + btoa(font.woff.map(asChars).join(''));
-    var fontface = ["@font-face {\n  font-family: 'custom font';"
+    var fontface = ["@font-face {\n  font-family: '" + cssFontFamily + "';"
                    , "  font-weight: normal;"
                    , "  font-style: normal;"
                    , "  src: url('" +dataurl_otf+ "') format('opentype'),"
                    , "       url('" +dataurl_woff+ "') format('woff');"
                    , "}"].join("\n");
-    var sheet = document.createElement("style");
+    var sheet = create("style");
     sheet.innerHTML = fontface;
     document.head.appendChild(sheet);
   }());
-
-}(this));
+}

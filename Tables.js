@@ -1,9 +1,10 @@
-(function(context, mapper) {
+(function(context) {
 
   "use strict";
 
-  // local-global-sort-of-thing-object
+  // local-global-sort-of-thing-objects
   var globals = {};
+  var mapper = false;
 
   /**
    * Turn [[a],[b],[c,d]] into [a.b.c.d]
@@ -216,6 +217,7 @@
    * Create a font. The options are... pretty self explanatory
    */
   var buildFont = function(options) {
+    mapper = new Mapper();
 
     // make sure the options are good.
     if(!options.outline) { throw new Error("No outline was passed to build a font for"); }
@@ -236,6 +238,8 @@
       , quadSize: options.quadSize || 1024
       , label: options.label || false
       , identifier: options.identifier || "-"
+      , minimal: options.minimal || false
+      , compliant: options.compliant || true
     };
 
     var letters = false;
@@ -634,21 +638,26 @@
       // See the 'Name IDs' section on http://www.microsoft.com/typography/otspec/name.htm for
       // the details on which strings we can encode, and what their associated ID must be.
       var strings = {
-                                     //  "0" = copyright text (irrelevant for our purpose)
-        "1": globals.fontFamily,     //      = font name
-        "2": globals.subfamily,      //      = font subfamily name
-        "3": globals.identifier,     //      = the unique font identifier (irrelevant for our purpose)
-//      "4": globals.fontName,       //      = full font name
-//      "5": globals.fontVersion,    //      = font version. "Preferred" format is "Version \d+.\d+; specifics"
-        "6": globals.compactFontName //      = postscript font name
-                                     //  "7" = trademark text (irrelevant for our purpose)
-                                     // "13" = a tl;dr. version of the font's license (irrelevant for our purpose)
+        "1": globals.fontFamily,  // = font name
+        "2": globals.subfamily       // = font subfamily name
       };
+
+      if(globals.label) {
+        strings["1"] = globals.fontFamily,      // = font name
+        strings["3"] = globals.identifier;      // = the unique font identifier (irrelevant for our purpose)
+        strings["4"] = globals.fontName;        // = full font name
+        strings["5"] = globals.fontVersion;     // = font version. "Preferred" format is "Version \d+.\d+; specifics"
+        strings["6"] = globals.compactFontName; // = postscript font name
+      };
+
+      if(globals.copyright !== -1) { strings["0"] = globals.copyright; }
+      if(globals.trademark !== -1) { strings["7"] = globals.trademark; }
+      if(globals.license !== -1)   { strings["13"] = globals.license; }
 
       var macRecords = [],
           macHeader = [
             ["platform", USHORT, "macintosh", 1]
-          , ["encoding", USHORT, "uninterpreted", 32]
+          , ["encoding", USHORT, "roman", 0] // I want to use 32, but fontforge freaks out if we do
           , ["language", USHORT, "english (a bit nonsense if we're uninterpreted)", 0]];
 
       var winRecords = [],
@@ -1122,4 +1131,4 @@
 
   context.buildFont = buildFont;
 
-}(this, new Mapper()));
+}(this));

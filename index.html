@@ -5,20 +5,12 @@
     <meta charset="utf-8">
     <title>Let's make a font</title>
     <link rel="stylesheet" href="style.css">
-    <script src="dataBuilding.js"></script>
-    <script src="Mapper.js"></script>
-    <script src="Tables.js"></script>
-    <script>
-      Array.prototype.first = function() { return this[0]; };
-      Array.prototype.last = function() { return this[this.length-1]; };
-      NodeList.prototype.array = function() { return Array.prototype.slice.call(this); };
-      NodeList.prototype.forEach = Array.prototype.forEach;
-    </script>
   </head>
 
   <body>
     <h1>Let's make a font</h1>
 
+<!--
     <p>We all use fonts every day, and we don't even have to bother noticing. Text looks pretty
     (okay, sometimes it looks horrible) and that's pretty much the extent of our interaction with
     fonts. We take them for granted, and that's a good thing: they're not just easy to use, we
@@ -41,9 +33,14 @@
 
     <p>First off, let's quickly generate a small font that we can use to examine how they're
     built up, and how they work:</p>
+-->
 
-    <script src="buildTablesNow.js"></script>
+    <!-- this gets replaced by the on-page script -->
+    <div id="tables"></div>
 
+    <p>plain test: <span style="font-family: 'custom font (small)';">~</span> (should be a rect. with cutout)</p>
+
+<!--
     <p>The above two tables are a font. Seriously! The table on the left shows you the bytecode
     for a custom font that was just made, right now, on this page. On the right the same bytecode has
     been turned into letters, but not every byte has a corresponding letter, because the <a
@@ -54,7 +51,7 @@
     value, so actually the decimal value 65) is the letter "A".</p>
 
     <p>So, let's test that font. If all went well, this is a little rectangle with a rectangular
-    hole cut out of the center: <span style="font-family: 'custom font';">~</span>. However, if
+    hole cut out of the center: <span style="font-family: 'custom font (small)';">~</span>. However, if
     you view the HTML code for this page, and you search for this paragraph, you'll see that
     it's actually the letter "A", with this tiny font applied to it. So... let's figure out
     why you saw a rectangle instead of the letter "A".</p>
@@ -135,6 +132,12 @@
     fonts. The font we're using on this page is one of these "type 2" fonts. (note that they're
     called type 2 not because they are usually the second in the list of available flavours, but
     because they use Adobe's "type 2 charstring" format for the graphics instructions.)</p>
+-->
+
+    <!-- this gets replaced by the on-page script -->
+    <div id="tables_small"></div>
+
+    <p>GSUB test: <span style="font-family: 'custom font (big)';">custom</span> (should be a rect. with cutout)</p>
 
 <!--
 <pre>
@@ -152,6 +155,21 @@
           - quad sizes
 </pre>
 -->
+
+    <script src="dataBuilding.js"></script>
+    <script src="Mapper.js"></script>
+    <script src="Tables.js"></script>
+    <script>
+      Array.prototype.first = function() { return this[0]; };
+      Array.prototype.last = function() { return this[this.length-1]; };
+      NodeList.prototype.array = function() { return Array.prototype.slice.call(this); };
+      NodeList.prototype.forEach = Array.prototype.forEach;
+    </script>
+    <script src="buildTablesNow.js"></script>
+    <script>
+      buildTables(this, false, "#tables", "custom font (small)", "A minimal, full spec-conforming OpenType font");
+      buildTables(this, true, "#tables_small", "custom font (big)", "A more legible version of our full spec-conforming OpenType font");
+    </script>
   </body>
 
 </html>
