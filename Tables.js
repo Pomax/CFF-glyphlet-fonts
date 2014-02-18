@@ -637,10 +637,7 @@
 
       // See the 'Name IDs' section on http://www.microsoft.com/typography/otspec/name.htm for
       // the details on which strings we can encode, and what their associated ID must be.
-      var strings = {
-        "1": globals.fontFamily,  // = font name
-        "2": globals.subfamily       // = font subfamily name
-      };
+      var strings = {};
 
       if(globals.label) {
         strings["1"] = globals.fontFamily,      // = font name
