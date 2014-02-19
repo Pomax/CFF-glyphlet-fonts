@@ -1,8 +1,15 @@
 (function(context) {
   "use strict";
 
+  var ol = false;
+  if (typeof Mapper === "undefined") {
+    ol = typeof require !== "undefined" ? require("./Mapper.js").Mapper : false;
+  }
+
+  var builder = {};
+
   // Convert ASCII to UTF16, the cheap way.
-  context.atou = function atou(v) {
+  builder.atou = function atou(v) {
     var pad = String.fromCharCode(0),
         a = v.split(''),
         out = [];
@@ -21,25 +28,25 @@
    *
    ***/
 
-  context.BYTE = function BYTE(v) { return [v]; };
-  context.CHAR = function CHAR(v) { return [v.charCodeAt(0)]; };
-  context.CHARARRAY = function CHARARRAY(v) { return v.split('').map(function(v) { return v.charCodeAt(0); }); };
-  context.FIXED = function FIXED(v) { return [(v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF]; };
-  context.USHORT = function USHORT(v) { return [(v >> 8) & 0xFF, v & 0xFF]; };
-  context.SHORT = function SHORT(v)  {
+  builder.BYTE = function BYTE(v) { return [v]; };
+  builder.CHAR = function CHAR(v) { return [v.charCodeAt(0)]; };
+  builder.CHARARRAY = function CHARARRAY(v) { return v.split('').map(function(v) { return v.charCodeAt(0); }); };
+  builder.FIXED = function FIXED(v) { return [(v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF]; };
+  builder.USHORT = function USHORT(v) { return [(v >> 8) & 0xFF, v & 0xFF]; };
+  builder.SHORT = function SHORT(v)  {
     var limit = 32768;
     if(v >= limit) { v = -(2*limit - v); } // 2's complement
     return [(v >> 8) & 0xFF, v & 0xFF];
   };
-  context.UINT24 = function UINT24(v) { return [(v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF]; };
-  context.ULONG = function ULONG(v) { return [(v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF]; };
-  context.LONG = function LONG(v)  {
+  builder.UINT24 = function UINT24(v) { return [(v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF]; };
+  builder.ULONG = function ULONG(v) { return [(v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF]; };
+  builder.LONG = function LONG(v)  {
     var limit = 2147483648;
     if(v >= limit) { v = -(2*limit - v); } // 2's complement
     return [(v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF];
   };
 
-  context.LONGDATETIME = function LONGDATETIME(v) {
+  builder.LONGDATETIME = function LONGDATETIME(v) {
     // This doesn't actually work in JS. Then again, these values that use
     // this are irrelevant, too, so we just return a 64bit "zero"
     return [0,0,0,0,0,0,0,0];
@@ -47,9 +54,9 @@
 
 
   // aliased datatypes
-  context.FWORD = SHORT;
-  context.UFWORD = USHORT;
-  context.OFFSET = USHORT;
+  builder.FWORD = builder.SHORT;
+  builder.UFWORD = builder.USHORT;
+  builder.OFFSET = builder.USHORT;
 
   /***
    *
@@ -57,7 +64,7 @@
    *
    ***/
 
-  context.NUMBER = function NUMBER(v) {
+  builder.NUMBER = function NUMBER(v) {
     if (-107 <= v && v <= 107) {
       return [v + 139];
     }
@@ -79,13 +86,13 @@
     return [29, (v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF];
   };
 
-  context.OPERAND = function OPERAND(v1, v2) {
+  builder.OPERAND = function OPERAND(v1, v2) {
     var opcode = BYTE(v1);
     if(v2 !== undefined) { opcode.concat(BYTE(v2)); }
     return opcode;
   };
 
-  context.DICTINSTRUCTION = function DICTINSTRUCTION(codes) {
+  builder.DICTINSTRUCTION = function DICTINSTRUCTION(codes) {
     var data = [];
     codes.forEach(function(code) {
       data = data.concat(code);
@@ -99,25 +106,25 @@
    *
    ***/
 
-  context.GlyphID = USHORT;
-  context.Offset = USHORT;
-  context.Card8 = BYTE;
-  context.Card16 = USHORT;
-  context.SID = USHORT;
-  context.OffSize = BYTE;
-  context.OffsetX = [undefined, BYTE, USHORT, UINT24, ULONG];
+  builder.GlyphID = builder.USHORT;
+  builder.Offset = builder.USHORT;
+  builder.Card8 = builder.BYTE;
+  builder.Card16 = builder.USHORT;
+  builder.SID = builder.USHORT;
+  builder.OffSize = builder.BYTE;
+  builder.OffsetX = [undefined, builder.BYTE, builder.USHORT, builder.UINT24, builder.ULONG];
 
   /**
    * Helper function for copying data regions
    */
-  context.LITERAL = function LITERAL(array) {
+  builder.LITERAL = function LITERAL(array) {
     return array;
   };
 
   /**
    * Helper function for decoding strings as ULONG
    */
-  context.decodeULONG = function decodeULONG(ulong) {
+  builder.decodeULONG = function decodeULONG(ulong) {
     var b = ulong.split ? ulong.split('').map(function(c) { return c.charCodeAt(0); }) : ulong;
     var val = (b[0] << 24) + (b[1] << 16) + (b[2] << 8) + b[3];
     if (val < 0 ) { val += Math.pow(2,32); }
@@ -133,11 +140,11 @@
   /**
    * Serialise a record structure into byte code
    */
-  context.serialize = function serialize(base_record, mapper, basename, offset) {
+  builder.serialize = function serialize(base_record, mapper, basename, offset) {
     basename = basename || "";
     offset = offset || 0;
     var data = [];
-    var map = mapper ? new Mapper() : false;
+    var map = mapper ? ol ? new ol() : new Mapper() : false;
     (function _serialize(record, prefix) {
       if(prefix == parseInt(prefix,10)) {
         prefix = "";
@@ -180,6 +187,25 @@
     }
     return data;
   };
+
+  // AMD style function
+  if(context.define) {
+    context.define(function() {
+      return builder;
+    });
+  }
+
+  // Node.js
+  else if(context.module) {
+    context.module.exports = builder;
+  }
+
+  // any other context
+  else {
+    Object.keys(builder).forEach(function(key) {
+      context[key] = builder[key];
+    });
+  }
 
 }(this));
 

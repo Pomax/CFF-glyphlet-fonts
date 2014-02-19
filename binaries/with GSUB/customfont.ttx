@@ -4,12 +4,12 @@
   <GlyphOrder>
     <!-- The 'id' attribute is only for humans; it is ignored when parsed. -->
     <GlyphID id="0" name=".notdef"/>
-    <GlyphID id="1" name="e"/>
-    <GlyphID id="2" name="k"/>
-    <GlyphID id="3" name="m"/>
-    <GlyphID id="4" name="n"/>
-    <GlyphID id="5" name="o"/>
-    <GlyphID id="6" name="y"/>
+    <GlyphID id="1" name="c"/>
+    <GlyphID id="2" name="m"/>
+    <GlyphID id="3" name="o"/>
+    <GlyphID id="4" name="s"/>
+    <GlyphID id="5" name="t"/>
+    <GlyphID id="6" name="u"/>
     <GlyphID id="7" name="~"/>
   </GlyphOrder>
 
@@ -17,12 +17,12 @@
     <!-- Most of this table will be recalculated by the compiler -->
     <tableVersion value="1.0"/>
     <fontRevision value="1.0"/>
-    <checkSumAdjustment value="0xfcb535eb"/>
+    <checkSumAdjustment value="0x2f4eea07"/>
     <magicNumber value="0x5f0f3cf5"/>
     <flags value="00000000 00000000"/>
     <unitsPerEm value="1024"/>
-    <created value="Thu Jan 01 00:00:00 1970"/>
-    <modified value="Thu Jan 01 00:00:00 1970"/>
+    <created value="Thu Jan  1 00:00:00 1970"/>
+    <modified value="Thu Jan  1 00:00:00 1970"/>
     <xMin value="20"/>
     <yMin value="-20"/>
     <xMax value="700"/>
@@ -94,7 +94,7 @@
     <ulUnicodeRange4 value="00000000 00000000 00000000 00000000"/>
     <achVendID value=" =) "/>
     <fsSelection value="00000000 01000000"/>
-    <fsFirstCharIndex value="101"/>
+    <fsFirstCharIndex value="99"/>
     <fsLastCharIndex value="126"/>
     <sTypoAscender value="680"/>
     <sTypoDescender value="-20"/>
@@ -111,23 +111,38 @@
   </OS_2>
 
   <name>
-    <namerecord nameID="1" platformID="1" platEncID="32" langID="0x0">
+    <namerecord nameID="0" platformID="1" platEncID="0" langID="0x0">
+      License-free
+    </namerecord>
+    <namerecord nameID="1" platformID="1" platEncID="0" langID="0x0">
       Custom Font
     </namerecord>
-    <namerecord nameID="2" platformID="1" platEncID="32" langID="0x0">
-      Regular
+    <namerecord nameID="3" platformID="1" platEncID="0" langID="0x0">
+      -
     </namerecord>
-    <namerecord nameID="4" platformID="1" platEncID="32" langID="0x0">
+    <namerecord nameID="4" platformID="1" platEncID="0" langID="0x0">
       Custom Glyph Font
     </namerecord>
-    <namerecord nameID="5" platformID="1" platEncID="32" langID="0x0">
+    <namerecord nameID="5" platformID="1" platEncID="0" langID="0x0">
       Version 1.0
+    </namerecord>
+    <namerecord nameID="6" platformID="1" platEncID="0" langID="0x0">
+      customfont
+    </namerecord>
+    <namerecord nameID="7" platformID="1" platEncID="0" langID="0x0">
+      License-free
+    </namerecord>
+    <namerecord nameID="13" platformID="1" platEncID="0" langID="0x0">
+      License-free
+    </namerecord>
+    <namerecord nameID="0" platformID="3" platEncID="1" langID="0x409">
+      License-free
     </namerecord>
     <namerecord nameID="1" platformID="3" platEncID="1" langID="0x409">
       Custom Font
     </namerecord>
-    <namerecord nameID="2" platformID="3" platEncID="1" langID="0x409">
-      Regular
+    <namerecord nameID="3" platformID="3" platEncID="1" langID="0x409">
+      -
     </namerecord>
     <namerecord nameID="4" platformID="3" platEncID="1" langID="0x409">
       Custom Glyph Font
@@ -135,17 +150,26 @@
     <namerecord nameID="5" platformID="3" platEncID="1" langID="0x409">
       Version 1.0
     </namerecord>
+    <namerecord nameID="6" platformID="3" platEncID="1" langID="0x409">
+      customfont
+    </namerecord>
+    <namerecord nameID="7" platformID="3" platEncID="1" langID="0x409">
+      License-free
+    </namerecord>
+    <namerecord nameID="13" platformID="3" platEncID="1" langID="0x409">
+      License-free
+    </namerecord>
   </name>
 
   <cmap>
     <tableVersion version="0"/>
     <cmap_format_4 platformID="3" platEncID="1" language="0">
-      <map code="0x65" name="e"/><!-- LATIN SMALL LETTER E -->
-      <map code="0x6b" name="k"/><!-- LATIN SMALL LETTER K -->
+      <map code="0x63" name="c"/><!-- LATIN SMALL LETTER C -->
       <map code="0x6d" name="m"/><!-- LATIN SMALL LETTER M -->
-      <map code="0x6e" name="n"/><!-- LATIN SMALL LETTER N -->
       <map code="0x6f" name="o"/><!-- LATIN SMALL LETTER O -->
-      <map code="0x79" name="y"/><!-- LATIN SMALL LETTER Y -->
+      <map code="0x73" name="s"/><!-- LATIN SMALL LETTER S -->
+      <map code="0x74" name="t"/><!-- LATIN SMALL LETTER T -->
+      <map code="0x75" name="u"/><!-- LATIN SMALL LETTER U -->
       <map code="0x7e" name="~"/><!-- TILDE -->
     </cmap_format_4>
   </cmap>
@@ -179,12 +203,12 @@
       <StrokeWidth value="0"/>
       <!-- charset is dumped separately as the 'GlyphOrder' element -->
       <Encoding>
-        <map code="0x1" name="e"/>
-        <map code="0x2" name="k"/>
-        <map code="0x3" name="m"/>
-        <map code="0x4" name="n"/>
-        <map code="0x5" name="o"/>
-        <map code="0x6" name="y"/>
+        <map code="0x1" name="c"/>
+        <map code="0x2" name="m"/>
+        <map code="0x3" name="o"/>
+        <map code="0x4" name="s"/>
+        <map code="0x5" name="t"/>
+        <map code="0x6" name="u"/>
         <map code="0x7" name="~"/>
       </Encoding>
       <Private>
@@ -206,22 +230,22 @@
         <CharString name=".notdef">
           endchar
         </CharString>
-        <CharString name="e">
-          endchar
-        </CharString>
-        <CharString name="k">
+        <CharString name="c">
           endchar
         </CharString>
         <CharString name="m">
           endchar
         </CharString>
-        <CharString name="n">
-          endchar
-        </CharString>
         <CharString name="o">
           endchar
         </CharString>
-        <CharString name="y">
+        <CharString name="s">
+          endchar
+        </CharString>
+        <CharString name="t">
+          endchar
+        </CharString>
+        <CharString name="u">
           endchar
         </CharString>
         <CharString name="~">
@@ -231,9 +255,9 @@
           0 -700 rlineto
           -680 0 rlineto
           150 150 rmoveto
-          0 400 rlineto
           380 0 rlineto
-          0 -400 rlineto
+          0 400 rlineto
+          -380 0 rlineto
           endchar
         </CharString>
       </CharStrings>
@@ -276,8 +300,8 @@
         <LookupFlag value="0"/>
         <!-- SubTableCount=1 -->
         <LigatureSubst index="0">
-          <LigatureSet glyph="m">
-            <Ligature components="o,n,k,e,y" glyph="~"/>
+          <LigatureSet glyph="c">
+            <Ligature components="u,s,t,o,m" glyph="~"/>
           </LigatureSet>
         </LigatureSubst>
       </Lookup>
@@ -286,12 +310,12 @@
 
   <hmtx>
     <mtx name=".notdef" width="0" lsb="0"/>
-    <mtx name="e" width="0" lsb="0"/>
-    <mtx name="k" width="0" lsb="0"/>
+    <mtx name="c" width="0" lsb="0"/>
     <mtx name="m" width="0" lsb="0"/>
-    <mtx name="n" width="0" lsb="0"/>
     <mtx name="o" width="0" lsb="0"/>
-    <mtx name="y" width="0" lsb="0"/>
+    <mtx name="s" width="0" lsb="0"/>
+    <mtx name="t" width="0" lsb="0"/>
+    <mtx name="u" width="0" lsb="0"/>
     <mtx name="~" width="680" lsb="0"/>
   </hmtx>
 

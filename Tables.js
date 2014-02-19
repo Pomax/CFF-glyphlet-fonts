@@ -2,6 +2,11 @@
 
   "use strict";
 
+  // Node.js?
+  if(typeof global !== "undefined") {
+    context = global;
+  }
+
   // local-global-sort-of-thing-objects
   var globals = {};
   var mapper = false;
@@ -216,8 +221,14 @@
   /**
    * Create a font. The options are... pretty self explanatory
    */
-  var buildFont = function(options) {
-    mapper = new Mapper();
+  var buildFont = function(options, CustomMapper, dataBuilder) {
+    mapper = CustomMapper ? new CustomMapper : new Mapper();
+
+    if(dataBuilder && typeof global !== "undefined") {
+      Object.keys(dataBuilder).forEach(function(key) {
+        global[key] = dataBuilder[key];
+      });
+    }
 
     // make sure the options are good.
     if(!options.outline) { throw new Error("No outline was passed to build a font for"); }
@@ -1126,6 +1137,21 @@
     }
   };
 
-  context.buildFont = buildFont;
+  // AMD style function
+  if(context.define) {
+    context.define(function() {
+      return buildFont;
+    });
+  }
+
+  // Node.js
+  else if(typeof global !== "undefined" && typeof module !== "undefined") {
+    module.exports = buildFont;
+  }
+
+  // any other context
+  else {
+    context.buildFont = buildFont;
+  }
 
 }(this));

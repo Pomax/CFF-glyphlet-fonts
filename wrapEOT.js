@@ -18,7 +18,6 @@
     console.log(v);
     return v.reverse(); }
 
-
   /**
    * Turning an opentype font into an EOT is principly a matter
    * of duplicating several of the table fields, and then adding
