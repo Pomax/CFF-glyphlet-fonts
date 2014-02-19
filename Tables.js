@@ -12,6 +12,22 @@
   var mapper = false;
 
   /**
+   * In non-compliance mode, we don't bother with certain tables
+   * that are pure meta-data and don't describe the actual font.
+   */
+  function stripCompliantList(tagList) {
+    if (globals.compliant === false) {
+      var pos = 0;
+      ["name", "post"].forEach(function(tag) {
+        pos = tagList.indexOf(tag);
+        if(pos > -1) {
+          tagList.splice(pos, 1);
+        }
+      });
+    }
+  };
+
+  /**
    * Turn [[a],[b],[c,d]] into [a.b.c.d]
    */
   function arrayconcat() {
@@ -70,8 +86,17 @@
   /**
    * Generate the font's binary data
    */
-  function buildSFNT(numTables, TableModels) {
-    var maxPower = ((Math.log(numTables)/Math.log(2))|0),
+  function buildSFNT(TableModels) {
+    // custom-order the tables, see "Optimized Table Ordering" at
+    // http://www.microsoft.com/typography/otspec140/recom.htm
+    var sorted = Object.keys(TableModels).sort(),
+        optimized = getOptimizedTableOrder(sorted);
+
+    stripCompliantList(sorted);
+    stripCompliantList(optimized);
+
+    var numTables = sorted.length,
+        maxPower = ((Math.log(numTables)/Math.log(2))|0),
         searchRange = Math.pow(2, maxPower) * 16,
         entrySelector = maxPower,
         rangeShift = numTables * 16 - searchRange,
@@ -125,11 +150,6 @@
     };
 
     mapper.addMapping("sfnt header", 0, 12, "sfnt");
-
-    // custom-order the tables, see "Optimized Table Ordering" at
-    // http://www.microsoft.com/typography/otspec140/recom.htm
-    var sorted = Object.keys(TableModels).sort(),
-        optimized = getOptimizedTableOrder(sorted);
 
     // build the fontdata by running through all tables
     var data = (function(){
@@ -249,8 +269,8 @@
       , quadSize: options.quadSize || 1024
       , label: options.label || false
       , identifier: options.identifier || "-"
-      , minimal: options.minimal || false
-      , compliant: options.compliant || true
+      , minimal: options.minimal !== "undefined" ? options.minimal : false
+      , compliant: options.compliant !== "undefined" ? options.compliant : true
     };
 
     var letters = false;
@@ -1130,8 +1150,10 @@
     console.log(JSON.stringify(TableModels, functionsByName, 2));
 */
 
-    var numTables = Object.keys(TableModels).length;
-    var otf = buildSFNT(numTables, TableModels);
+    var tablekeys = Object.keys(TableModels);
+    stripCompliantList(tablekeys);
+    var numTables = tablekeys.length;
+    var otf = buildSFNT(TableModels);
 
     return {
       cff: serialize(TableModels["CFF "]),
