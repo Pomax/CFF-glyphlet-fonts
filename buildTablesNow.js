@@ -133,9 +133,11 @@ function buildTables(context, legible, selector, cssFontFamily, tableCaption) {
           e.style.background = typeof override === "string" ? override : color;
           var name = mapping.name.replace(/\.+/g,'.').replace(/\.\[/g,'[');
           var value = mapping.value;
-          var dec = mapping.start+"-"+mapping.end;
-          var hex = mapping.start.toString(16).toUpperCase()+"-"+mapping.end.toString(16).toUpperCase();
-          e.title = name + (value? "\nvalue: " + value : '') + "\ndec: " + dec + "\nhex: " + hex;
+          if(value && value.replace) { value = value.replace(/\u0000/g,' 0x00 '); }
+          var description = mapping.description;
+          var dec = mapping.start+"-"+(mapping.end-1);
+          var hex = mapping.start.toString(16).toUpperCase()+"-"+(mapping.end-1).toString(16).toUpperCase();
+          e.title = name + (description? "\ndesc: " + description : '') + (value !== undefined? "\nvalue: " + value : '') + "\npos (dec): " + dec + "\npos (hex): " + hex;
         };
         var restore = function(e, last) {
           e.style.background = e.getAttribute("data-background");
