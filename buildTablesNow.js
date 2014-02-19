@@ -250,14 +250,10 @@ function buildTables(context, legible, selector, cssFontFamily, tableCaption) {
   // near-illegally-short version
   var small = {
       outline: outline
-    , glyphName: "c"
+    , glyphName: "~"
     , fontFamily: "c"
     , subfamily: "c"
-    , fontName: "c"
-    , fontVersion: "1"
-    , copyright: -1
-    , trademark: -1
-    , license: -1
+    , minimal: true
   };
 
   var options = legible ? big : small;

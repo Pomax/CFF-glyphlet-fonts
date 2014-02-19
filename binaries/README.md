@@ -6,6 +6,10 @@ A brief explanation:
   They should all validate through tx, TTX, and Microsoft's
   "Font Validator" utilities.
 
+  These files are auto-generated through the "compile.js"
+  script in the base dir. Run with $> node compile to generate
+  a fresh set of font files.
+
 Files provided:
 
   customfont.cff  - CFF-only data block

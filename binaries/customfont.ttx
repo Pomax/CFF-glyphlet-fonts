@@ -11,7 +11,7 @@
     <!-- Most of this table will be recalculated by the compiler -->
     <tableVersion value="1.0"/>
     <fontRevision value="1.0"/>
-    <checkSumAdjustment value="0xfa939764"/>
+    <checkSumAdjustment value="0x3d3a183c"/>
     <magicNumber value="0x5f0f3cf5"/>
     <flags value="00000000 00000000"/>
     <unitsPerEm value="1024"/>
@@ -105,6 +105,18 @@
   </OS_2>
 
   <name>
+    <namerecord nameID="1" platformID="1" platEncID="0" langID="0x0">
+      c
+    </namerecord>
+    <namerecord nameID="2" platformID="1" platEncID="0" langID="0x0">
+      Regular
+    </namerecord>
+    <namerecord nameID="1" platformID="3" platEncID="1" langID="0x409">
+      c
+    </namerecord>
+    <namerecord nameID="2" platformID="3" platEncID="1" langID="0x409">
+      Regular
+    </namerecord>
   </name>
 
   <cmap>
@@ -128,8 +140,8 @@
 
   <CFF>
     <CFFFont name="customfont">
-      <version value="1"/>
-      <FullName value="c"/>
+      <version value="Version 1.0"/>
+      <FullName value="Custom Glyph Font"/>
       <FamilyName value="c"/>
       <Weight value="Roman"/>
       <isFixedPitch value="0"/>

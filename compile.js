@@ -55,11 +55,7 @@ var small = {
   , glyphName: "c"
   , fontFamily: "c"
   , subfamily: "c"
-  , fontName: "c"
-  , fontVersion: "1"
-  , copyright: -1
-  , trademark: -1
-  , license: -1
+  , minimal: true
 };
 
 font = buildFont(small, Mapper, dataBuilder);

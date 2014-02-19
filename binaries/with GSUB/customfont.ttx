@@ -17,7 +17,7 @@
     <!-- Most of this table will be recalculated by the compiler -->
     <tableVersion value="1.0"/>
     <fontRevision value="1.0"/>
-    <checkSumAdjustment value="0x2f4eea07"/>
+    <checkSumAdjustment value="0x332b3239"/>
     <magicNumber value="0x5f0f3cf5"/>
     <flags value="00000000 00000000"/>
     <unitsPerEm value="1024"/>
@@ -117,6 +117,9 @@
     <namerecord nameID="1" platformID="1" platEncID="0" langID="0x0">
       Custom Font
     </namerecord>
+    <namerecord nameID="2" platformID="1" platEncID="0" langID="0x0">
+      Regular
+    </namerecord>
     <namerecord nameID="3" platformID="1" platEncID="0" langID="0x0">
       -
     </namerecord>
@@ -135,11 +138,17 @@
     <namerecord nameID="13" platformID="1" platEncID="0" langID="0x0">
       License-free
     </namerecord>
+    <namerecord nameID="19" platformID="1" platEncID="0" langID="0x0">
+      ~
+    </namerecord>
     <namerecord nameID="0" platformID="3" platEncID="1" langID="0x409">
       License-free
     </namerecord>
     <namerecord nameID="1" platformID="3" platEncID="1" langID="0x409">
       Custom Font
+    </namerecord>
+    <namerecord nameID="2" platformID="3" platEncID="1" langID="0x409">
+      Regular
     </namerecord>
     <namerecord nameID="3" platformID="3" platEncID="1" langID="0x409">
       -
@@ -158,6 +167,9 @@
     </namerecord>
     <namerecord nameID="13" platformID="3" platEncID="1" langID="0x409">
       License-free
+    </namerecord>
+    <namerecord nameID="19" platformID="3" platEncID="1" langID="0x409">
+      ~
     </namerecord>
   </name>
 

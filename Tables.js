@@ -237,9 +237,9 @@
     globals = {
         vendorId: " =) "
       , fontFamily: options.fontFamily || "Custom"
-      , subfamily: options.subfamily || "Regular"
+      , subFamily: options.subFamily || "Regular"
       , fontName: options.fontName || "Custom Glyph Font"
-      , compactFontName: options.compactFontName || "customfont"
+      , postscriptName: options.postscriptName || "customfont"
       , fontVersion: options.fontVersion || "Version 1.0"
       , copyright: options.copyright || "License-free"
       , trademark: options.trademark || "License-free"
@@ -588,8 +588,8 @@
               ["0", OffsetX[1], "first offset, relative to the byte preceding the data block", 1]
             , ["1", OffsetX[1], "offset to end of the data block", (1 + "customfont".length)]]]
             // object data
-          , ["data", CHARARRAY, "we only include one name, namely the compact font name", globals.compactFontName]
-            // fun fact: the compactFontName must be at least 10 characters long before Firefox accepts the font
+          , ["data", CHARARRAY, "we only include one name, namely the compact font name", globals.postscriptName]
+            // fun fact: the postscriptName must be at least 10 characters long before Firefox accepts the font
         ]],
         ["top dict index", [
             ["count", Card16, "top dicts store one 'thing' by definition", 1]
@@ -646,19 +646,25 @@
 
       // See the 'Name IDs' section on http://www.microsoft.com/typography/otspec/name.htm for
       // the details on which strings we can encode, and what their associated ID must be.
-      var strings = {};
-
-      if(globals.label) {
-        strings["1"] = globals.fontFamily,      // = font name
-        strings["3"] = globals.identifier;      // = the unique font identifier (irrelevant for our purpose)
-        strings["4"] = globals.fontName;        // = full font name
-        strings["5"] = globals.fontVersion;     // = font version. "Preferred" format is "Version \d+.\d+; specifics"
-        strings["6"] = globals.compactFontName; // = postscript font name
+      var strings = {
+        "1": globals.fontFamily,      // = font name
+        "2": globals.subFamily        // = 'Regular' etc.
       };
 
-      if(globals.copyright !== -1) { strings["0"] = globals.copyright; }
-      if(globals.trademark !== -1) { strings["7"] = globals.trademark; }
-      if(globals.license !== -1)   { strings["13"] = globals.license; }
+      // Fun facts:
+      // - Windows needs (1,2,3,6) to be installable,
+      // - OSX needs (1,2,3,4,5,6) to be installable.
+      if(!globals.minimal) {
+        if(globals.copyright      !== -1)  strings[ "0"] = globals.copyright;
+        if(globals.identifier     !== -1)  strings[ "3"] = globals.identifier;
+        if(globals.fontName       !== -1)  strings[ "4"] = globals.fontName;
+        if(globals.fontVersion    !== -1)  strings[ "5"] = globals.fontVersion;
+        if(globals.postscriptName !== -1)  strings[ "6"] = globals.postscriptName;
+        if(globals.trademark      !== -1)  strings[ "7"] = globals.trademark;
+        if(globals.license        !== -1)  strings["13"] = globals.license;
+        // the 'preview text' is simply just the tilde, since that's the only glyph with an outline.
+        strings["19"] = String.fromCharCode(globals.glyphCode);
+      }
 
       var macRecords = [],
           macHeader = [
