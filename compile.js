@@ -52,9 +52,11 @@ function toBuffer(a) {
 // generate small font
 var small = {
     outline: outline
-  , glyphName: "c"
+  , glyphName: "~"
   , fontFamily: "c"
-  , subfamily: "c"
+  , subFamily: "c"
+  , fontVersion: "1"
+  , fontName: "c"
   , minimal: true
 };
 
@@ -71,7 +73,7 @@ var big = {
   , label: "custom"
   , glyphName: "custom"
   , fontFamily: "Custom Font"
-  , subfamily: "Regular"
+  , subFamily: "Regular"
   , fontName: "Custom Glyph Font"
   , compactFontName: "customfont"
   , fontVersion: "Version 1.0"
