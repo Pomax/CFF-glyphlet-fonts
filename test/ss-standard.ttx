@@ -6885,7 +6885,7 @@
           <DefaultLangSys>
             <ReqFeatureIndex value="65535"/>
             <!-- FeatureCount=1 -->
-            <FeatureIndex index="0" value="1"/>
+            <FeatureIndex index="0" value="0"/>
           </DefaultLangSys>
           <!-- LangSysCount=0 -->
         </Script>
@@ -6898,7 +6898,6 @@
         <Feature>
           <!-- LookupCount=2 -->
           <LookupListIndex index="0" value="0"/>
-          <!--<LookupListIndex index="1" value="1"/>-->
         </Feature>
       </FeatureRecord>
       <FeatureRecord index="1">
