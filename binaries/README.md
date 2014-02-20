@@ -16,6 +16,7 @@ Files provided:
   customfont.otf  - OpenType font with embedded CFF data block
   customfont.ttx  - The .otf unpacked to human-readable XML by TTX
   customfont.woff - WOFF-wrapped version of Customfont.otf
+  test.html       - a test page that tries to apply the .otf and .woff
 
   The "with GSUB" dir contains the same files as generated with
   GSUB ligature substitution baked in; the font does not implement

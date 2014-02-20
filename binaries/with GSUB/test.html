@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Basic font test page</title>
+    <style>
+      @font-face {
+        font-family: "custom otf";
+        src: url('./customfont.otf') format('opentype');
+      }
+      @font-face {
+        font-family: "custom woff";
+        src: url('./customfont.woff') format('woff');
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Plain test</h1>
+    <p>~ using OTF: <span style="font-family: 'custom otf'">~</span>.</p>
+    <p>~ using WOFF: <span style="font-family: 'custom woff'">~</span>.</p>
+    <h1>GSUB test</h1>
+    <p>custom using OTF: <span style="font-family: 'custom otf'">custom</span>.</p>
+    <p>custom using WOFF: <span style="font-family: 'custom woff'">custom</span>.</p>
+    <h1>Files</h1>
+    <footer>
+      <p><a href="customfont.otf">customfont.otf</a></p>
+      <p><a href="customfont.woff">customfont.woff</a></p>
+      <p><a href="customfont.ttx">customfont.ttx (from .otf)</a></p>
+    </footer>
+  </body>
+</html>
