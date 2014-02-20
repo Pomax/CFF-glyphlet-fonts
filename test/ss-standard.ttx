@@ -6892,18 +6892,11 @@
       </ScriptRecord>
     </ScriptList>
     <FeatureList>
-      <!-- FeatureCount=2 -->
+      <!-- FeatureCount=1 -->
       <FeatureRecord index="0">
         <FeatureTag value="liga"/>
         <Feature>
           <!-- LookupCount=2 -->
-          <LookupListIndex index="0" value="0"/>
-        </Feature>
-      </FeatureRecord>
-      <FeatureRecord index="1">
-        <FeatureTag value="liga"/>
-        <Feature>
-          <!-- LookupCount=1 -->
           <LookupListIndex index="0" value="0"/>
         </Feature>
       </FeatureRecord>
