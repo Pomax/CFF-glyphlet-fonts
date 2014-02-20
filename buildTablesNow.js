@@ -241,21 +241,23 @@ function buildTables(context, legible, selector, cssFontFamily, tableCaption) {
     , label: "custom"
     , glyphName: "custom"
     , fontFamily: "Custom Font"
-    , subFamily: "Regular"
+    , subfamily: "Regular"
     , fontName: "Custom Glyph Font"
-    , postscriptName: "customfont"
+    , compactFontName: "customfont"
     , fontVersion: "Version 1.0"
   }
 
   // near-illegally-short version
   var small = {
       outline: outline
-    , glyphName: "~"
+    , glyphName: "c"
     , fontFamily: "c"
-    , subFamily: "c"
-    , fontVersion: "1"
+    , subfamily: "c"
     , fontName: "c"
-    , minimal: true
+    , fontVersion: "1"
+    , copyright: -1
+    , trademark: -1
+    , license: -1
   };
 
   var options = legible ? big : small;
@@ -292,11 +294,22 @@ function buildTables(context, legible, selector, cssFontFamily, tableCaption) {
     var mime_woff = "application/font-woff";
     var dataurl_woff = "data:" + mime_woff + ";base64," + btoa(font.woff.map(asChars).join(''));
     var fontface = ["@font-face {\n  font-family: '" + cssFontFamily + "';"
-                   , "  font-weight: normal;"
-                   , "  font-style: normal;"
                    , "  src: url('" +dataurl_otf+ "') format('opentype'),"
                    , "       url('" +dataurl_woff+ "') format('woff');"
                    , "}"].join("\n");
+    // without this, Chrome and IE fail to render
+    if(options.label) {
+      var liga = [
+          ".liga {"
+        , "  -webkit-font-feature-settings: 'liga';"
+        , "  -moz-font-feature-settings: 'liga=1';"
+        , "  -moz-font-feature-settings: 'liga';"
+        , "  -ms-font-feature-settings: 'liga' 1;"
+        , "  -o-font-feature-settings: 'liga';"
+        , "  font-feature-settings: 'liga';"
+        , "}"].join("\n");
+      fontface += liga;
+    }
     var sheet = create("style");
     sheet.innerHTML = fontface;
     document.head.appendChild(sheet);

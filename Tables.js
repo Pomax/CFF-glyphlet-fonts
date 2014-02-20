@@ -1015,10 +1015,15 @@
 
           // Scripts
         , ["Script List", [
-            ["ScriptCount", USHORT, "Number of ScriptRecords", 1]
+            ["ScriptCount", USHORT, "Number of ScriptRecords", 2] // DFLT and latn. Without latn, Chrome and IE break.
           , ["ScriptRecord", [
-              ["ScriptTag", CHARARRAY, "We only use the default script", "DFLT"]
-            , ["ScriptTableOffset", OFFSET, "Offset to Script table-from beginning of ScriptList", 0x0008] // hardcoded
+              ["0", [
+                ["ScriptTag", CHARARRAY, "substitution in the the default script", "DFLT"]
+              , ["ScriptTableOffset", OFFSET, "Offset to Script table-from beginning of ScriptList", 0x000E]]] // hardcoded (same as for latn)
+              // TEST: omitting the latn script breaks chrome and IE
+            , ["1", [
+                ["ScriptTag", CHARARRAY, "substitution in the latin script", "latn"]
+              , ["ScriptTableOffset", OFFSET, "Offset to Script table-from beginning of ScriptList", 0x000E]]] // hardcoded (same as for DFLT)
           ]]
 
           , ["Script table", [
@@ -1027,8 +1032,8 @@
 
             , ["Default LangSys table", [
                 ["LookupOrder", OFFSET, "reserved value. Because why not", 0]
-              , ["ReqFeatureIndex", USHORT, "We require the first (and only) feature. It must always kick in.", 0]
-              , ["FeatureCount", USHORT, "Number of FeatureIndex values for this language system, excluding required", 0]
+              , ["ReqFeatureIndex", USHORT, "no required features", 0xFF] // without "latn", I'd set this to 0
+              , ["FeatureCount", USHORT, "Number of FeatureIndex values for this language system, excluding required", 1] // without "latn", this would be 0
               , ["FeatureIndex", [
                   ['0', USHORT, "first index is the only index", 0]
               ]]
