@@ -5932,7 +5932,7 @@
         <ScriptTag value="DFLT"/>
         <Script>
           <DefaultLangSys>
-            <ReqFeatureIndex value="65535"/>
+            <ReqFeatureIndex value="0"/>
             <!-- FeatureCount=1 -->
             <FeatureIndex index="0" value="0"/>
           </DefaultLangSys>
@@ -5943,7 +5943,7 @@
         <ScriptTag value="latn"/>
         <Script>
           <DefaultLangSys>
-            <ReqFeatureIndex value="65535"/>
+            <ReqFeatureIndex value="0"/>
             <!-- FeatureCount=1 -->
             <FeatureIndex index="0" value="0"/>
           </DefaultLangSys>
