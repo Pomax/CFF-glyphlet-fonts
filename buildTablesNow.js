@@ -241,7 +241,7 @@ function buildTables(context, legible, selector, cssFontFamily, tableCaption) {
     , label: "custom"
     , glyphName: "custom"
     , fontFamily: "Custom Font"
-    , subfamily: "Regular"
+    , subFamily: "Regular"
     , fontName: "Custom Glyph Font"
     , compactFontName: "customfont"
     , fontVersion: "Version 1.0"
@@ -251,13 +251,11 @@ function buildTables(context, legible, selector, cssFontFamily, tableCaption) {
   var small = {
       outline: outline
     , glyphName: "c"
-    , fontFamily: "c"
-    , subfamily: "c"
     , fontName: "c"
+    , fontFamily: "c"
+    , subFamily: "c"
     , fontVersion: "1"
-    , copyright: -1
-    , trademark: -1
-    , license: -1
+    , minimal: true
   };
 
   var options = legible ? big : small;

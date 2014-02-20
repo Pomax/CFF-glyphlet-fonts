@@ -670,7 +670,7 @@
         "1": globals.fontFamily,      // = font name
         "2": globals.subFamily        // = 'Regular' etc.
       };
-
+      console.log(globals.minimal);
       // Fun facts:
       // - Windows needs (1,2,3,6) to be installable,
       // - OSX needs (1,2,3,4,5,6) to be installable.
