@@ -17,12 +17,12 @@
     <!-- Most of this table will be recalculated by the compiler -->
     <tableVersion value="1.0"/>
     <fontRevision value="1.0"/>
-    <checkSumAdjustment value="0x332b3239"/>
+    <checkSumAdjustment value="0x54084f6b"/>
     <magicNumber value="0x5f0f3cf5"/>
     <flags value="00000000 00000000"/>
     <unitsPerEm value="1024"/>
-    <created value="Thu Jan  1 00:00:00 1970"/>
-    <modified value="Thu Jan  1 00:00:00 1970"/>
+    <created value="Thu Jan 01 00:00:00 1970"/>
+    <modified value="Thu Jan 01 00:00:00 1970"/>
     <xMin value="20"/>
     <yMin value="-20"/>
     <xMax value="700"/>
@@ -283,13 +283,25 @@
   <GSUB>
     <Version value="1.0"/>
     <ScriptList>
-      <!-- ScriptCount=1 -->
+      <!-- ScriptCount=2 -->
       <ScriptRecord index="0">
         <ScriptTag value="DFLT"/>
         <Script>
           <DefaultLangSys>
-            <ReqFeatureIndex value="0"/>
-            <!-- FeatureCount=0 -->
+            <ReqFeatureIndex value="65535"/>
+            <!-- FeatureCount=1 -->
+            <FeatureIndex index="0" value="0"/>
+          </DefaultLangSys>
+          <!-- LangSysCount=0 -->
+        </Script>
+      </ScriptRecord>
+      <ScriptRecord index="1">
+        <ScriptTag value="latn"/>
+        <Script>
+          <DefaultLangSys>
+            <ReqFeatureIndex value="65535"/>
+            <!-- FeatureCount=1 -->
+            <FeatureIndex index="0" value="0"/>
           </DefaultLangSys>
           <!-- LangSysCount=0 -->
         </Script>

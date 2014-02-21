@@ -1032,7 +1032,7 @@
 
             , ["Default LangSys table", [
                 ["LookupOrder", OFFSET, "reserved value. Because why not", 0]
-              , ["ReqFeatureIndex", USHORT, "no required features", 0xFF] // without "latn", I'd set this to 0
+              , ["ReqFeatureIndex", USHORT, "no required features", 0xFFFF] // without "latn", I'd set this to 0
               , ["FeatureCount", USHORT, "Number of FeatureIndex values for this language system, excluding required", 1] // without "latn", this would be 0
               , ["FeatureIndex", [
                   ['0', USHORT, "first index is the only index", 0]
