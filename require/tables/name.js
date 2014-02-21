@@ -9,15 +9,33 @@
 
 define(["./Table.js", "atou"], function(Table, atou) {
 
-  var macHeader = [
-        ["platform", Table.USHORT, "macintosh", 1]
-      , ["encoding", Table.USHORT, "roman", 0]
-      , ["language", Table.USHORT, "english (a bit nonsense if we're uninterpreted)", 0]];
+  var NameRecord_PEL = function(platform, encoding, language, desc) {
+    return [
+      ["platform", Table.USHORT, desc.platform, platform]
+    , ["encoding", Table.USHORT, desc.encoding, encoding]
+    , ["language", Table.USHORT, desc.language, language]
+    ];
+  };
 
-  var winHeader = [
-        ["platform", Table.USHORT, "windows", 3]
-      , ["encoding", Table.USHORT, "Unicode BMP (UCS-2)", 1]
-      , ["language", Table.USHORT, "US english (a bit nonsense if we're doing unicode)", 0x0409]];
+  var NameRecord_RLO = function(recordID, length, offset) {
+    return [
+        ["recordID", Table.USHORT, "See the 'Name IDs' section on http://www.microsoft.com/typography/otspec/name.htm for details", recordID]
+      , ["length",   Table.USHORT, "the length of this string", length]
+      , ["offset",   Table.USHORT, "offset for this string in the string heap", offset]
+    ];
+  };
+
+  var macHeader = NameRecord_PEL(1, 0, 0, {
+    platform: "macintosh",
+    encoding: "roman",
+    language: "english (a bit nonsense, really"
+  });
+
+  var winHeader = NameRecord_PEL(3, 1, 0x0409, {
+    platform: "windows",
+    encoding: "Unicode BMP (UCS-2)",
+    language: "US english (pure nonsense if we're doing unicode)"
+  });
 
   var buildDataStructure = function(strings) {
     var offset = 0,
@@ -28,25 +46,15 @@ define(["./Table.js", "atou"], function(Table, atou) {
 
     Object.keys(strings).forEach(function(key) {
       var string = strings[key];
-      var recordId = parseInt(key, 10);
-
+      var recordID = parseInt(key, 10);
       // mac string
-      nameRecordPartial = [
-          ["recordID", Table.USHORT, "See the 'Name IDs' section on http://www.microsoft.com/typography/otspec/name.htm for details", recordId]
-        , ["length",   Table.USHORT, "the length of this string", string.length]
-        , ["offset",   Table.USHORT, "offset for this string in the string heap", offset]
-      ];
+      nameRecordPartial = NameRecord_RLO(recordID, string.length, offset);
       macRecords.push(macHeader.concat(nameRecordPartial));
       stringHeap.push(["(ascii)", Table.CHARARRAY, "mac version of "+string, string]);
       offset += string.length;
-
       // windows string
       var ustring = atou(string);
-      nameRecordPartial = [
-          ["recordID", Table.USHORT, "See the 'Name IDs' section on http://www.microsoft.com/typography/otspec/name.htm for details", recordId]
-        , ["length",   Table.USHORT, "the length of this string", ustring.length]
-        , ["offset",   Table.USHORT, "offset for this string in the string heap", offset]
-      ];
+      nameRecordPartial = NameRecord_RLO(recordID, ustring.length, offset);
       winRecords.push(winHeader.concat(nameRecordPartial));
       stringHeap.push(["(utf16)", Table.CHARARRAY, "windows version of "+string, ustring]);
       offset += ustring.length;
@@ -75,7 +83,7 @@ define(["./Table.js", "atou"], function(Table, atou) {
     ["format",       "USHORT",  "<name> table format"]
   , ["count",        "USHORT",  "Number of name records in this table"]
   , ["stringOffset", "OFFSET",  "offset to the string data, relative to the table start"]
-  , ["NameRecords",   "LITERAL", "The name record metadata"]
+  , ["NameRecords",  "LITERAL", "The name record metadata"]
   , ["StringData",   "LITERAL", "The actual strings that describe this font"]
   ]);
 

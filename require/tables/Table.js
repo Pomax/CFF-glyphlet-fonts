@@ -1,23 +1,23 @@
 define(["dataBuilding"], function(dataBuilder) {
 
   var encoder = dataBuilder.encoder,
-      decoder = dataBuilder.decoder,l
-      sizeOf = dataBuilder.sizeOf;
+      decoder = dataBuilder.decoder,
+      sizeOf = dataBuilder.sizeOf,
+      serialize = encoder.serialize;
 
 	var Table = function(fields) {
     var self = this;
-
     this.fields = {};
-
+    this.values = {};
     fields.forEach(function(record) {
-      var fieldValue = 0;
       var fieldName = record[0];
       var fieldType = record[1];
       var fieldDesc = record[2];
       self.fields[fieldName] = fieldType;
+      self.values[fieldName] = 0;
       Object.defineProperty(self, fieldName, {
-        get: function() { return decoder[fieldType](fieldValue); },
-        set: function(v) { fieldValue = encoder[fieldType](v);   }
+        get: function() { return decoder[fieldType](self.values[fieldName]); },
+        set: function(v) { self.values[fieldName] = encoder[fieldType](v);   }
       });
     });
   };
@@ -34,7 +34,15 @@ define(["dataBuilding"], function(dataBuilder) {
     },
     sizeOf: function(fieldName) { return sizeOf[this.fields[fieldName]](this[fieldName]); },
     parse: function(data){},
-    finalise: function(){}
+    finalise: function(){},
+    serialize: function() {
+      var self = this;
+      var data = [];
+      Object.keys(this.values).forEach(function(fieldName) {
+        data = data.concat(self.values[fieldName]);
+      });
+      return data;
+    }
   };
 
   dataBuilder.bind(Table);
