@@ -1,4 +1,5 @@
-define(["./Table"], function(Table){
+define(["../struct"], function(Table){
+  "use strict";
 
   var LongHorMetric = function() {
     return [
@@ -7,8 +8,11 @@ define(["./Table"], function(Table){
     ];
   };
 
-  var hmtx = function(dataBlock) {
-    if(dataBlock) { this.parse(dataBlock); }
+  var hmtx = function(input) {
+    if(!this.parse(input)) {
+      input = input || {};
+      this.fill(input);
+    }
   };
 
   hmtx.prototype = new Table([

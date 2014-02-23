@@ -1,7 +1,11 @@
-define(["./Table"], function(Table){
+define(["../struct"], function(Table){
+  "use strict";
 
-  var head = function(dataBlock) {
-    if(dataBlock) { this.parse(dataBlock); }
+  var head = function(input) {
+    if(!this.parse(input)) {
+      input = input || {};
+      this.fill(input);
+    }
   };
 
   head.prototype = new Table([

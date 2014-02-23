@@ -15,6 +15,16 @@ define(["Mapper"], function(Mapper) {
         }
       };
 
+
+  (function() {
+    for(var i=1; i<=4; i++) {
+      encoder["PADDING"+i] = function PADDING(v) { return (new Array(i+1)).join(0).split('').map(function(v) { return 0; }); };
+      decoder["PADDING"+i] = function PADDING(v) { return 0; };
+      sizeOf[ "PADDING"+i] = function(v) { return i; };
+    }
+  }());
+
+
   /***
    *
    * OpenType data types
@@ -22,44 +32,54 @@ define(["Mapper"], function(Mapper) {
    ***/
 
   encoder.BYTE = function BYTE(v) { return [v]; };
-  decoder.BYTE = function BYTE(v) { v[0]; };
-  sizeOf.BYTE = function() { return 1; };
+  decoder.BYTE = function BYTE(v) { return v[0]; };
+  sizeOf.BYTE  = function() { return 1; };
 
   encoder.CHAR = function CHAR(v) { return [v.charCodeAt(0)]; };
   decoder.CHAR = function CHAR(v) { return String.fromCharCode(v[0]); };
-  sizeOf.CHAR = function() { return 1; };
+  sizeOf.CHAR  = function() { return 1; };
 
   encoder.CHARARRAY = function CHARARRAY(v) { return v.split('').map(function(v) { return v.charCodeAt(0); }); };
-  decoder.CHARARRAY = function CHARARRAY(v) { return v.forEach(function(v) { return String.fromCharCode(v); }).join(); };
-  sizeOf.CHARARRAY = function(a) { return a.length; };
+  decoder.CHARARRAY = function CHARARRAY(v) { return v.map(function(v) { return String.fromCharCode(v); }).join(); };
+  sizeOf.CHARARRAY  = function(a) { return a.length; };
 
   encoder.USHORT = function USHORT(v) { return [(v >> 8) & 0xFF, v & 0xFF]; };
   decoder.USHORT = function USHORT(v) { return (v[0] << 8)  + v[1]; };
-  sizeOf.USHORT = function() { return 2; };
+  sizeOf.USHORT  = function() { return 2; };
 
   encoder.SHORT = function SHORT(v)  {
     var limit = 32768;
     if(v >= limit) { v = -(2*limit - v); } // 2's complement
     return [(v >> 8) & 0xFF, v & 0xFF];
   };
-  decoder.SHORT = function SHORT(v)  { return false; };
-  sizeOf.SHORT = function() { return 2; };
+  decoder.SHORT = function SHORT(v)  {
+    var limit = 32768;
+    var v = (v[0] <<8) + v[1];
+    if(v > limit) { v -= 2*limit; }
+    return v;
+  };
+  sizeOf.SHORT  = function() { return 2; };
 
   encoder.UINT24 = function UINT24(v) { return [(v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF]; };
   decoder.UINT24 = function UINT24(v) { return (v[0] << 16) + (v[1] << 8) + v[2]; };
-  sizeOf.UINT24 = function() { return 3; };
+  sizeOf.UINT24  = function() { return 3; };
 
   encoder.ULONG = function ULONG(v) { return [(v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF]; };
   decoder.ULONG = function ULONG(v) { return (v[0] << 24) + (v[1] << 16) + (v[2] << 8) + v[3]; };
-  sizeOf.ULONG = function() { return 4; };
+  sizeOf.ULONG  = function() { return 4; };
 
   encoder.LONG = function LONG(v)  {
     var limit = 2147483648;
     if(v >= limit) { v = -(2*limit - v); } // 2's complement
     return [(v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF];
   };
-  decoder.LONG = function LONG(v)  { return false; }
-  sizeOf.LONG = function() { return 4; };
+  decoder.LONG = function SHORT(v)  {
+    var limit = 2147483648;
+    var v = (v[0] << 24) + (v[1] << 16) + (v[2] <<8) + v[3];
+    if(v > limit) { v -= 2*limit; }
+    return v;
+  };
+  sizeOf.LONG  = function() { return 4; };
 
   // This doesn't actually work in JS. Then again, these values that use
   // this are irrelevant, too, so we just return a 64bit "zero"
@@ -71,11 +91,11 @@ define(["Mapper"], function(Mapper) {
   // aliased datatypes
   encoder.FIXED  = encoder.ULONG;
   decoder.FIXED  = decoder.ULONG;
-  sizeOf.FIXED  = sizeOf.ULONG;
+  sizeOf.FIXED   = sizeOf.ULONG;
 
   encoder.FWORD  = encoder.SHORT;
   decoder.FWORD  = decoder.SHORT;
-  sizeOf.FWORD  = sizeOf.SHORT;
+  sizeOf.FWORD   = sizeOf.SHORT;
 
   encoder.UFWORD = encoder.USHORT;
   decoder.UFWORD = decoder.USHORT;
@@ -115,7 +135,7 @@ define(["Mapper"], function(Mapper) {
   };
 
   encoder.OPERAND = function OPERAND(v1, v2) {
-    var opcode = BYTE(v1);
+    var opcode = encoder.BYTE(v1);
     if(v2 !== undefined) { opcode.concat(BYTE(v2)); }
     return opcode;
   };

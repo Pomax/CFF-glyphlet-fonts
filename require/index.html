@@ -9,9 +9,17 @@
 
   <body>
     <script>
+
     require(["builder"], function(builder) {
-      // do things
+      "use strict";
+
+      var y = -120;
+      var outline = "M  20 "+(100 + y) + " L  20 "+(800 + y) + " 700 "+(800 + y) + " 700 "+(100 + y) + " 20 "+(100 + y)
+                  + "M 170 "+(250 + y) + " L 550 "+(250 + y) + " 550 "+(650 + y) + " 170 "+(650 + y);
+      var options = { outline: outline, minimal: false };
+      var font = builder.build(options);
     });
+
     </script>
   </body>
 

@@ -1,7 +1,11 @@
-define(["./Table"], function(Table){
+define(["../struct"], function(Table){
+  "use strict";
 
-  var maxp = function(dataBlock) {
-    if(dataBlock) { this.parse(dataBlock); }
+  var maxp = function(input) {
+    if(!this.parse(input)) {
+      input = input || {};
+      this.fill(input);
+    }
   };
 
   maxp.prototype = new Table([

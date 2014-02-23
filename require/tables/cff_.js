@@ -1,6 +1,18 @@
-define(["./Table"], function(Table){
-  var cff = function() {}
-  cff.prototype = new Table([]);
-  cff.prototype.constructor = cff;
-  return cff;
+define(["../struct"], function(Table){
+  "use strict";
+
+  var CFF = function(input) {
+    if(!this.parse(input)) {
+      input = input || {};
+      this.fill(input);
+    }
+  };
+
+  CFF.prototype = new Table([
+    // ...def goes here...
+  ]);
+
+  CFF.prototype.constructor = CFF;
+
+  return CFF;
 });

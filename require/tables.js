@@ -2,7 +2,7 @@
  * just to make life easier
  */
 define([
-  "tables/cff_",
+  "tables/CFF_",
   "tables/cmap",
   "tables/head",
   "tables/hhea",
@@ -17,9 +17,11 @@ define([
   "tables/common/JSTF",
   "tables/common/BASE"
 ],
-function(cff, cmap, head, hhea, hmtx, maxp, name, OS_2, post, GSUB, GPOS, GDEF, JSTF, BASE) {
+function(CFF, cmap, head, hhea, hmtx, maxp, name, OS_2, post, GSUB, GPOS, GDEF, JSTF, BASE) {
+  "use strict";
+
   return {
-    cff: cff,
+    CFF: CFF,
     cmap: cmap,
     head: head,
     hhea: hhea,

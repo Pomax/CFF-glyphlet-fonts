@@ -675,13 +675,13 @@
       // - Windows needs (1,2,3,6) to be installable,
       // - OSX needs (1,2,3,4,5,6) to be installable.
       if(!globals.minimal) {
-        if(globals.copyright      !== -1)  strings[ "0"] = globals.copyright;
-        if(globals.identifier     !== -1)  strings[ "3"] = globals.identifier;
-        if(globals.fontName       !== -1)  strings[ "4"] = globals.fontName;
-        if(globals.fontVersion    !== -1)  strings[ "5"] = globals.fontVersion;
-        if(globals.postscriptName !== -1)  strings[ "6"] = globals.postscriptName;
-        if(globals.trademark      !== -1)  strings[ "7"] = globals.trademark;
-        if(globals.license        !== -1)  strings["13"] = globals.license;
+        if(globals.copyright      !== undefined)  strings[ "0"] = globals.copyright;
+        if(globals.identifier     !== undefined)  strings[ "3"] = globals.identifier;
+        if(globals.fontName       !== undefined)  strings[ "4"] = globals.fontName;
+        if(globals.fontVersion    !== undefined)  strings[ "5"] = globals.fontVersion;
+        if(globals.postscriptName !== undefined)  strings[ "6"] = globals.postscriptName;
+        if(globals.trademark      !== undefined)  strings[ "7"] = globals.trademark;
+        if(globals.license        !== undefined)  strings["13"] = globals.license;
         // the 'preview text' is simply just the tilde, since that's the only glyph with an outline.
         strings["19"] = String.fromCharCode(globals.glyphCode);
       }
