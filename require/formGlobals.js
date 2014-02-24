@@ -23,7 +23,7 @@ define(["convertOutline"], function(convertOutline) {
       , minimal: options.minimal !== "undefined" ? options.minimal : false
       , compliant: options.compliant !== "undefined" ? options.compliant : true
       , letters: (function(globals) {
-          var letters = false;
+          var letters = ["~"];
           if(globals.label) {
             letters = [];
             globals.label.split('').forEach(function(l) {

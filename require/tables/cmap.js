@@ -1,27 +1,60 @@
-define(["../struct",
-  "./cmaps/format.0",
-  "./cmaps/format.2",
-  "./cmaps/format.4",
-  "./cmaps/format.6",
-  "./cmaps/format.8",
-  "./cmaps/format.10",
-  "./cmaps/format.12",
-  "./cmaps/format.13",
-  "./cmaps/format.14"
-], function(Table, format0, format2, format4, format6, format8, format10, format12, format13, format14){
+define(["../struct", "./cmaps/EncodingRecord", "./cmaps/subtables"], function(Table, EncodingRecord, subtables){
   "use strict";
 
   var cmap = function(input) {
+    this.tables = [];
+
+    this.tables.toJSON = function() {
+      return this.map(function(r) { return r.toJSON(); });
+    };
+
     if(!this.parse(input)) {
       input = input || {};
       this.fill(input);
+      this.numTables = 0;
     }
   };
 
   cmap.prototype = new Table([
-    // ...def goes here...
+      ["version", "USHORT", "cmap table version"]
+    , ["numTables", "USHORT", "number of subtables"]
+    , ["encodingRecords", "LITERAL", "array[numTables] of encoding records"]
+    , ["subTables", "LITERAL", "the set of character map subtables"]
   ]);
+
   cmap.prototype.constructor = cmap;
+
+  cmap.prototype.addTable = function(format, options) {
+    var subtable = new subtables[format](options);
+    this.tables.push(subtable);
+    this.numTables = this.numTables + 1;
+  };
+
+  cmap.prototype.finalise = function() {
+
+    var encodingrecords = (function(encodingrecords) {
+      encodingrecords.toJSON = function() {
+        return this.map(function(r) { return r.toJSON(); });
+      };
+      encodingrecords.toString = function() {
+        return JSON.stringify(this.toJSON(), false, 2);
+      }
+      return encodingrecords;
+    }([]));
+
+    var offset = 4 + (this.numTables * 8); // sizeOf(EncodingRecord) is 8
+    for(var i=0; i<this.numTables; i++) {
+      encodingrecords.push(new EncodingRecord({
+        platformID: 3,   // Windows
+        encodingID: 1,   // Unicode BMP (UCS-2)
+        offset: offset
+      }));
+      offset += this.tables[i].length;
+    }
+
+    this.subTables = this.tables;
+    this.encodingRecords = encodingrecords;
+  };
 
   return cmap;
 });

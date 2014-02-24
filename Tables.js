@@ -759,7 +759,7 @@
             startCount.push(singleton);
             idDelta.push([""+i, SHORT, "delta for the segment", -(code - idx)]);
             idRangeOffset.push([""+i, USHORT, "range offset for segment 1", 0]);
-            glyphIdArray.push([""+idx, USHORT, "Our second glyphId points to our own glyph", idx]);
+            glyphIdArray.push([""+idx, USHORT, "glyphId in our sequence", idx]);
           });
         }
 

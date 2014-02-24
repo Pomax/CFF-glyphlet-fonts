@@ -5,6 +5,9 @@ define(["../struct"], function(Table){
     if(!this.parse(input)) {
       input = input || {};
       this.fill(input);
+      if(input.version < 2) {
+       this.unset(["sxHeight","sCapHeight","usDefaultChar","usBreakChar","usMaxContext"]);
+      }
     }
   };
 

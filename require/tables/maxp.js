@@ -5,6 +5,13 @@ define(["../struct"], function(Table){
     if(!this.parse(input)) {
       input = input || {};
       this.fill(input);
+      if(input.version === 0x00005000) {
+        var keep = ["version", "numGlyphs"];
+        var remove = Object.keys(this.fields).filter(function(v) {
+          return keep.indexOf(v) === -1;
+        });
+        this.unset(remove);
+      }
     }
   };
 

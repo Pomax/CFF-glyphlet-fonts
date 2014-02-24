@@ -1,4 +1,4 @@
-define(["SFNT", "globals", "shimie"], function(SFNT, formGlobals) {
+define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
   "use strict";
 
   return {
@@ -36,7 +36,7 @@ define(["SFNT", "globals", "shimie"], function(SFNT, formGlobals) {
 
 
       /**
-       * Horizontal metrics table
+       * Horizontal metrics header table
        */
       font.hhea = new font.hhea({
         version: 0x00010000,
@@ -50,13 +50,15 @@ define(["SFNT", "globals", "shimie"], function(SFNT, formGlobals) {
         caretSlopeRise: 0,
         caretSlopeRun: 0,
         caretOffset: 0,
-        _reserved1: 0,
-        _reserved2: 0,
-        _reserved3: 0,
-        _reserved4: 0,
         metricDataFormat: 0,
         numberOfHMetrics: globals.letters ? 1 + globals.letters.length : 2
       });
+
+
+      /**
+       * Horizontal metrics table
+       */
+      font.hmtx = new font.hmtx(globals, font.hhea.numberOfHMetrics);
 
 
       /**
@@ -90,6 +92,10 @@ define(["SFNT", "globals", "shimie"], function(SFNT, formGlobals) {
         if(globals.postscriptName !== undefined)  font.name.set( 6, globals.postscriptName);
         if(globals.trademark      !== undefined)  font.name.set( 7, globals.trademark);
         if(globals.license        !== undefined)  font.name.set(13, globals.license);
+
+        // NameID 19 is for the "preview text" in font preview utilities. Since we're
+        // only implementing a single glyph, that's the entire preview string.
+        font.name.set(19, "~");
       }
       font.name.finalise();
 
@@ -181,6 +187,22 @@ define(["SFNT", "globals", "shimie"], function(SFNT, formGlobals) {
         minMemType1: 0,
         maxMemType1: 0
       });
+
+
+      /**
+       * The character map for this font
+       */
+      font.cmap = new font.cmap({ version: 0 });
+      font.cmap.addTable(4, { letters: globals.letters });
+      font.cmap.finalise();
+
+
+      /**
+       * The CFF table for this font. This is, ironically,
+       * the actual font, rather than a million different
+       * bits of metadata *about* the font and its glyphs.
+       */
+      font["CFF "] = new font["CFF "](globals);
 
 
       console.log(sfnt.toJSON());

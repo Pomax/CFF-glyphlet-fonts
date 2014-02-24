@@ -41,7 +41,18 @@ define(["dataBuilding"], function(dataBuilder) {
               self.values[fieldName] = v.encode ? v.encode() : encoder[fieldType](v);
             }
           });
+          // ensure padding fields are always zero, rather than uninitialised
+          if(fieldType === "PADDING1" || fieldType === "PADDING2" || fieldType === "PADDING3" || fieldType === "PADDING4") {
+            self[fieldName] = 0;
+          }
         }(record[0], record[1], record[2]));
+      });
+    },
+    unset: function(fields) {
+      var self = this;
+      fields.forEach(function(fieldName) {
+        delete self.fields[fieldName];
+        delete self.values[fieldName];
       });
     },
     offset: function(fieldName) {

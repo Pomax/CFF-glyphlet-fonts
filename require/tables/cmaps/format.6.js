@@ -1,6 +1,18 @@
 define(["../../struct"], function(Table){
-  var cmap = function() {}
-  cmap.prototype = new Table([]);
-  cmap.prototype.constructor = cmap;
-  return cmap;
+
+  var format6 = function(input) {
+    if(!this.parse(input)) {
+      input = input || {};
+      input.format = 6;
+      this.fill(input);
+    }
+  };
+
+  format6.prototype = new Table([
+    ["format", "USHORT", "subtable format"]
+  ]);
+
+  format6.prototype.constructor = format6;
+
+  return format6;
 });
