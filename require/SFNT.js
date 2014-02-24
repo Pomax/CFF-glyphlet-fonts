@@ -36,6 +36,27 @@ define(["dataBuilding", "tables", "./tables/name/StringRecord"], function(dataBu
         }
       });
       return obj;
+    },
+    toData: function() {
+      var self = this,
+          dataBlocks = {};
+      Object.keys(this.stub).forEach(function(tag) {
+        if(self.stub[tag].toData) {
+          dataBlocks[tag] = self.stub[tag].toData();
+        }
+      });
+
+      // form table directory
+
+      // optimise table data blocks
+
+      // update the head.checksum
+
+      var data = [];
+      Object.keys(dataBlocks).forEach(function(tag) {
+        data = data.concat(dataBlocks[tag]);
+      })
+      return data;
     }
   };
 

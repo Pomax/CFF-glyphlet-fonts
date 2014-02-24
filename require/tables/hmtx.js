@@ -27,6 +27,14 @@ define(["../struct", "./hmtx/LongHorMetric"], function(Table, LongHorMetric){
     };
   };
 
+  hmtx.prototype.toData = function() {
+    var data = [];
+    this.hMetrics.forEach(function(v) {
+      data = data.concat(v.toData());
+    });
+    return data;
+  };
+
   return hmtx;
 
 });

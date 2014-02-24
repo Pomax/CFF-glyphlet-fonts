@@ -206,6 +206,7 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
 
 
       console.log(sfnt.toJSON());
+      sfnt.toData();
       return sfnt;
 	  }
   };

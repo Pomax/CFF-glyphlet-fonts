@@ -101,6 +101,23 @@ define(["dataBuilding"], function(dataBuilder) {
     },
     toString: function() {
       return JSON.stringify(this.toJSON(), false, 2);
+    },
+    toData: function() {
+      var self = this,
+          data = [],
+          val;
+      Object.keys(this.fields).forEach(function(field) {
+        if(self.fields[field] === "LITERAL") {
+          if(self.values[field].toData) {
+            val = self.values[field].toData();
+          }
+          else { val = self.values[field]; }
+        }
+        else { val = self.values[field]; }
+        console.log(val);
+        data = data.concat(val);
+      });
+      return data;
     }
   };
 

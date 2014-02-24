@@ -39,6 +39,13 @@ define(["../struct", "./cmaps/EncodingRecord", "./cmaps/subtables"], function(Ta
       encodingrecords.toString = function() {
         return JSON.stringify(this.toJSON(), false, 2);
       }
+      encodingrecords.toData = function() {
+        var data = [];
+        this.forEach(function(r) {
+          data = data.concat(r.toData());
+        });
+        return data;
+      };
       return encodingrecords;
     }([]));
 
