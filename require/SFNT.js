@@ -53,6 +53,7 @@ define(["dataBuilding", "tables", "./SFNTHeader", "./DirectoryEntry"], function(
           tagStruct.tag = tag;
           dataBlocks[tag] = self.stub[tag].toData();
           tagStruct.length = dataBlocks[tag].length;
+          while(dataBlocks[tag].length % 4 !== 0) { dataBlocks[tag].push(0); }
           tagStruct.checkSum = dataBuilding.computeChecksum(dataBlocks[tag]);
           // offset is computed when we actually fix the block locations in the file
         }
@@ -67,16 +68,39 @@ define(["dataBuilding", "tables", "./SFNTHeader", "./DirectoryEntry"], function(
       header.searchRange = 16 * maxPower2;
       header.entrySelector = log2(maxPower2);
       header.rangeShift = header.numTables * 16 - header.searchRange;
+      var headerBlock = header.toData();
 
       // optimise table data block ordering
+      var sorted = Object.keys(tags).sort();
+      var offsets = {};
+      var dataBlock = [];
+      var preferred = (function getOptimizedTableOrder(sorted) {
+        var preferred = ["head", "hhea", "maxp", "OS/2", "name", "cmap", "post", "CFF "],
+            filtered = sorted.filter(function(v) {
+              return preferred.indexOf(v) === -1;
+            }),
+            keys = preferred.concat(filtered);
+        return keys;
+      }(sorted));
+      var offset = headerBlock.length + header.numTables * 16;
+      preferred.forEach(function(tag) {
+        if(dataBlocks[tag]) {
+          offsets[tag] = offset + dataBlock.length;
+          dataBlock = dataBlock.concat(dataBlocks[tag]);
+        }
+      });
 
-      // update the head.checksum
-
-      var data = [];
-      Object.keys(dataBlocks).forEach(function(tag) {
-        data = data.concat(dataBlocks[tag]);
+      // finalise and write out the directory block
+      var directoryBlock = [];
+      sorted.forEach(function(tag) {
+        if(tags[tag]) {
+          tags[tag].offset = offsets[tag];
+          directoryBlock = directoryBlock.concat(tags[tag].toData());
+        }
       })
-      return data;
+
+      // assemble the final font data into one "file"
+      return headerBlock.concat(directoryBlock).concat(dataBlock);
     }
   };
 

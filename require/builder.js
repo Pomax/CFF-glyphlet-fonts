@@ -219,9 +219,17 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
       console.log(sfnt.toJSON());
       var byteArray = sfnt.toData();
       var byteString = byteArray.join(',');
-      var asChars = function(v) { return String.fromCharCode(v); };
+      var asHex = function(v) { if(!v) return v; return v.toString(16).toUpperCase(); };
+      var hexString = byteArray.map(asHex).join(',');
+      var asChars = function(v) { if(!v) return v; return String.fromCharCode(v); };
       var charString = byteArray.map(asChars).join(',');
-      console.log( byteArray.length, byteString, charString );
+      console.log(byteArray.length);
+      console.log("---");
+      console.log(byteString);
+      console.log("---");
+      console.log(hexString);
+      console.log("---");
+      console.log(charString);
       return sfnt;
 	  }
   };
