@@ -7,6 +7,11 @@ define(["../struct", "./cmaps/EncodingRecord", "./cmaps/subtables"], function(Ta
     this.tables.toJSON = function() {
       return this.map(function(r) { return r.toJSON(); });
     };
+    this.tables.toData = function() {
+      var data = [];
+      this.forEach(function(r) { data = data.concat(r.toData()); });
+      return data;
+    };
 
     if(!this.parse(input)) {
       input = input || {};

@@ -56,6 +56,7 @@ define(["../../struct", "./format4/Segments"], function(Table, Segments){
         idDelta = [],
         idRangeOffset = [],
         glyphIdArray = [];
+
     segments.data.forEach(function(segment) {
       endCount = endCount.concat(segment.values["end"]);
       startCount = startCount.concat(segment.values["start"]);
@@ -72,6 +73,14 @@ define(["../../struct", "./format4/Segments"], function(Table, Segments){
     this.idDelta = idDelta;
     this.idRangeOffset = idRangeOffset;
     this.glyphIdArray = glyphIdArray;
+
+    // set up the toString, toJSON, and toData functions.
+    // FIXME: this should be necessary with properly written code.
+    [endCount, startCount, idDelta, idRangeOffset, glyphIdArray].forEach(function(arr) {
+      arr.toData = function() { return arr; };
+      arr.toJSON = function() { return { data: arr}; };
+      arr.toString = function() { return JSON.stringify(arr.toJSON(), false, 2); };
+    });
 
     // And record the size of this subtable
     var fixed = 14 + 2,

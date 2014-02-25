@@ -9,6 +9,10 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
       var globals = formGlobals(options);
 
 
+      // Right. Let's start create a font by defining its tables,
+      // rather than using a font design tool to do that for us.
+
+
       /**
        * Font header
        */
@@ -62,8 +66,8 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
 
 
       /**
-       * Max profiles - CFF does not use these,
-       * which we incidate with table version 0.5
+       * Max profiles - CFF does not use these, which we indicate by
+       * using a table version 0.5
        */
       font.maxp = new font.maxp({
         version: 0x00005000,
@@ -174,7 +178,7 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
 
       /**
        * The post table -- this table should not be necessary for
-       * webfonts, but for the moment simply is.
+       * webfonts, but for now must be included for the font to be legal.
        */
       font.post = new font.post({
         version: 0x00030000,
@@ -190,7 +194,8 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
 
 
       /**
-       * The character map for this font
+       * The character map for this font, using a cmap
+       * format 4 subtable for our implemented glyphs.
        */
       font.cmap = new font.cmap({ version: 0 });
       font.cmap.addTable(4, { letters: globals.letters });
@@ -201,12 +206,22 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
        * The CFF table for this font. This is, ironically,
        * the actual font, rather than a million different
        * bits of metadata *about* the font and its glyphs.
+       *
+       * It's also the most complex bit (closely followed
+       * by the GSUB table for ligature substitution).
        */
       font["CFF "] = new font["CFF "](globals);
 
 
+      /**
+       * Let's see that bytecode.
+       */
       console.log(sfnt.toJSON());
-      sfnt.toData();
+      var byteArray = sfnt.toData();
+      var byteString = byteArray.join(',');
+      var asChars = function(v) { return String.fromCharCode(v); };
+      var charString = byteArray.map(asChars).join(',');
+      console.log( byteArray.length, byteString, charString );
       return sfnt;
 	  }
   };

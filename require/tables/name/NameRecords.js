@@ -4,9 +4,15 @@ define(["./NameRecord", "./StringRecord"], function(NameRecord, StringRecord) {
   var NameRecords = function() {
     var self = this;
 
+    // FIXME: this should be necessary with properly written code.
     (function(records) {
       records.toJSON = function() {
         return this.map(function(r) { return r.toJSON(); });
+      };
+      records.toData = function() {
+        var data = [];
+        this.forEach(function(r) { data = data.concat(r.toData()); });
+        return data;
       };
       records.toString = function() {
         return JSON.stringify(this.toJSON(), false, 2);
@@ -14,9 +20,15 @@ define(["./NameRecord", "./StringRecord"], function(NameRecord, StringRecord) {
       self.records = records;
     }([]));
 
+    // FIXME: this should be necessary with properly written code.
     (function(strings) {
       strings.toJSON = function() {
         return this.map(function(r) { return r.values["string"].map(function(i) { return String.fromCharCode(i); }).join(''); });
+      };
+      strings.toData = function() {
+        var data = [];
+        this.forEach(function(r) { data = data.concat(r.values["string"]); });
+        return data;
       };
       strings.toString = function() {
         return JSON.stringify(this.toJSON(), false, 2);

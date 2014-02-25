@@ -111,10 +111,11 @@ define(["dataBuilding"], function(dataBuilder) {
           if(self.values[field].toData) {
             val = self.values[field].toData();
           }
-          else { val = self.values[field]; }
+          else {
+            val = self.values[field];
+          }
         }
         else { val = self.values[field]; }
-        console.log(val);
         data = data.concat(val);
       });
       return data;

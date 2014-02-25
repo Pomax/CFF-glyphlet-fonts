@@ -12,6 +12,15 @@ define(["Mapper"], function(Mapper) {
           Object.keys(encoder).forEach(function(key) {
             obj[key] = encoder[key];
           });
+        },
+        computeChecksum: function(chunk) {
+          while(chunk.length % 4 !== 0) { chunk.push(0); }
+          var tally = 0;
+          for(var i=0, last=chunk.length; i<last; i+=4) {
+            tally += (chunk[i] << 24) + (chunk[i + 1] << 16) + (chunk[i + 2] << 8) + (chunk[i + 3]);
+          }
+          tally %= Math.pow(2,32);
+          return tally;
         }
       };
 

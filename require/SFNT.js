@@ -1,7 +1,9 @@
-define(["dataBuilding", "tables", "./tables/name/StringRecord"], function(dataBuilding, tables, StringRecord) {
+define(["dataBuilding", "tables", "./SFNTHeader", "./DirectoryEntry"], function(dataBuilding, tables, SFNTHeader, DirectoryEntry) {
   "use strict";
 
-  var SFNT = function() {
+  var header = SFNTHeader("CFF");
+
+  var SFNT = function(type) {
     this.stub = {
       BASE:   tables.BASE,
       "CFF ": tables.CFF,
@@ -18,6 +20,7 @@ define(["dataBuilding", "tables", "./tables/name/StringRecord"], function(dataBu
       name:   tables.name,
       post:   tables.post
     };
+    this.header = new header();
   };
 
   SFNT.prototype = {
@@ -39,16 +42,33 @@ define(["dataBuilding", "tables", "./tables/name/StringRecord"], function(dataBu
     },
     toData: function() {
       var self = this,
+          tags = {},
           dataBlocks = {};
+
+      // form data blocks and table directory
       Object.keys(this.stub).forEach(function(tag) {
         if(self.stub[tag].toData) {
+          var tagStruct = new DirectoryEntry();
+          tags[tag] = tagStruct;
+          tagStruct.tag = tag;
           dataBlocks[tag] = self.stub[tag].toData();
+          tagStruct.length = dataBlocks[tag].length;
+          tagStruct.checkSum = dataBuilding.computeChecksum(dataBlocks[tag]);
+          // offset is computed when we actually fix the block locations in the file
         }
       });
 
-      // form table directory
+      // fill in the header values that are based on the number of tables
+      var log2 = function(v) { return (Math.log(v) / Math.log(2)) | 0; }
+      var header = this.header;
+      header.version = "OTTO";
+      header.numTables = Object.keys(tags).length;
+      var maxPower2 = log2(header.numTables);
+      header.searchRange = 16 * maxPower2;
+      header.entrySelector = log2(maxPower2);
+      header.rangeShift = header.numTables * 16 - header.searchRange;
 
-      // optimise table data blocks
+      // optimise table data block ordering
 
       // update the head.checksum
 
