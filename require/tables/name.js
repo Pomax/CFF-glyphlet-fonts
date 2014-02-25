@@ -18,6 +18,7 @@ define(["../struct", "../atou", "../dataBuilding", "./name/NameRecords"], functi
       input = input || {};
       input.format = input.format || 0;
       this.fill(input);
+      this.setStrings(input);
     }
   };
 
@@ -62,6 +63,27 @@ define(["../struct", "../atou", "../dataBuilding", "./name/NameRecords"], functi
     if(string !== undefined) { this.strings[""+id] = string; }
     else { delete this.strings[""+id]; }
   };
+
+  /**
+   * Set all strings based on the globals object
+   */
+  name.prototype.setStrings = function(globals) {
+    this.set(1, globals.fontFamily);
+    this.set(2, globals.subFamily);
+    if(!globals.minimal) {
+      if(globals.copyright      !== undefined)  this.set( 0, globals.copyright);
+      if(globals.identifier     !== undefined)  this.set( 3, globals.identifier);
+      if(globals.fontName       !== undefined)  this.set( 4, globals.fontName);
+      if(globals.fontVersion    !== undefined)  this.set( 5, globals.fontVersion);
+      if(globals.postscriptName !== undefined)  this.set( 6, globals.postscriptName);
+      if(globals.trademark      !== undefined)  this.set( 7, globals.trademark);
+      if(globals.license        !== undefined)  this.set(13, globals.license);
+      // NameID 19 is for the "preview text" in font preview utilities. Since we're
+      // only implementing a single glyph, that's the entire preview string.
+      this.set(19, "~");
+    }
+    this.finalise();
+  }
 
   /**
    * convert the current string collection

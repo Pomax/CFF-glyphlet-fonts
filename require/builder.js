@@ -17,7 +17,7 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
        * Font header
        */
       font.head = new font.head({
-        version: 0x0001000,
+        version: 0x00010000,
         fontRevision: 0x00010000,
         checkSumAdjustment: 0,
         magicNumber: 0x5F0F3CF5,
@@ -58,7 +58,6 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
         numberOfHMetrics: globals.letters ? 1 + globals.letters.length : 2
       });
 
-
       /**
        * Horizontal metrics table
        */
@@ -85,23 +84,7 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
        * (OTS may be patched at some point to not even check the name table at
        *  all, at which point we don't have to bother generating it for webfonts)
        */
-      font.name = new font.name();
-      font.name.set(1, globals.fontFamily);
-      font.name.set(2, globals.subFamily);
-      if(!globals.minimal) {
-        if(globals.copyright      !== undefined)  font.name.set( 0, globals.copyright);
-        if(globals.identifier     !== undefined)  font.name.set( 3, globals.identifier);
-        if(globals.fontName       !== undefined)  font.name.set( 4, globals.fontName);
-        if(globals.fontVersion    !== undefined)  font.name.set( 5, globals.fontVersion);
-        if(globals.postscriptName !== undefined)  font.name.set( 6, globals.postscriptName);
-        if(globals.trademark      !== undefined)  font.name.set( 7, globals.trademark);
-        if(globals.license        !== undefined)  font.name.set(13, globals.license);
-
-        // NameID 19 is for the "preview text" in font preview utilities. Since we're
-        // only implementing a single glyph, that's the entire preview string.
-        font.name.set(19, "~");
-      }
-      font.name.finalise();
+      font.name = new font.name(globals);
 
 
       /**
@@ -212,24 +195,7 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
        */
       font["CFF "] = new font["CFF "](globals);
 
-
-      /**
-       * Let's see that bytecode.
-       */
-      console.log(sfnt.toJSON());
-      var byteArray = sfnt.toData();
-      var byteString = byteArray.join(',');
-      var asHex = function(v) { if(!v) return v; return v.toString(16).toUpperCase(); };
-      var hexString = byteArray.map(asHex).join(',');
-      var asChars = function(v) { if(!v) return v; return String.fromCharCode(v); };
-      var charString = byteArray.map(asChars).join(',');
-      console.log(byteArray.length);
-      console.log("---");
-      console.log(byteString);
-      console.log("---");
-      console.log(hexString);
-      console.log("---");
-      console.log(charString);
+      // we're done.
       return sfnt;
 	  }
   };

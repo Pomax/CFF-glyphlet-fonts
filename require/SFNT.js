@@ -63,11 +63,14 @@ define(["dataBuilding", "tables", "./SFNTHeader", "./DirectoryEntry"], function(
       var log2 = function(v) { return (Math.log(v) / Math.log(2)) | 0; }
       var header = this.header;
       header.version = "OTTO";
-      header.numTables = Object.keys(tags).length;
-      var maxPower2 = log2(header.numTables);
-      header.searchRange = 16 * maxPower2;
+
+      var numTables = Object.keys(tags).length;
+      header.numTables = numTables;
+      var maxPower2 = Math.pow(2, log2(numTables));
+      var searchRange = 16 * maxPower2;
+      header.searchRange = searchRange;
       header.entrySelector = log2(maxPower2);
-      header.rangeShift = header.numTables * 16 - header.searchRange;
+      header.rangeShift = numTables * 16 - searchRange;
       var headerBlock = header.toData();
 
       // optimise table data block ordering

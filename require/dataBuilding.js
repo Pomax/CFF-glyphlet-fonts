@@ -27,9 +27,12 @@ define(["Mapper"], function(Mapper) {
 
   (function() {
     for(var i=1; i<=4; i++) {
-      encoder["PADDING"+i] = function PADDING(v) { return (new Array(i+1)).join(0).split('').map(function(v) { return 0; }); };
-      decoder["PADDING"+i] = function PADDING(v) { return 0; };
-      sizeOf[ "PADDING"+i] = function(v) { return i; };
+      (function setupPadding(size) {
+        // this needs closure wrapped, because of that late binding for the encode.PADDING function.
+        encoder["PADDING"+size] = function PADDING(v) { return (new Array(size+1)).join(0).split('').map(function(v) { return 0; }); };
+        decoder["PADDING"+size] = function PADDING(v) { return 0; };
+        sizeOf[ "PADDING"+size] = function(v) { return size; };
+      }(i));
     }
   }());
 
