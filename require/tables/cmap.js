@@ -29,8 +29,8 @@ define(["../struct", "./cmaps/EncodingRecord", "./cmaps/subtables"], function(Ta
 
   cmap.prototype.constructor = cmap;
 
-  cmap.prototype.addTable = function(format, options) {
-    var subtable = new subtables[format](options);
+  cmap.prototype.addTable = function(options) {
+    var subtable = new subtables[options.format](options);
     this.tables.push(subtable);
     this.numTables = this.numTables + 1;
   };

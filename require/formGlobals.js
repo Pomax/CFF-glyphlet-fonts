@@ -4,6 +4,7 @@ define(["convertOutline"], function(convertOutline) {
 	return function(options) {
 
     // ensure we have all the necessary globals
+    var glyphCode = "~".charCodeAt(0);
     var globals = {
         outline: options.outline || ""
       , vendorId: " =) "
@@ -16,13 +17,13 @@ define(["convertOutline"], function(convertOutline) {
       , trademark: options.trademark || "Trademark-free"
       , license: options.license || "License-free"
       , glyphName: options.glyphName || "~"
-      , glyphCode: "~".charCodeAt(0)
+      , glyphCode: glyphCode
       , quadSize: options.quadSize || 1024
       , label: options.label || false
       , identifier: options.identifier || "-"
       , minimal: options.minimal !== "undefined" ? options.minimal : false
       , compliant: options.compliant !== "undefined" ? options.compliant : true
-      , letters: (function(globals) {
+      , letters: (function(globals, glyphCode) {
           var letters = ["~"];
           if(globals.label) {
             letters = [];
@@ -31,11 +32,11 @@ define(["convertOutline"], function(convertOutline) {
                 letters.push(l);
               }
             });
-            letters.push(String.fromCharCode(globals.glyphCode));
+            letters.push(String.fromCharCode(glyphCode));
             letters.sort();
           }
           return letters;
-        }(options))
+        }(options, glyphCode))
     };
 
     // Turn the SVG outline into a charstring,

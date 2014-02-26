@@ -59,41 +59,44 @@ define(["dataBuilding", "tables", "./SFNTHeader", "./DirectoryEntry"], function(
         }
       });
 
-      // fill in the header values that are based on the number of tables
-      var log2 = function(v) { return (Math.log(v) / Math.log(2)) | 0; }
       var header = this.header;
       header.version = "OTTO";
 
+      // fill in the header values that are based on the number of tables
+      var log2 = function(v) { return (Math.log(v) / Math.log(2)) | 0; }
       var numTables = Object.keys(tags).length;
       header.numTables = numTables;
-      var maxPower2 = Math.pow(2, log2(numTables));
-      var searchRange = 16 * maxPower2;
+      var highestPowerOf2 = Math.pow(2, log2(numTables));
+      var searchRange = 16 * highestPowerOf2;
       header.searchRange = searchRange;
-      header.entrySelector = log2(maxPower2);
+      header.entrySelector = log2(highestPowerOf2);
       header.rangeShift = numTables * 16 - searchRange;
       var headerBlock = header.toData();
 
-      // optimise table data block ordering
-      var sorted = Object.keys(tags).sort();
-      var offsets = {};
-      var dataBlock = [];
-      var preferred = (function getOptimizedTableOrder(sorted) {
-        var preferred = ["head", "hhea", "maxp", "OS/2", "name", "cmap", "post", "CFF "],
-            filtered = sorted.filter(function(v) {
-              return preferred.indexOf(v) === -1;
-            }),
-            keys = preferred.concat(filtered);
-        return keys;
-      }(sorted));
-      var offset = headerBlock.length + header.numTables * 16;
+      // optimise table data block ordering, based on the
+      // "Optimized Table Ordering" section on
+      // http://www.microsoft.com/typography/otspec140/recom.htm
+      var sorted = Object.keys(tags).sort(),
+          offsets = {},
+          block_offset = headerBlock.length + header.numTables * 16,
+          dataBlock = [],
+          preferred = (function getOptimizedTableOrder(sorted) {
+            var preferred = ["head", "hhea", "maxp", "OS/2", "name", "cmap", "post", "CFF "],
+                filtered = sorted.filter(function(v) {
+                  return preferred.indexOf(v) === -1;
+                }),
+                keys = preferred.concat(filtered);
+            return keys;
+          }(sorted));
+
       preferred.forEach(function(tag) {
         if(dataBlocks[tag]) {
-          offsets[tag] = offset + dataBlock.length;
+          offsets[tag] = block_offset + dataBlock.length;
           dataBlock = dataBlock.concat(dataBlocks[tag]);
         }
       });
 
-      // finalise and write out the directory block
+      // Then, finalise and write out the directory block:
       var directoryBlock = [];
       sorted.forEach(function(tag) {
         if(tags[tag]) {
@@ -102,8 +105,14 @@ define(["dataBuilding", "tables", "./SFNTHeader", "./DirectoryEntry"], function(
         }
       })
 
-      // assemble the final font data into one "file"
-      return headerBlock.concat(directoryBlock).concat(dataBlock);
+      // And then assemble the final font data into one "file",
+      // making sure the checkSumAdjustment value in the <head>
+      // table is based on the final serialized font data.
+      var font = headerBlock.concat(directoryBlock).concat(dataBlock);
+      var checksum = dataBuilding.computeChecksum(font);
+      return font.slice(0, offsets["head"] + 8)
+                 .concat(dataBuilding.encoder.ULONG(0xB1B0AFBA - checksum))
+                 .concat(font.slice(offsets["head"] + 12));
     }
   };
 

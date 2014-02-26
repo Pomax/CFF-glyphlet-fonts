@@ -13,7 +13,7 @@ define(["../struct", "../atou", "../dataBuilding", "./name/NameRecords"], functi
    * Name table constructor
    */
   var name = function(input) {
-    this.strings = [];
+    this.strings = {};
     if(!this.parse(input)) {
       input = input || {};
       input.format = input.format || 0;
@@ -40,14 +40,20 @@ define(["../struct", "../atou", "../dataBuilding", "./name/NameRecords"], functi
    */
   name.prototype.buildDataStructure = function(strings) {
     var nameRecords = new NameRecords();
-    var strings = this.strings, string, ustring, recordID;
+    var strings = this.strings,
+        string,
+        ustring,
+        recordID;
     Object.keys(strings).forEach(function(key) {
       recordID = parseInt(key, 10);
+      // store for {macintosh / roman / english}
       string = strings[key];
+      nameRecords.addRecord(recordID,  string, 1, 0, 0);
+      // store for {windows / Unicode BMP (UCS-2) / US English}
       ustring = atou(string);
-      nameRecords.addRecord(recordID,  string, 1, 0, 0);       // {macintosh / roman / english}
-      nameRecords.addRecord(recordID, ustring, 3, 1, 0x0409);  // {windows / Unicode BMP (UCS-2) / US English}
+      nameRecords.addRecord(recordID, ustring, 3, 1, 0x0409);
     });
+    nameRecords.finalise();
     return {
       nameRecords: nameRecords.records,
       nameRecordLength: nameRecords.offset,
@@ -90,11 +96,11 @@ define(["../struct", "../atou", "../dataBuilding", "./name/NameRecords"], functi
    * into a name table structure.
    */
   name.prototype.finalise = function() {
-    this.count = Object.keys(this.strings).length;
     var data = this.buildDataStructure();
-    this.stringOffset = this.offset("NameRecords") + data.nameRecordLength;
+    this.count = data.nameRecords.length;
     this.NameRecords = data.nameRecords;
     this.StringData = data.nameStrings;
+    this.stringOffset = this.offset("StringData");
   };
 
   return name;

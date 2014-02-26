@@ -52,7 +52,7 @@ define(["Mapper"], function(Mapper) {
   sizeOf.CHAR  = function() { return 1; };
 
   encoder.CHARARRAY = function CHARARRAY(v) { return v.split('').map(function(v) { return v.charCodeAt(0); }); };
-  decoder.CHARARRAY = function CHARARRAY(v) { return v.map(function(v) { return String.fromCharCode(v); }).join(); };
+  decoder.CHARARRAY = function CHARARRAY(v) { return v.map(function(v) { return String.fromCharCode(v); }).join(''); };
   sizeOf.CHARARRAY  = function(a) { return a.length; };
 
   encoder.USHORT = function USHORT(v) { return [(v >> 8) & 0xFF, v & 0xFF]; };
@@ -186,6 +186,7 @@ define(["Mapper"], function(Mapper) {
    */
   encoder.LITERAL = function LITERAL(array) { return array; };
   decoder.LITERAL = encoder.LITERAL;
+  sizeOf.LITERAL = function(v) { if(v.toData) return v.toData().length; return v.length; };
 
   /**
    * Helper function for decoding strings as ULONG

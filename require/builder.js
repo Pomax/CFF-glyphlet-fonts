@@ -181,7 +181,7 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
        * format 4 subtable for our implemented glyphs.
        */
       font.cmap = new font.cmap({ version: 0 });
-      font.cmap.addTable(4, { letters: globals.letters });
+      font.cmap.addTable({ format: 4, letters: globals.letters });
       font.cmap.finalise();
 
 
@@ -191,9 +191,17 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
        * bits of metadata *about* the font and its glyphs.
        *
        * It's also the most complex bit (closely followed
-       * by the GSUB table for ligature substitution).
+       * by the GSUB table for ligature substitution), which
+       * is why the CFF table isn't actually a struct, but
+       * a somewhat different bytecode generator.
        */
       font["CFF "] = new font["CFF "](globals);
+
+
+      /**
+       * Finally, if there was a "label", we need some GSUB magic
+       */
+//      if(globals.label) { font.GSUB = new font.GSUB(globals); }
 
       // we're done.
       return sfnt;

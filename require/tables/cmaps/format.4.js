@@ -3,7 +3,6 @@ define(["../../struct", "./format4/Segments"], function(Table, Segments){
   var format4 = function(input) {
     if(!this.parse(input)) {
       input = input || {};
-      input.format = 4;
       input.language = 0;
       this.fill(input);
       this.build(input);
