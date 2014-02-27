@@ -4,6 +4,45 @@ define(["struct"], function(Table){
   var OS_2 = function(input) {
     if(!this.parse(input)) {
       input = input || {};
+      // standard font = font classification 0 ("Regular")
+      input.sFamilyClass= input.sFamilyClass || 0;
+      input.fsType = input.fsType || 0;
+      // we don't really care about the sub/super/strikeout values:
+      input.ySubscriptXSize = input.ySubscriptXSize || 0;
+      input.ySubscriptYSize = input.ySubscriptYSize || 0;
+      input.ySubscriptXOffset = input.ySubscriptXOffset || 0;
+      input.ySubscriptYOffset = input.ySubscriptYOffset || 0;
+      input.ySuperscriptXSize = input.ySuperscriptXSize || 0;
+      input.ySuperscriptYSize = input.ySuperscriptYSize || 0;
+      input.ySuperscriptXOffset = input.ySuperscriptXOffset || 0;
+      input.ySuperscriptYOffset = input.ySuperscriptYOffset || 0;
+      input.yStrikeoutSize = input.yStrikeoutSize || 0;
+      input.yStrikeoutPosition = input.yStrikeoutPosition || 0;
+      // Oh look! A trademarked classification system the bytes
+      // for which cannot be legally set unless you pay HP.
+      // Why this is part of the OS/2 table instead of its own
+      // proprietary table I will likely never truly know.
+      input.bFamilyType = input.bFamilyType || 0;
+      input.bSerifStyle = input.bSerifStyle || 0;
+      input.bWeight = input.bWeight || 0;
+      input.bProportion = input.bProportion || 0;
+      input.bContrast = input.bContrast || 0;
+      input.bStrokeVariation = input.bStrokeVariation || 0;
+      input.bArmStyle = input.bArmStyle || 0;
+      input.bLetterform = input.bLetterform || 0;
+      input.bMidline = input.bMidline || 0;
+      input.bXHeight = input.bXHeight || 0;
+      input.ulUnicodeRange1 = input.ulUnicodeRange1 || 0;
+      input.ulUnicodeRange2 = input.ulUnicodeRange2 || 0;
+      input.ulUnicodeRange3 = input.ulUnicodeRange3 || 0;
+      input.ulUnicodeRange4 = input.ulUnicodeRange4 || 0;
+      input.ulCodePageRange1 = input.ulCodePageRange1 || 0;
+      input.ulCodePageRange2 = input.ulCodePageRange2 || 0;
+      // We don't care all too much about the next 5 values, but they're
+      // required for an OS/2 version 2, 3, or 4 table.
+      input.sxHeight = input.sxHeight || 0;
+      input.sCapHeight = input.sCapHeight ||  0;
+      input.usDefaultChar = input.usDefaultChar || 0;
       this.fill(input);
       if(input.version < 2) {
        this.unset(["sxHeight","sCapHeight","usDefaultChar","usBreakChar","usMaxContext"]);

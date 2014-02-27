@@ -292,7 +292,7 @@ define(["struct", "dataBuilding"], function(Table, dataBuilder){
   };
 
   CFF.prototype = new Table([
-    ["datablock", "LITERAL", "we're not going to do this as a struct right now."]
+    ["datablock", "LITERAL", "we're not going to do this as a struct build-up right now."]
   ]);
 
   CFF.prototype.constructor = CFF;

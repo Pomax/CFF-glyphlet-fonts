@@ -4,6 +4,18 @@ define(["struct"], function(Table){
   var head = function(input) {
     if(!this.parse(input)) {
       input = input || {};
+      input.version = input.version || 0x00010000;
+      input.fontRevision = input.fontRevision || 0x00010000;
+      input.checkSumAdjustment = input.checkSumAdjustment || 0;
+      input.magicNumber =  0x5F0F3CF5;
+      input.created = input.created || 0;
+      input.modified = input.modified || 0;
+      input.flags = input.flags || 0; // see http://www.microsoft.com/typography/otspec/head.htm, "flags" section
+      input.macStyle = input.macStyle || 0;
+      input.fontDirectionHint = input.fontDirectionHint || 2;
+      // these two values do not apply to CFF fonts, yet are still necessary
+      input.indexToLocFormat = input.indexToLocFormat || 0;
+      input.glyphDataFormat = input.glyphDataFormat || 0;
       this.fill(input);
     }
   };

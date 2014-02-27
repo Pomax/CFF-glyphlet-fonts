@@ -4,6 +4,14 @@ define(["struct"], function(Table){
   var hhea = function(input) {
     if(!this.parse(input)) {
       input = input || {};
+      input.version = input.version || 0x00010000;
+      input.LineGap = input.LineGap || 0;
+      input.minLeftSideBearing = input.minLeftSideBearing || 0;
+      input.minRightSideBearing = input.minRightSideBearing || 0;
+      input.caretSlopeRise = input.caretSlopeRise || 0;
+      input.caretSlopeRun = input.caretSlopeRun || 0;
+      input.caretOffset = input.caretOffset || 0;
+      input.metricDataFormat = input.metricDataFormat || 0;
       this.fill(input);
     }
   };
