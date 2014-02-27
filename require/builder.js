@@ -8,11 +8,6 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
       var font = sfnt.stub;
       var globals = formGlobals(options);
 
-
-      // Right. Let's start create a font by defining its tables,
-      // rather than using a font design tool to do that for us.
-
-
       /**
        * Font header
        */
@@ -75,12 +70,9 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
         xAvgCharWidth: 0,
         usWeightClass: 400,
         usWidthClass: 1,
-        // we only encode the letter 'A' in the latin block,
-        // so we set bit 1 of a 128 bit sequence
-        ulUnicodeRange1: 0x00000001,
+        ulUnicodeRange1: 0x00000001, // we implement part of the latin block
         achVendID: globals.vendorId,
-        // font selection flag: bit 6 (lsb=0) is high, to indicate 'regular font'
-        fsSelection: 0x0040,
+        fsSelection: 0x0040,         // font selection flag: bit 6 (lsb=0) is high, to indicate 'regular font'
         usFirstCharIndex: globals.label ? globals.letters[0].charCodeAt(0) : globals.glyphCode,
         usLastCharIndex: globals.glyphCode,
         // vertical metrics: see http://typophile.com/node/13081 for how the hell these work.
@@ -90,7 +82,7 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
         sTypoLineGap: globals.quadSize - globals.yMax + globals.yMin,
         usWinAscent: globals.quadSize + globals.yMin,
         usWinDescent: (globals.quadSize - globals.yMax),
-        ulCodePageRange1: 0x00000001,
+        ulCodePageRange1: 0x00000001, // we implement part of the latin1 codepage
         // we have no break char, but we must point to a "not .notdef" glyphid to
         // validate as "legal font". Normally this would be the 'space' glyphid.
         usBreakChar: globals.glyphCode,
