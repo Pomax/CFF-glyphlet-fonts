@@ -108,6 +108,7 @@ define(["dataBuilding"], function(dataBuilder) {
           val;
       Object.keys(this.fields).forEach(function(field) {
         if(self.fields[field] === "LITERAL") {
+//          console.log(field);
           if(self.values[field].toData) {
             val = self.values[field].toData();
           }

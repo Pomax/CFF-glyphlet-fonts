@@ -2,17 +2,24 @@ define(["struct"], function(struct) {
   "use strict";
 
   var ScriptTable = function(input) {
-    if(!this.parse(input) {
+    this.tables = [];
+    if(!this.parse(input)) {
       input = input || {};
       input.defaultLangSys = 4;
+      var langsystables = input.LangSysTables;
+      delete input.LangSysTables;
       this.fill(input);
+      if(langsystables) {
+        this.tables = langsystables;
+        this.LangSysCount = this.tables.length;
+      }
     }
   };
 
   ScriptTable.prototype = new struct([
       ["defaultLangSys", "OFFSET",  "the langsys record to use in absence of a specific language, from start of script table"]
-    , ["LangSysCount",   "USHORT",  "this font is not language specific, so has no langsys records beyond default"]
-    , ["LangSys",        "LITERAL", "the collection of LangSys objects"]
+    , ["LangSysCount",   "USHORT",  "how many language systam tables are used?"]
+    , ["LangSysTables",  "LITERAL", "the collection of LangSys objects"]
   ]);
 
   return ScriptTable;

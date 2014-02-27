@@ -1,14 +1,15 @@
-define(["struct", "common", "ScriptList"], function(struct, common){
+define(["struct", "common", "ScriptList", "FeatureList", "LookupList", "LangSysTable"], function(struct, common, ScriptList, FeatureList, LookupList, LangSysTable){
   "use strict";
 
   var GSUB = function(input) {
+    this.scripts  = new ScriptList();
+    this.features = new FeatureList();
+    this.lookups  = new LookupList();
+
     if(!this.parse(input)) {
       input = input || {};
       input.version = input.version || 0x00010000;
-      this.ScriptListOffset = 10; // scriptlist starts immediately after the GSUB header
-      this.ScriptList  = new ScriptList();
-      this.FeatureList = new FeatureList();
-      this.LookupList  = new LookupList();
+      input.ScriptListOffset = 10; // scriptlist starts immediately after the GSUB header
       this.fill(input);
     }
   };
@@ -27,26 +28,26 @@ define(["struct", "common", "ScriptList"], function(struct, common){
 
   GSUB.prototype.constructor = GSUB;
 
-  GSUB.prototype.addScript = function() {
-    this.ScriptList.addScript.call(this.ScriptList, arguments);
+  GSUB.prototype.addScript = function(options) {
+    return this.scripts.addScript(options)
   };
 
-  GSUB.prototype.addFeature = function() {
-    this.FeatureList.addFeature.call(this.FeatureList, arguments);
+  GSUB.prototype.addFeature = function(options) {
+    return this.features.addFeature(options);
   };
 
-  GSUB.prototype.addLookup = function() {
-    this.LookupList.addLookup.call(this.LookupList, arguments);
+  GSUB.prototype.addLookup = function(options) {
+    return this.lookups.addLookup(options);
   };
+
+  GSUB.prototype.makeLangSys = function(options) {
+    return new LangSysTable(options);
+  }
 
   GSUB.prototype.finalize = function() {
-    var scriptlist = [],
-        featurelist = [],
-        lookuplist = [];
-    this.script.forEach(function() {
-
-    });
-    this.ScriptList = this.scriptlist;
+    // finalise in reverse order: first the lookup list,
+    // then the feature list, then the script list.
+    this.LookupList = this.lookups.finalize();
   }
 
   return GSUB;

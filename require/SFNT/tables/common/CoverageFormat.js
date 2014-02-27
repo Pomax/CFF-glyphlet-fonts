@@ -2,7 +2,7 @@ define(["struct"], function(struct) {
 	"use strict";
 
   var CoverageFormat1 = function(input) {
-    if(!this.parse(input) {
+    if(!this.parse(input)) {
       input = input || {};
       input.CoverageFormat = 1;
       this.fill(input);
@@ -16,7 +16,7 @@ define(["struct"], function(struct) {
   ]);
 
   var CoverageFormat2 = function(input) {
-    if(!this.parse(input) {
+    if(!this.parse(input)) {
       input = input || {};
       input.CoverageFormat = 2;
       this.fill(input);

@@ -2,7 +2,7 @@ define(["struct"], function(struct) {
   "use strict";
 
   var ScriptRecord = function(input) {
-    if(!this.parse(input) {
+    if(!this.parse(input)) {
       input = input || {};
       input.ScriptTag = "DFLT";
       this.fill(input);

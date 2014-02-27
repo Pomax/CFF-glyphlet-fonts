@@ -4,7 +4,7 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
   return {
   	build: function (options) {
 	    var sfnt = new SFNT();
-	    sfnt.use(["CFF ","OS/2","cmap","head","hhea","hmtx","maxp","name","post"]);
+	    sfnt.use(["CFF ","GSUB", "OS/2","cmap","head","hhea","hmtx","maxp","name","post"]);
       var font = sfnt.stub;
       var globals = formGlobals(options);
 
@@ -123,14 +123,60 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
 
 
       /**
-       * Finally, if there was a "label", we need some GSUB magic
+       * Finally, if there was a "label", we need some GSUB magic.
+       * note: this shit is complex. Properly.
        */
-//      if(globals.label) {
-//        font.GSUB = new font.GSUB(globals);
-//        var lookup = font.GSUB.addLookup({ ... });
-//        var feature = font.GSUB.addFeature({ ... }, lookup);
-//        var script = font.GUB.addScript({ ... }, feature};
-//      }
+      if(globals.label) {
+        font.GSUB = new font.GSUB(globals);
+
+        // step 1: add a ligature lookup. This takes a bit of work.
+        //         Also note this is now just a "loose" lookup.
+
+        var inputs = globals.letters.slice();
+        inputs.splice(0,1);
+        inputs.splice(inputs.length-1,1);
+
+        // GSUB lookup type 4 is for the "many-to-one substitution" effect
+        var lookup = font.GSUB.addLookup({ LookupType: 4 });
+
+        var subtable = lookup.addSubTable();
+
+        // this defines the distinct starting letters for one
+        // or more ligatures that are used in the font.
+        var converage = subtable.addCoverage({
+          format: 1,
+          GlyphCount: inputs.length,
+          GlyphArray: inputs
+        });
+
+        var ligatureSet = subtable.addLigatureSet();
+
+        // ultimately, this is the thing we really care about:
+        var ligatureTable = ligatureSet.addLigatureTable({
+          LigGlyph: globals.letters.length,
+          CompCount: globals.label.length,
+          Components: globals.label.split('').map(function(v) { return 1 + globals.letters.indexOf(v); })
+        });
+
+        // step 2: wrap this lookup as a ligature feature. This feature
+        //         is also just a "loose" feature, but at least we now
+        //         know that it's a ligature feature.
+
+        var feature = font.GSUB.addFeature({ FeatureTag: "liga", lookups: [lookup] });
+
+        // step 3: now say for which script(s) this feature should kick in.
+        //         This requires first defining a language systam, and then
+        //         for that language system, defining one or more scripts
+        //         to use our feature. Yeah: this is extremely graphy.
+
+        var defaultLangSys = font.GSUB.makeLangSys({ features: [feature] });
+        font.GSUB.addScript({ ScriptTag: "DFLT", LangSysTables: [defaultLangSys] });
+        font.GSUB.addScript({ ScriptTag: "latn", LangSysTables: [defaultLangSys] });
+
+        // Now, wasn't that fun? Step last: make this permanent
+        font.GSUB.finalize();
+        delete font.GSUB;
+      }
 
       // we're done.
       return sfnt;
