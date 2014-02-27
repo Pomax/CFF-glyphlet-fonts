@@ -21,6 +21,13 @@ define(["Mapper"], function(Mapper) {
           }
           tally %= Math.pow(2,32);
           return tally;
+        },
+        // this function probably shouldn't exist...
+        decodeULONG: function(input) {
+          var b = input.split ? input.split('').map(function(c) { return c.charCodeAt(0); }) : input;
+          var val = (b[0] << 24) + (b[1] << 16) + (b[2] << 8) + b[3];
+          if (val < 0 ) { val += Math.pow(2,32); }
+          return val;
         }
       };
 

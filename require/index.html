@@ -10,21 +10,28 @@
   </head>
 
   <body>
-    <div id="tables">tables go here.</div>
+    <p>Let's test this font: <span style="font-family: customfont">~</span></p>
+    <div id="tables"></div>
+    <script>require(["builder", "buildTables", "addStyleSheet"], function(builder, buildTables, addStyleSheet) {"use strict";
 
-    <!-- require config -->
-    <script>require(["builder", "utils/buildTables"], function(builder, buildTables) {"use strict";
 
       var y = -120;
+
       var outline = "M  20 "+(100 + y) + " L  20 "+(800 + y) + " 700 "+(800 + y) + " 700 "+(100 + y) + " 20 "+(100 + y)
                   + "M 170 "+(250 + y) + " L 550 "+(250 + y) + " 550 "+(650 + y) + " 170 "+(650 + y);
+
       var options = {
         outline: outline,
         label: "custom",
         minimal: false
       };
+
       var font = builder.build(options);
+
       buildTables(font, window, true, "#tables", "custom font", "test");
+
+      addStyleSheet(font, "customfont");
+
 
     });</script>
   </body>
