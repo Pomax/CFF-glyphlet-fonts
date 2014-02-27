@@ -1,4 +1,4 @@
-define(["struct", "common"], function(struct, common){
+define(["struct"], function(struct){
   "use strict";
 
   var GDEF = function(input) {
@@ -8,7 +8,10 @@ define(["struct", "common"], function(struct, common){
     }
   };
 
-  GDEF.prototype = new common();
+  GDEF.prototype = new struct([
+    //...
+  ]);
+
   GDEF.prototype.constructor = GDEF;
 
   return GDEF;

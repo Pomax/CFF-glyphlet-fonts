@@ -1,4 +1,4 @@
-define(["struct", "common"], function(struct, common){
+define(["struct"], function(struct){
   "use strict";
 
   var BASE = function(input) {
@@ -8,7 +8,10 @@ define(["struct", "common"], function(struct, common){
     }
   };
 
-  BASE.prototype = new common();
+  BASE.prototype = new struct([
+    //...
+  ]);
+
   BASE.prototype.constructor = BASE;
 
   return BASE;

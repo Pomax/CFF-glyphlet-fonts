@@ -1,4 +1,4 @@
-define(["struct", "common"], function(struct, common){
+define(["struct"], function(struct){
   "use strict";
 
   var JSTF = function(input) {
@@ -8,7 +8,10 @@ define(["struct", "common"], function(struct, common){
     }
   };
 
-  JSTF.prototype = new common();
+  JSTF.prototype = new struct([
+    //...
+  ]);
+
   JSTF.prototype.constructor = JSTF;
 
   return JSTF;

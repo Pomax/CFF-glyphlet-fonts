@@ -1,4 +1,4 @@
-define(["struct", "common"], function(struct, common){
+define(["struct"], function(struct){
   "use strict";
 
   var GPOS = function(input) {
@@ -8,7 +8,10 @@ define(["struct", "common"], function(struct, common){
     }
   };
 
-  GPOS.prototype = new common();
+  GPOS.prototype = new struct([
+    //...
+  ]);
+
   GPOS.prototype.constructor = GPOS;
 
   return GPOS;

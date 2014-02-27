@@ -1,4 +1,4 @@
-define(["struct", "common", "ScriptList", "FeatureList", "LookupList", "LangSysTable"], function(struct, common, ScriptList, FeatureList, LookupList, LangSysTable){
+define(["struct", "ScriptList", "FeatureList", "LookupList", "LangSysTable"], function(struct, ScriptList, FeatureList, LookupList, LangSysTable){
   "use strict";
 
   var GSUB = function(input) {
