@@ -1,4 +1,4 @@
-define(["struct", "LongHorMetric"], function(Table, LongHorMetric){
+define(["struct", "LongHorMetric"], function(struct, LongHorMetric){
   "use strict";
 
   var hmtx = function(input, numberOfHMetrics) {
@@ -8,7 +8,7 @@ define(["struct", "LongHorMetric"], function(Table, LongHorMetric){
     }
   };
 
-  hmtx.prototype = new Table();
+  hmtx.prototype = new struct();
   hmtx.prototype.constructor = hmtx;
 
   hmtx.prototype.build = function(globals, numberOfHMetrics) {

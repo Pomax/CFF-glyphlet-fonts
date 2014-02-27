@@ -1,4 +1,4 @@
-define(["struct", "atou"], function(Table, atou){
+define(["struct", "atou"], function(struct, atou){
   "use strict";
 
   /**
@@ -14,7 +14,7 @@ define(["struct", "atou"], function(Table, atou){
   /**
    * Name table definition
    */
-  StringRecord.prototype = new Table([
+  StringRecord.prototype = new struct([
     ["string", "CHARARRAY", "The string to be encoded"]
   ]);
   StringRecord.prototype.constructor = StringRecord;

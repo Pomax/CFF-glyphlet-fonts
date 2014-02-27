@@ -1,4 +1,5 @@
-define(["struct"], function(Table){
+define(["struct"], function(struct){
+  "use strict";
 
   var format12 = function(input) {
     if(!this.parse(input)) {
@@ -8,7 +9,7 @@ define(["struct"], function(Table){
     }
   };
 
-  format12.prototype = new Table([
+  format12.prototype = new struct([
     ["format", "USHORT", "subtable format"]
   ]);
 

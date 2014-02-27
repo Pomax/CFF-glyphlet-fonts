@@ -1,4 +1,4 @@
-define(["struct"], function(Table){
+define(["struct"], function(struct){
   "use strict";
 
   var post = function(input) {
@@ -17,7 +17,7 @@ define(["struct"], function(Table){
     }
   };
 
-  post.prototype = new Table([
+  post.prototype = new struct([
     ["version",            "FIXED", "post table format"]
   , ["italicAngle",        "FIXED", ""]
   , ["underlinePosition",  "FWORD", ""]

@@ -6,7 +6,7 @@
 // TEST: no mac strings
 // TEST: no windows strings
 // TODO: make the headers controllable
-define(["struct", "atou", "dataBuilding", "NameRecords"], function(Table, atou, databuilder, NameRecords) {
+define(["struct", "atou", "dataBuilding", "NameRecords"], function(struct, atou, databuilder, NameRecords) {
   "use strict";
 
   /**
@@ -25,7 +25,7 @@ define(["struct", "atou", "dataBuilding", "NameRecords"], function(Table, atou, 
   /**
    * Name table definition
    */
-  name.prototype = new Table([
+  name.prototype = new struct([
     ["format",       "USHORT", "<name> table format"]
   , ["count",        "USHORT", "Number of name records in this table"]
   , ["stringOffset", "OFFSET", "offset to the string data, relative to the table start"]

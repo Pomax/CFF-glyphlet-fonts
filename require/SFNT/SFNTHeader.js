@@ -1,4 +1,4 @@
-define(["struct"], function(Table) {
+define(["struct"], function(struct) {
   "use strict";
 
   return function(type) {
@@ -10,7 +10,7 @@ define(["struct"], function(Table) {
       }
     };
 
-    SFNTHeader.prototype = new Table([
+    SFNTHeader.prototype = new struct([
         ["version", type === "CFF" ? "CHARARRAY" : "FIXED", "either 0x0001000 for TTF, or 'OTTO' for CFF"]
       , ["numTables",     "USHORT", "number of tables in this font"]
       , ["searchRange",   "USHORT", "(Maximum power of 2 <= numTables) x 16"]
