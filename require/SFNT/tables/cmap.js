@@ -1,4 +1,4 @@
-define(["struct", "EncodingRecord", "subtables"], function(Table, EncodingRecord, subtables){
+define(["struct", "EncodingRecord", "subtables"], function(struct, EncodingRecord, subtables){
   "use strict";
 
   var cmap = function(input) {
@@ -20,7 +20,7 @@ define(["struct", "EncodingRecord", "subtables"], function(Table, EncodingRecord
     }
   };
 
-  cmap.prototype = new Table([
+  cmap.prototype = new struct([
       ["version", "USHORT", "cmap table version"]
     , ["numTables", "USHORT", "number of subtables"]
     , ["encodingRecords", "LITERAL", "array[numTables] of encoding records"]

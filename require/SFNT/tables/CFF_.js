@@ -1,4 +1,4 @@
-define(["struct", "dataBuilding"], function(Table, dataBuilder){
+define(["struct", "dataBuilding"], function(struct, dataBuilder){
   "use strict";
 
   var encoder = dataBuilder.encoder,
@@ -291,7 +291,7 @@ define(["struct", "dataBuilding"], function(Table, dataBuilder){
     }
   };
 
-  CFF.prototype = new Table([
+  CFF.prototype = new struct([
     ["datablock", "LITERAL", "we're not going to do this as a struct build-up right now."]
   ]);
 

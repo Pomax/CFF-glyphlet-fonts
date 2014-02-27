@@ -125,7 +125,12 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
       /**
        * Finally, if there was a "label", we need some GSUB magic
        */
-//      if(globals.label) { font.GSUB = new font.GSUB(globals); }
+//      if(globals.label) {
+//        font.GSUB = new font.GSUB(globals);
+//        var lookup = font.GSUB.addLookup({ ... });
+//        var feature = font.GSUB.addFeature({ ... }, lookup);
+//        var script = font.GUB.addScript({ ... }, feature};
+//      }
 
       // we're done.
       return sfnt;

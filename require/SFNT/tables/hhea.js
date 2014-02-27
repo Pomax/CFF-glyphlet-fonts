@@ -1,4 +1,4 @@
-define(["struct"], function(Table){
+define(["struct"], function(struct){
   "use strict";
 
   var hhea = function(input) {
@@ -16,7 +16,7 @@ define(["struct"], function(Table){
     }
   };
 
-  hhea.prototype = new Table([
+  hhea.prototype = new struct([
     ["version",             "FIXED",     "Table version (must be 0x00010000"]
   , ["Ascender",            "FWORD",     "Typographic ascender"]
   , ["Descender",           "FWORD",     "Typographic descender"]

@@ -1,4 +1,4 @@
-define(["struct", "common"], function(Table, common){
+define(["struct", "common"], function(struct, common){
   "use strict";
 
   var JSTF = function(input) {

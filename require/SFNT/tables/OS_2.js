@@ -1,4 +1,4 @@
-define(["struct"], function(Table){
+define(["struct"], function(struct){
   "use strict";
 
   var OS_2 = function(input) {
@@ -50,7 +50,7 @@ define(["struct"], function(Table){
     }
   };
 
-  OS_2.prototype = new Table([
+  OS_2.prototype = new struct([
     ["version",             "USHORT",    "OS/2 table version"]
   , ["xAvgCharWidth",       "SHORT",     "xAvgCharWidth"]
   , ["usWeightClass",       "USHORT",    "usWeightClass"]

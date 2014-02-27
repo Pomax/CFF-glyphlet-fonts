@@ -1,4 +1,4 @@
-define(["struct"], function(Table){
+define(["struct"], function(struct){
   "use strict";
 
   var head = function(input) {
@@ -20,7 +20,7 @@ define(["struct"], function(Table){
     }
   };
 
-  head.prototype = new Table([
+  head.prototype = new struct([
     ["version",            "FIXED",        "table version (should be 0x00010000)"]
   , ["fontRevision",       "FIXED",        "font reversion number"]
   , ["checkSumAdjustment", "ULONG",        "0xB1B0AFBA minus (ULONG sum of the entire font, computed with this value set to 0)"]

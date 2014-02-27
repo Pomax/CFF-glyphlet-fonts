@@ -1,4 +1,4 @@
-define(["struct"], function(Table) {
+define(["struct"], function(struct) {
   "use strict";
 
   var Segment = function(input) {
@@ -8,7 +8,7 @@ define(["struct"], function(Table) {
     }
   };
 
-  Segment.prototype = new Table([
+  Segment.prototype = new struct([
   	  ["end",     "USHORT", "end code for this segment"]
   	, ["start",   "USHORT", "start code for this segment"]
   	, ["delta",   "SHORT",  "delta to ensure continuous sequence wrt previous segments"]

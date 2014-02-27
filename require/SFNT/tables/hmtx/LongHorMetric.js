@@ -1,4 +1,4 @@
-define(["struct"], function(Table){
+define(["struct"], function(struct){
   "use strict";
 
   /**
@@ -14,7 +14,7 @@ define(["struct"], function(Table){
   /**
    *
    */
-  LongHorMetric.prototype = new Table([
+  LongHorMetric.prototype = new struct([
       ["advanceWidth", "USHORT", ""]
     , ["lsb",          "SHORT",  ""]
   ]);

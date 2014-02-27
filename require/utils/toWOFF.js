@@ -1,4 +1,4 @@
-define(["struct", "dataBuilding"], function(Table, dataBuilder) {
+define(["struct", "dataBuilding"], function(struct, dataBuilder) {
 
   /**
    * repackage an SFNT block as WOFF
@@ -22,7 +22,7 @@ define(["struct", "dataBuilding"], function(Table, dataBuilder) {
       }
     };
 
-    wOFFheader.prototype = new Table([
+    wOFFheader.prototype = new struct([
         ["signature",      "CHARARRAY", "this has to be the string 'wOFF'..."]
       , ["flavour",        "CHARARRAY", "The sfnt version of the wrapped font"]
       , ["length",         "ULONG",     "Total size of the WOFF file (placeholder, we compute this later)."]
@@ -55,7 +55,7 @@ define(["struct", "dataBuilding"], function(Table, dataBuilder) {
         this.fill(input);
       }
     };
-    wOFFdictionaryEntry.prototype = new Table([
+    wOFFdictionaryEntry.prototype = new struct([
         ["tag",          "LITERAL", "tag name"]
       , ["offset",       "ULONG",   "Offset to the data, from beginning of WOFF file"]
       , ["compLength",   "LITERAL", "length of the compressed data table"]

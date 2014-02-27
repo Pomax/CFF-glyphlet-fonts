@@ -1,4 +1,5 @@
-define(["struct", "Segments"], function(Table, Segments){
+define(["struct", "Segments"], function(struct, Segments){
+  "use strict";
 
   var format4 = function(input) {
     if(!this.parse(input)) {
@@ -9,7 +10,7 @@ define(["struct", "Segments"], function(Table, Segments){
     }
   };
 
-  format4.prototype = new Table([
+  format4.prototype = new struct([
     ["format",   "USHORT", "format 4 subtable"]
   , ["length",   "USHORT", "table length in bytes"]
   , ["language", "USHORT", "language"]

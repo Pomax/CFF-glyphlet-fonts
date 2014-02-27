@@ -1,4 +1,4 @@
-define(["struct"], function(Table) {
+define(["struct"], function(struct) {
 	"use strict";
 
   var DirectoryEntry = function(input) {
@@ -8,7 +8,7 @@ define(["struct"], function(Table) {
     }
   };
 
-  DirectoryEntry.prototype = new Table([
+  DirectoryEntry.prototype = new struct([
       ["tag",      "CHARARRAY", "4-byte identifier"]
     , ["checkSum", "ULONG", "sum-as-ULONGs for this table"]
     , ["offset",   "ULONG", "offset to this table from the beginning of the file"]

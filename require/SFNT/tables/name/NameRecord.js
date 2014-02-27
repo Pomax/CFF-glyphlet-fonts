@@ -1,4 +1,4 @@
-define(["struct"], function(Table){
+define(["struct"], function(struct){
   "use strict";
 
   /**
@@ -14,7 +14,7 @@ define(["struct"], function(Table){
   /**
    * Name table definition
    */
-  NameRecord.prototype = new Table([
+  NameRecord.prototype = new struct([
       ["platform", "USHORT", "which platform?"]
     , ["encoding", "USHORT", "which platform-specific encoding?"]
     , ["language", "USHORT", "which platform-specific language"]
