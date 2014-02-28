@@ -8,6 +8,9 @@ define(["struct", "LongHorMetric"], function(struct, LongHorMetric){
     }
   };
 
+  // FIXME: don't bypass the struct concept, even though this table
+  //        only contains a single array?
+
   hmtx.prototype = new struct();
   hmtx.prototype.constructor = hmtx;
 

@@ -2,8 +2,7 @@ define(["struct", "FeatureRecord", "FeatureTable"], function(struct, FeatureReco
   "use strict";
 
   var FeatureList = function(input) {
-    this.records = [];
-    this.tables = [];
+    this.pairs = [];
     if(!this.parse(input)) {
       input = input || {};
       this.fill(input);
@@ -21,12 +20,33 @@ define(["struct", "FeatureRecord", "FeatureTable"], function(struct, FeatureReco
       FeatureTag: options.FeatureTag
     });
     delete options.FeatureTag;
-    this.records.push(featureRecord);
-
     var featureTable = new FeatureTable(options);
-    this.tables.push(featureTable);
+    this.pairs.push({
+      record: featureRecord,
+      table: featureTable,
+      finalize: function(idx) {
+        this.record.Offset = idx;
+        this.table.finalize(idx);
+      }
+    });
     return featureTable;
-  }
+  };
+
+  FeatureList.prototype.finalize = function() {
+    this.FeatureCount = this.pairs.length;
+    this.pairs.sort(function(a,b) {
+      return a.record.FeatureTag < b.record.FeatureTag ? -1 : 1;
+    });
+    var rdata = [],
+        tdata = [];
+    this.pairs.forEach(function(p, idx) {
+      p.finalize(idx);
+      rdata = rdata.concat(p.record.toData());
+      tdata = tdata.concat(p.table.toData());
+    });
+    this.FeatureRecords = rdata;
+    this.FeatureTables = tdata;
+  };
 
   return FeatureList
 });

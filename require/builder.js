@@ -1,4 +1,4 @@
-define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
+define(["SFNT", "formGlobals", "asNumbers", "shimie"], function(SFNT, formGlobals, asNumbers) {
   "use strict";
 
   return {
@@ -7,6 +7,7 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
 	    sfnt.use(["CFF ","GSUB", "OS/2","cmap","head","hhea","hmtx","maxp","name","post"]);
       var font = sfnt.stub;
       var globals = formGlobals(options);
+
 
       /**
        * Font header
@@ -31,6 +32,7 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
         xMaxExtent: globals.xMax - globals.xMin,
         numberOfHMetrics: globals.letters ? 1 + globals.letters.length : 2
       });
+
 
       /**
        * Horizontal metrics table
@@ -67,12 +69,8 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
       font["OS/2"] = new font["OS/2"]({
         // we use version 3, so we can pass Microsoft's "Font Validator"
         version: 0x0003,
-        xAvgCharWidth: 0,
-        usWeightClass: 400,
-        usWidthClass: 1,
         ulUnicodeRange1: 0x00000001, // we implement part of the latin block
         achVendID: globals.vendorId,
-        fsSelection: 0x0040,         // font selection flag: bit 6 (lsb=0) is high, to indicate 'regular font'
         usFirstCharIndex: globals.label ? globals.letters[0].charCodeAt(0) : globals.glyphCode,
         usLastCharIndex: globals.glyphCode,
         // vertical metrics: see http://typophile.com/node/13081 for how the hell these work.
@@ -82,7 +80,8 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
         sTypoLineGap: globals.quadSize - globals.yMax + globals.yMin,
         usWinAscent: globals.quadSize + globals.yMin,
         usWinDescent: (globals.quadSize - globals.yMax),
-        ulCodePageRange1: 0x00000001, // we implement part of the latin1 codepage
+        // we implement part of the latin1 codepage
+        ulCodePageRange1: 0x00000001,
         // we have no break char, but we must point to a "not .notdef" glyphid to
         // validate as "legal font". Normally this would be the 'space' glyphid.
         usBreakChar: globals.glyphCode,
@@ -146,7 +145,7 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
         var converage = subtable.addCoverage({
           format: 1,
           GlyphCount: inputs.length,
-          GlyphArray: inputs
+          GlyphArray: inputs.map(asNumbers)
         });
 
         var ligatureSet = subtable.addLigatureSet();
@@ -154,8 +153,8 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
         // ultimately, this is the thing we really care about:
         var ligatureTable = ligatureSet.addLigatureTable({
           LigGlyph: globals.letters.length,
-          CompCount: globals.label.length,
-          Components: globals.label.split('').map(function(v) { return 1 + globals.letters.indexOf(v); })
+          Components: globals.letters.slice(1, globals.letters.length-1).map(asNumbers)
+                      // we don't need letters[0] because the coverage table will imply the first letter in the ligature
         });
 
         // step 2: wrap this lookup as a ligature feature. This feature
@@ -169,13 +168,19 @@ define(["SFNT", "formGlobals", "shimie"], function(SFNT, formGlobals) {
         //         for that language system, defining one or more scripts
         //         to use our feature. Yeah: this is extremely graphy.
 
-        var defaultLangSys = font.GSUB.makeLangSys({ features: [feature] });
-        font.GSUB.addScript({ ScriptTag: "DFLT", LangSysTables: [defaultLangSys] });
-        font.GSUB.addScript({ ScriptTag: "latn", LangSysTables: [defaultLangSys] });
+        var singleLangSys = font.GSUB.makeLangSys({ features: [feature] });
+        font.GSUB.addScript({ ScriptTag: "DFLT", LangSysTables: [singleLangSys] });
+        font.GSUB.addScript({ ScriptTag: "latn", LangSysTables: [singleLangSys] });
 
-        // Now, wasn't that fun? Step last: make this permanent
+        // Now, wasn't that fun? Step last: make all these bindings stick.
         font.GSUB.finalize();
-        delete font.GSUB;
+
+        // this should be near-identical to the "non-require.js" GSUB table.
+        // TODO: verify and fix where this is not the case.
+        require(["asHex"], function(asHex) {
+          console.log( font.GSUB.toData() );
+          console.log( font.GSUB.toData().map(asHex).join(',') );
+        });
       }
 
       // we're done.

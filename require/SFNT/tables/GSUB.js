@@ -44,10 +44,17 @@ define(["struct", "ScriptList", "FeatureList", "LookupList", "LangSysTable"], fu
     return new LangSysTable(options);
   }
 
+  // finalise in reverse order: first the lookup list,
+  // then the feature list, then the script list.
   GSUB.prototype.finalize = function() {
-    // finalise in reverse order: first the lookup list,
-    // then the feature list, then the script list.
-    this.LookupList = this.lookups.finalize();
+    this.lookups.finalize();
+    this.LookupList = this.lookups.toData();
+    this.features.finalize();
+    this.FeatureList = this.features.toData();
+    this.scripts.finalize();
+    this.ScriptList  = this.scripts.toData();
+    this.FeatureListOffset = this.ScriptListOffset + this.ScriptList.length;
+    this.LookupListOffset = this.FeatureListOffset + this.FeatureList.length;
   }
 
   return GSUB;

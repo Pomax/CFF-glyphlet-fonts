@@ -4,9 +4,14 @@ define(["struct"], function(struct){
   var OS_2 = function(input) {
     if(!this.parse(input)) {
       input = input || {};
+      input.xAvgCharWidth = input.xAvgCharWidth || 0;
+      input.usWeightClass = input.usWeightClass || 400;
+      input.usWidthClass = input.usWidthClass || 1;
       // standard font = font classification 0 ("Regular")
       input.sFamilyClass= input.sFamilyClass || 0;
       input.fsType = input.fsType || 0;
+      // font selection flag: bit 6 (lsb=0) is high, to indicate 'regular font'
+      input.fsSelection = input.fsSelection || 0x0040;
       // we don't really care about the sub/super/strikeout values:
       input.ySubscriptXSize = input.ySubscriptXSize || 0;
       input.ySubscriptYSize = input.ySubscriptYSize || 0;

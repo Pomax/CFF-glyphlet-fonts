@@ -2,10 +2,9 @@ define(["struct"], function(struct) {
   "use strict";
 
   var LigatureTable = function(input) {
-    this.tables = [];
     if(!this.parse(input)) {
       input = input || {};
-      this.LigatureCount = 0;
+      input.CompCount = input.Components.length;
       this.fill(input);
     }
   };

@@ -22,6 +22,15 @@ define(["struct"], function(struct) {
     , ["LangSysTables",  "LITERAL", "the collection of LangSys objects"]
   ]);
 
+  ScriptTable.prototype.finalize = function(lookups) {
+    var data = []
+    this.tables.forEach(function(v){
+      v.finalize();
+      data = data.concat(v.toData());
+    });
+    this.LangSysTables = data;
+  };
+
   return ScriptTable;
 
 });

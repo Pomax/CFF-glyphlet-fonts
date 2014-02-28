@@ -22,11 +22,12 @@ define(["struct", "LookupTable"], function(struct, LookupTable) {
 
   LookupList.prototype.finalize = function() {
     this.LookupCount = this.tables.length;
-    this.tables.forEach(function(t) {
-      return t.finalize();
+    var data = [];
+    this.tables.forEach(function(t,idx) {
+      t.finalize(idx);
+      data = data.concat(t.toData());
     })
-    this.LookupTables = this.tables;
-    return this;
+    this.LookupTables = data;
   }
 
   return LookupList;

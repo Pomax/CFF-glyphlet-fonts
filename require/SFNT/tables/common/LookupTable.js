@@ -5,9 +5,11 @@ define(["struct", "lookups"], function(struct, lookups) {
     this.tables = [];
     if(!this.parse(input)) {
       input = input || {};
+      input.LookupFlag = input.LookupFlag || 0;
       this.fill(input);
-      if(this.UseMarkFilteringSet & 0x0010 !== 0x0010) {
-        this.unset("MarkFilteringSet");
+      // check the UseMarkFilteringSet bit in the lookup flags:
+      if((this.LookupFlag & 0x0010) !== 0x0010) {
+        this.unset(["MarkFilteringSet"]);
       }
     }
   };
@@ -26,11 +28,15 @@ define(["struct", "lookups"], function(struct, lookups) {
     return subtable;
   }
 
-  LookupTable.prototype.finalize = function() {
-    this.tables.forEach(function(t) {
-      return t.finalize();
+  LookupTable.prototype.finalize = function(idx) {
+    this.SubTableCount = this.tables.length;
+    var data = [];
+    this.tables.forEach(function(v) {
+      v.finalize()
+      data = data.concat(v.toData());
     });
-    return this;
+    this.SubTables = data;
+    this.lookupListIndex = idx;
   }
 
 

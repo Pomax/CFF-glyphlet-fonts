@@ -36,8 +36,9 @@ define(["dataBuilding"], function(dataBuilder) {
               }
               return self.values[fieldName] !== undefined ? decoder[fieldType](self.values[fieldName]) : "-";
             },
-            // store values already encoded correctly
+            // store values so that they're already encoded correctly
             set: function(v) {
+//              console.log(fieldName, "-", v);
               self.values[fieldName] = v.encode ? v.encode() : encoder[fieldType](v);
             }
           });

@@ -1,7 +1,7 @@
-define(["struct"], function(struct) {
+define(["struct", "dataBuilding"], function(struct, dataBuilder) {
   "use strict";
 
-  var LangSys = function(input) {
+  var LangSysTable = function(input) {
     this.features = [];
     if(!this.parse(input)) {
       input = input || {};
@@ -11,17 +11,26 @@ define(["struct"], function(struct) {
       this.fill(input);
       if(features) {
         this.features = features;
+        this.FeatureCount = features.length;
       }
     }
   };
 
-  LangSys.prototype = new struct([
+  LangSysTable.prototype = new struct([
       ["LookupOrder",     "PADDING2",  "reserved value. Because why not"]
     , ["ReqFeatureIndex", "USHORT",  "the one required feature that must always be enabled, or 0xFFFF if there are none"]
     , ["FeatureCount",    "USHORT",  "Number of FeatureIndex values for this language system, excluding the required one"]
     , ["FeatureIndex",    "LITERAL", "The indices of all the features that should be used, from the feature list (USHORT[featurecount])"]
   ]);
 
-  return LangSys;
+  LangSysTable.prototype.finalize = function() {
+    var data = [];
+    this.features.forEach(function(v){
+      data = data.concat(dataBuilder.encoder.OFFSET(v.featureListIndex));
+    });
+    this.FeatureIndex = data;
+  };
+
+  return LangSysTable;
 
 });

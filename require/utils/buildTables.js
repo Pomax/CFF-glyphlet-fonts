@@ -1,4 +1,4 @@
-define(function() {
+define(["asHex", "asChars"], function(asHex, asChars) {
   "use strict";
 
   return function buildTables(font, context, legible, selector, cssFontFamily, tableCaption) {
@@ -6,18 +6,6 @@ define(function() {
     // top element
     var top = document.querySelector(selector);
     var create = function(v) { return document.createElement(v); };
-
-    // array to hex filter
-    function asHex(v) {
-       v = v.toString(16).toUpperCase();
-       if(v.length === 1) v = "0" + v;
-       return v;
-    }
-
-    // array to string filter
-    function asChars(v) {
-      return String.fromCharCode(v);
-    }
 
     // array to HTML table function
     function makeTable(data, limit) {
