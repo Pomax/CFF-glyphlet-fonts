@@ -1,4 +1,4 @@
-define(["struct", "LookupTable"], function(struct, LookupTable) {
+define(["struct", "makeStructy", "LookupTable"], function(struct, makeStructy, LookupTable) {
   "use strict";
 
   var LookupList = function(input) {
@@ -22,12 +22,12 @@ define(["struct", "LookupTable"], function(struct, LookupTable) {
 
   LookupList.prototype.finalize = function() {
     this.LookupCount = this.tables.length;
-    var data = [];
+    var lookuptables = [];
     this.tables.forEach(function(t,idx) {
       t.finalize(idx);
-      data = data.concat(t.toData());
+      lookuptables.push(t);
     })
-    this.LookupTables = data;
+    this.LookupTables = makeStructy(lookuptables);
   }
 
   return LookupList;

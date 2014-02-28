@@ -1,4 +1,4 @@
-define(["struct", "dataBuilding"], function(struct, dataBuilder) {
+define(["struct", "makeStructy", "dataBuilding"], function(struct, makeStructy, dataBuilder) {
   "use strict";
 
   var LangSysTable = function(input) {
@@ -24,11 +24,7 @@ define(["struct", "dataBuilding"], function(struct, dataBuilder) {
   ]);
 
   LangSysTable.prototype.finalize = function() {
-    var data = [];
-    this.features.forEach(function(v){
-      data = data.concat(dataBuilder.encoder.OFFSET(v.featureListIndex));
-    });
-    this.FeatureIndex = data;
+    this.FeatureIndex = makeStructy(this.features.slice());
   };
 
   return LangSysTable;

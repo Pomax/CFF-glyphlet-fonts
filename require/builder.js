@@ -1,4 +1,4 @@
-define(["SFNT", "formGlobals", "asNumbers", "shimie"], function(SFNT, formGlobals, asNumbers) {
+define(["SFNT", "formGlobals", "asChars", "asNumbers", "shimie"], function(SFNT, formGlobals, asChars, asNumbers) {
   "use strict";
 
   return {
@@ -18,7 +18,6 @@ define(["SFNT", "formGlobals", "asNumbers", "shimie"], function(SFNT, formGlobal
         yMin: globals.yMin,
         xMax: globals.xMax,
         yMax: globals.yMax,
-        lowestRecPPEM: 8,
       });
 
 
@@ -69,7 +68,8 @@ define(["SFNT", "formGlobals", "asNumbers", "shimie"], function(SFNT, formGlobal
       font["OS/2"] = new font["OS/2"]({
         // we use version 3, so we can pass Microsoft's "Font Validator"
         version: 0x0003,
-        ulUnicodeRange1: 0x00000001, // we implement part of the latin block
+        // we implement part of the basic latin unicode block
+        ulUnicodeRange1: 0x00000001,
         achVendID: globals.vendorId,
         usFirstCharIndex: globals.label ? globals.letters[0].charCodeAt(0) : globals.glyphCode,
         usLastCharIndex: globals.glyphCode,
@@ -117,13 +117,16 @@ define(["SFNT", "formGlobals", "asNumbers", "shimie"], function(SFNT, formGlobal
        * by the GSUB table for ligature substitution), which
        * is why the CFF table isn't actually a struct, but
        * a somewhat different bytecode generator.
+       *
+       * It works, it just works a little different from
+       * everything else.
        */
       font["CFF "] = new font["CFF "](globals);
 
 
       /**
        * Finally, if there was a "label", we need some GSUB magic.
-       * note: this shit is complex. Properly.
+       * note: this shit is complex. Like, properly.
        */
       if(globals.label) {
         font.GSUB = new font.GSUB(globals);
@@ -144,8 +147,8 @@ define(["SFNT", "formGlobals", "asNumbers", "shimie"], function(SFNT, formGlobal
         // or more ligatures that are used in the font.
         var converage = subtable.addCoverage({
           format: 1,
-          GlyphCount: inputs.length,
-          GlyphArray: inputs.map(asNumbers)
+          GlyphCount: 1,
+          GlyphArray: [globals.label[0]]
         });
 
         var ligatureSet = subtable.addLigatureSet();
@@ -179,7 +182,9 @@ define(["SFNT", "formGlobals", "asNumbers", "shimie"], function(SFNT, formGlobal
         // TODO: verify and fix where this is not the case.
         require(["asHex"], function(asHex) {
           console.log( font.GSUB.toData() );
+          console.log( font.GSUB.toString() );
           console.log( font.GSUB.toData().map(asHex).join(',') );
+          console.log( font.GSUB.toData().map(asChars).join(',') );
         });
       }
 

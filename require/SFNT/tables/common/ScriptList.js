@@ -1,4 +1,4 @@
-define(["struct", "ScriptRecord", "ScriptTable"], function(struct, ScriptRecord, ScriptTable) {
+define(["struct", "makeStructy", "ScriptRecord", "ScriptTable"], function(struct, makeStructy, ScriptRecord, ScriptTable) {
   "use strict";
 
   var ScriptList = function(input) {
@@ -37,15 +37,15 @@ define(["struct", "ScriptRecord", "ScriptTable"], function(struct, ScriptRecord,
     this.pairs.sort(function(a,b) {
       return a.record.ScriptTag < b.record.ScriptTag ? -1 : 1;
     });
-    var rdata = [],
-        tdata = [];
+    var records = [],
+        tables = [];
     this.pairs.forEach(function(p, idx) {
       p.finalize(idx);
-      rdata = rdata.concat(p.record.toData());
-      tdata = tdata.concat(p.table.toData());
+      records.push(p.record);
+      tables.push(p.table);
     });
-    this.ScriptRecords = rdata;
-    this.ScriptTables = tdata;
+    this.ScriptRecords = makeStructy(records);
+    this.ScriptTables = makeStructy(tables);
   };
 
   return ScriptList;

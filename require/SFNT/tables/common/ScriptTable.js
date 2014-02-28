@@ -1,4 +1,4 @@
-define(["struct"], function(struct) {
+define(["struct", "makeStructy"], function(struct, makeStructy) {
   "use strict";
 
   var ScriptTable = function(input) {
@@ -23,12 +23,12 @@ define(["struct"], function(struct) {
   ]);
 
   ScriptTable.prototype.finalize = function(lookups) {
-    var data = []
+    var langsystables = []
     this.tables.forEach(function(v){
       v.finalize();
-      data = data.concat(v.toData());
+      langsystables.push(v);
     });
-    this.LangSysTables = data;
+    this.LangSysTables = makeStructy(langsystables);
   };
 
   return ScriptTable;

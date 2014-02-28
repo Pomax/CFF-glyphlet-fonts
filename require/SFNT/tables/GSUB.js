@@ -48,11 +48,11 @@ define(["struct", "ScriptList", "FeatureList", "LookupList", "LangSysTable"], fu
   // then the feature list, then the script list.
   GSUB.prototype.finalize = function() {
     this.lookups.finalize();
-    this.LookupList = this.lookups.toData();
+    this.LookupList = this.lookups;
     this.features.finalize();
-    this.FeatureList = this.features.toData();
+    this.FeatureList = this.features;
     this.scripts.finalize();
-    this.ScriptList  = this.scripts.toData();
+    this.ScriptList  = this.scripts;
     this.FeatureListOffset = this.ScriptListOffset + this.ScriptList.length;
     this.LookupListOffset = this.FeatureListOffset + this.FeatureList.length;
   }

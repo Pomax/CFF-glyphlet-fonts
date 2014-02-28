@@ -1,4 +1,4 @@
-define(["struct", "FeatureRecord", "FeatureTable"], function(struct, FeatureRecord, FeatureTable) {
+define(["struct", "makeStructy", "FeatureRecord", "FeatureTable"], function(struct, makeStructy, FeatureRecord, FeatureTable) {
   "use strict";
 
   var FeatureList = function(input) {
@@ -37,15 +37,15 @@ define(["struct", "FeatureRecord", "FeatureTable"], function(struct, FeatureReco
     this.pairs.sort(function(a,b) {
       return a.record.FeatureTag < b.record.FeatureTag ? -1 : 1;
     });
-    var rdata = [],
-        tdata = [];
+    var records = [],
+        tables = [];
     this.pairs.forEach(function(p, idx) {
       p.finalize(idx);
-      rdata = rdata.concat(p.record.toData());
-      tdata = tdata.concat(p.table.toData());
+      records.push(p.record);
+      tables.push(p.table);
     });
-    this.FeatureRecords = rdata;
-    this.FeatureTables = tdata;
+    this.FeatureRecords = makeStructy(records);
+    this.FeatureTables = makeStructy(tables);
   };
 
   return FeatureList

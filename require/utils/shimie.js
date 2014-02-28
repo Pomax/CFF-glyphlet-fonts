@@ -1,3 +1,6 @@
+/**
+ * function naming shim for browsers that don't have Function.name
+ */
 define(function shimIE() {
   "use strict";
 	if (Function.prototype.name === undefined && Object.defineProperty !== undefined) {

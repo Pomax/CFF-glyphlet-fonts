@@ -12,7 +12,9 @@ define(["struct"], function(struct){
       input.modified = input.modified || 0;
       input.flags = input.flags || 0; // see http://www.microsoft.com/typography/otspec/head.htm, "flags" section
       input.macStyle = input.macStyle || 0;
-      input.fontDirectionHint = input.fontDirectionHint || 2;
+      input.lowestRecPPEM = input.lowestRecPPEM || 8,
+      // obsolete value: we force it to 2 as per spec
+      input.fontDirectionHint = 2;
       // these two values do not apply to CFF fonts, yet are still necessary
       input.indexToLocFormat = input.indexToLocFormat || 0;
       input.glyphDataFormat = input.glyphDataFormat || 0;

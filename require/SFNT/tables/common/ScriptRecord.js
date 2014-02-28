@@ -4,7 +4,7 @@ define(["struct"], function(struct) {
   var ScriptRecord = function(input) {
     if(!this.parse(input)) {
       input = input || {};
-      input.ScriptTag = "DFLT";
+      input.ScriptTag = input.ScriptTag || "DFLT";
       this.fill(input);
     }
   };

@@ -1,4 +1,4 @@
-define(["struct", "dataBuilding", "CoverageFormat", "LigatureSet"], function(struct, dataBuilder, CoverageFormat, LigatureSet) {
+define(["struct", "makeStructy", "dataBuilding", "CoverageFormat", "LigatureSet"], function(struct, makeStructy, dataBuilder, CoverageFormat, LigatureSet) {
   "use strict";
 
   var LookupType4 = function(input) {
@@ -38,24 +38,24 @@ define(["struct", "dataBuilding", "CoverageFormat", "LigatureSet"], function(str
   LookupType4.prototype.finalize = function() {
     this.LigSetCount = this.ligaturesets.length;
     this.Coverage = 6 + 2 * this.LigSetCount;
-    var data = [];
+    var coverage = [];
     this.coverage.forEach(function(v){
-      data = data.concat(v.toData());
+      coverage.push(v);
     });
-    this.CoverageTables = data;
+    this.CoverageTables = makeStructy(coverage);
 
-    var distance = this.Coverage + data.length;
+    var distance = this.Coverage + coverage.length;
     var offsets = [];
 
-    data = [];
+    var ligaturesets = [];
     this.ligaturesets.forEach(function(v) {
       v.finalize();
-      offsets.push(distance + data.length);
-      data = data.concat(v.toData());
+      offsets.push(distance + ligaturesets.length);
+      ligaturesets.push(v);
     });
-    this.LigatureSetTables = data;
+    this.LigatureSetTables = makeStructy(ligaturesets);
 
-    data = [];
+    var data = [];
     offsets.forEach(function(v) {
       data = data.concat(dataBuilder.encoder.USHORT(v));
     });
