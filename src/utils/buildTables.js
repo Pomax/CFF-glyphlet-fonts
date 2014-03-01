@@ -1,7 +1,7 @@
-define(["asHex", "asChars"], function(asHex, asChars) {
+define(["toWOFF", "asHex", "asChars"], function(toWOFF, asHex, asChars) {
   "use strict";
 
-  return function buildTables(font, context, legible, selector, cssFontFamily, tableCaption) {
+  return function buildTables(font, context, selector, cssFontFamily, tableCaption) {
 
     // top element
     var top = document.querySelector(selector);
@@ -65,7 +65,7 @@ define(["asHex", "asChars"], function(asHex, asChars) {
       return table;
     }
 
-    function formTables(hexmap, charmap) {
+    function formTables(font, hexmap, charmap) {
       top.classList.add("tables");
       top.appendChild(makeTable(hexmap));
       top.appendChild(makeTable(charmap));
@@ -74,10 +74,20 @@ define(["asHex", "asChars"], function(asHex, asChars) {
       downloads.classList.add("downloads");
 
       // plain .otf file
+      var s = create("span");
+      s.innerHTML = tableCaption;
+      downloads.appendChild(s);
+
       var a = create("a");
-      a.innerHTML = "download opentype font";
+      a.innerHTML = "download as opentype font";
       a.download = "customfont.otf";
       a.href = "data:application/octet-stream;base64," + btoa(charmap.join(''));
+      downloads.appendChild(a);
+
+      a = create("a");
+      a.innerHTML = "download as WOFF version";
+      a.download = "customfont.woff";
+      a.href = "data:application/octet-stream;base64," + btoa(toWOFF(font).map(asChars).join(''));
       downloads.appendChild(a);
 
       top.appendChild(downloads);
@@ -86,7 +96,7 @@ define(["asHex", "asChars"], function(asHex, asChars) {
     var binary = font.toData();
     var hexmap = binary.map(asHex);
     var charmap = binary.map(asChars);
-    formTables(hexmap, charmap);
+    formTables(font, hexmap, charmap);
   };
 
 });
