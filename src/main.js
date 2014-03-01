@@ -1,10 +1,10 @@
-(function() {
+(function setupRequireJS() {
 
   var paths = {};
 
   var extend = function(location, files) {
-    files.forEach(function(file) {
-      paths[file] = "src/" + location + "/" + file;
+    files.forEach(function(filename) {
+      paths[filename] = "src/" + location + "/" + filename;
     });
   };
 
@@ -20,11 +20,11 @@
   extend("SFNT/tables/hmtx",          ["LongHorMetric"]);
   extend("SFNT/tables/name",          ["NameRecord", "NameRecords", "StringRecord"]);
 
-	require.config({
-	  baseDir:'./',
-	  paths: paths
-	});
-
-  require(["shimFname"], function(_) { /* shim the function 'name' property if necessary */ });
+  // Set up require.js for this project
+  require.config({
+    baseUrl: ".",
+    paths: paths,
+    shim: { "shimFname": {} }
+  });
 
 }());

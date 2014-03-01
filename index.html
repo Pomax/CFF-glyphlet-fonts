@@ -6,11 +6,12 @@
     <title>Font building</title>
     <link rel="stylesheet" href="style.css">
     <script src="require.js"></script>
-    <script src="src/require.config.js"></script>
+    <!-- can't turn this into data-main, because then paths resolve completely wrong -->
+    <script src="src/main.js"></script>
   </head>
 
   <body>
-    <p>Let's test this font: <span class="custom">~</span>, and <span class="custom">custom</span></p>
+    <p>Let's test this font: <span class="custom">~</span>, and <span class="custom">custom</span>.</p>
     <div id="tables"></div>
     <script>require(["builder", "buildTables", "addStyleSheet"], function(builder, buildTables, addStyleSheet) {"use strict";
 
