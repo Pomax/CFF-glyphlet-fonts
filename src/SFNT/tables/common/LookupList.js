@@ -25,13 +25,13 @@ define(["struct", "makeStructy", "LookupTable", "dataBuilding"], function(struct
     this.LookupCount = this.tables.length;
     var lookuptables = [];
     var offsets = [];
-    var offset = 0;
+    var offset = 2 + this.tables.length * 2; // USHORT values
     this.tables.forEach(function(t,idx) {
       offsets = offsets.concat(dataBuilder.encoder.USHORT(offset));
       t.finalize(idx);
       lookuptables.push(t);
       offset += t.toData().length;
-    })
+    });
     this.LookupOffsets = offsets;
     this.LookupTables = makeStructy(lookuptables);
   }

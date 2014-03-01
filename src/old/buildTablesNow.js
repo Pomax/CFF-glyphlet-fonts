@@ -202,6 +202,12 @@ function buildTables(context, legible, selector, cssFontFamily, tableCaption) {
           };
           moverfn.mapping = mapping;
           e.eventListeners.add("mouseover", moverfn);
+          e.simulate = function(eventName) {
+            var list = e.eventListeners[eventName] || [];
+            list.forEach(function(fn) {
+              fn();
+            });
+          }
 
           // mouse-out handling
           var moutfn = function moutfn(evt) {
@@ -214,6 +220,7 @@ function buildTables(context, legible, selector, cssFontFamily, tableCaption) {
           };
           moutfn.mapping = mapping;
           e.eventListeners.add("mouseout", moutfn);
+          e.simulateMouseOut = moverfn;
 
         };
         nodelist.array().forEach(colorize);

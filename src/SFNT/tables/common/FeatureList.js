@@ -24,25 +24,29 @@ define(["struct", "makeStructy", "FeatureRecord", "FeatureTable"], function(stru
     this.pairs.push({
       record: featureRecord,
       table: featureTable,
-      finalize: function(idx) {
-        this.record.Offset = idx;
+      finalize: function(featureCount, idx, offset) {
         this.table.finalize(idx);
+        this.record.Offset = 2 + featureCount * 6 + offset;
       }
     });
     return featureTable;
   };
 
   FeatureList.prototype.finalize = function() {
-    this.FeatureCount = this.pairs.length;
+    var count = this.pairs.length;
+    this.FeatureCount = count;
     this.pairs.sort(function(a,b) {
       return a.record.FeatureTag < b.record.FeatureTag ? -1 : 1;
     });
     var records = [],
-        tables = [];
+        tables = [],
+        offset = 0;
     this.pairs.forEach(function(p, idx) {
-      p.finalize(idx);
+      p.finalize(count, idx, offset);
       records.push(p.record);
       tables.push(p.table);
+      // FIXME: use a sizeOf
+      offset += p.table.toData().length;
     });
     this.FeatureRecords = makeStructy(records);
     this.FeatureTables = makeStructy(tables);

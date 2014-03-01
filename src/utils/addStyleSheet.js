@@ -1,6 +1,6 @@
 define(["asChars", "toWOFF"], function(asChars, toWOFF) {
 
-	return function(font, fontFamily) {
+	return function addStyleSheet(font, fontFamily, className) {
     // set up the .otf and .woff rules
     fontFamily = fontFamily || "custom font";
     var mime_otf = "font/opentype";
@@ -13,8 +13,9 @@ define(["asChars", "toWOFF"], function(asChars, toWOFF) {
                    , "}"].join("\n");
 
     // without this, Chrome and IE fail to render GSUB ligatures
-    var liga = [
-        ".liga {"
+    var cssClass = [""
+      , "." + className + " {"
+      , "  font-family: '" + fontFamily + "';"
       , "  -webkit-font-feature-settings: 'liga';"
       , "  -moz-font-feature-settings: 'liga=1';"
       , "  -moz-font-feature-settings: 'liga';"
@@ -22,7 +23,7 @@ define(["asChars", "toWOFF"], function(asChars, toWOFF) {
       , "  -o-font-feature-settings: 'liga';"
       , "  font-feature-settings: 'liga';"
       , "}"].join("\n");
-    //fontface += liga;
+    fontface += cssClass;
 
     // inject stylesheet
     var sheet = document.createElement("style");

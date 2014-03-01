@@ -2,7 +2,7 @@ define(["struct", "makeStructy", "dataBuilding", "CoverageFormat", "LigatureSet"
   "use strict";
 
   var LookupType4 = function(input) {
-    this.coverage = [];
+    this.coveragetables = [];
     this.ligaturesets = [];
     if(!this.parse(input)) {
       input = input || {};
@@ -13,7 +13,7 @@ define(["struct", "makeStructy", "dataBuilding", "CoverageFormat", "LigatureSet"
 
   LookupType4.prototype = new struct([
       ["SubstFormat",        "USHORT",  "lookup type 4 must be format 1"]
-    , ["Coverage",           "OFFSET",  "Offset to Coverage table, from beginning of Substitution table"]
+    , ["CoverageOffset",     "OFFSET",  "Offset to Coverage table, from beginning of Substitution table"]
     , ["LigSetCount",        "USHORT",  "Number of ligature sets"]
     , ["LigatureSetOffsets", "LITERAL", "Array of offsets to LigatureSet tables, from beginning of Substitution table; assumed ordered by Coverage Index"]
       // coverage data
@@ -24,9 +24,9 @@ define(["struct", "makeStructy", "dataBuilding", "CoverageFormat", "LigatureSet"
   LookupType4.prototype.addCoverage = function(options) {
     var format = options.format;
     delete options.format;
-    var coverage = new CoverageFormat[format](options);
-    this.coverage.push(coverage);
-    return coverage;
+    var coverageformat = new CoverageFormat[format](options);
+    this.coveragetables.push(coverageformat);
+    return coverageformat;
   };
 
   LookupType4.prototype.addLigatureSet = function(options) {
@@ -37,29 +37,25 @@ define(["struct", "makeStructy", "dataBuilding", "CoverageFormat", "LigatureSet"
 
   LookupType4.prototype.finalize = function() {
     this.LigSetCount = this.ligaturesets.length;
-    this.Coverage = 6 + 2 * this.LigSetCount;
+    this.CoverageOffset = 6 + 2 * this.LigSetCount;
     var coverage = [];
-    this.coverage.forEach(function(v){
+    this.coveragetables.forEach(function(v){
       coverage.push(v);
     });
     this.CoverageTables = makeStructy(coverage);
 
-    var distance = this.Coverage + coverage.length;
+    var offset = this.CoverageOffset + coverage.toData().length;
     var offsets = [];
 
     var ligaturesets = [];
     this.ligaturesets.forEach(function(v) {
       v.finalize();
-      offsets.push(distance + ligaturesets.length);
       ligaturesets.push(v);
+      offsets = offsets.concat(dataBuilder.encoder.USHORT(offset));
+      offset += v.toData().length;
     });
     this.LigatureSetTables = makeStructy(ligaturesets);
-
-    var data = [];
-    offsets.forEach(function(v) {
-      data = data.concat(dataBuilder.encoder.USHORT(v));
-    });
-    this.LigatureSetOffsets = data;
+    this.LigatureSetOffsets = offsets;
   };
 
   return LookupType4;

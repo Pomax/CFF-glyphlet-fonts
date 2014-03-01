@@ -3,41 +3,37 @@
 
   <head>
     <meta charset="utf-8">
-    <title>Let's make a font</title>
+    <title>Font building</title>
     <link rel="stylesheet" href="style.css">
+    <script src="require.js"></script>
+    <script src="src/require.config.js"></script>
   </head>
 
   <body>
-    <h1>Let's make a small font</h1>
-
-    <!-- this gets replaced by the on-page script -->
+    <p>Let's test this font: <span class="custom">~</span>, and <span class="custom">custom</span></p>
     <div id="tables"></div>
+    <script>require(["builder", "buildTables", "addStyleSheet"], function(builder, buildTables, addStyleSheet) {"use strict";
 
-    <p>plain test: <span style="font-family: 'custom font (small)';">~</span> (glyph "~", should be a rect. with cutout — a copy/paste should reveal "~")</p>
 
-    <hr>
+      var y = -120;
 
-    <h1>Let's also make a larger with-GSUB font</h1>
+      var outline = "M  20 "+(100 + y) + " L  20 "+(800 + y) + " 700 "+(800 + y) + " 700 "+(100 + y) + " 20 "+(100 + y)
+                  + "M 170 "+(250 + y) + " L 550 "+(250 + y) + " 550 "+(650 + y) + " 170 "+(650 + y);
 
-    <!-- this gets replaced by the on-page script -->
-    <div id="tables_small"></div>
+      var options = {
+        outline: outline,
+        label: "custom",
+        minimal: false
+      };
 
-    <p>GSUB test: <span class="liga" style="font-family: 'custom font (big)';">custom</span> (string "custom"; should also be a rect. with cutout — a copy/paste should reveal "custom")</p>
+      var font = builder.build(options);
 
-    <script src="Mapper.js"></script>
-    <script src="dataBuilding.js"></script>
-    <script src="Tables.js"></script>
-    <script>
-      Array.prototype.first = function() { return this[0]; };
-      Array.prototype.last = function() { return this[this.length-1]; };
-      NodeList.prototype.array = function() { return Array.prototype.slice.call(this); };
-      NodeList.prototype.forEach = Array.prototype.forEach;
-    </script>
-    <script src="buildTablesNow.js"></script>
-    <script>
-      buildTables(this, false, "#tables", "custom font (small)", "A minimal, full spec-conforming OpenType font");
-      buildTables(this, true, "#tables_small", "custom font (big)", "A more legible version of our full spec-conforming OpenType font");
-    </script>
+      buildTables(font, window, true, "#tables", "custom font", "test");
+
+      addStyleSheet(font, "customfont", "custom");
+
+
+    });</script>
   </body>
 
 </html>

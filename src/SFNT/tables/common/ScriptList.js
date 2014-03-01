@@ -25,15 +25,17 @@ define(["struct", "makeStructy", "ScriptRecord", "ScriptTable"], function(struct
     this.pairs.push({
       record: scriptRecord,
       table: scriptTable,
-      finalize: function(idx) {
-        this.record.Offset = idx;
+      finalize: function(scriptCount, offset) {
         this.table.finalize();
+        this.record.Offset = 2 + scriptCount * 6 + offset;
       }
     });
     return scriptTable;
   };
 
-  var duplicateTable = function(tables, table) {
+  // Do we already have a table pointing to the same langsys data?
+  // If we do, we don't want to encode it a second (or third etc) time.
+  var alreadyReferenced = function(tables, table) {
     var todata = function(v) { return v.toData(); };
     var collapse = function (arr) { return arr.map(todata).join(''); };
     var i, a, b;
@@ -46,19 +48,27 @@ define(["struct", "makeStructy", "ScriptRecord", "ScriptTable"], function(struct
   }
 
   ScriptList.prototype.finalize = function() {
-    this.ScriptCount = this.pairs.length;
+    var count = this.pairs.length;
+    this.ScriptCount = count;
     this.pairs.sort(function(a,b) {
       return a.record.ScriptTag < b.record.ScriptTag ? -1 : 1;
     });
     var records = [],
-        tables = [];
+        tables = [],
+        oldoffset = 0,
+        offset = 0;
     this.pairs.forEach(function(p, idx) {
-      if(duplicateTable(tables, p.table)) return;
-      if(tables.indexOf(p.table) === -1) {
-        p.finalize(idx);
+      if(alreadyReferenced(tables, p.table)) {
+        p.finalize(count, oldoffset);
         records.push(p.record);
-        tables.push(p.table);
+        return;
       }
+      oldoffset = offset;
+      p.finalize(count, offset);
+      records.push(p.record);
+      tables.push(p.table);
+      // FIXME: use a sizeOf
+      offset += p.table.toData().length;
     });
     this.ScriptRecords = makeStructy(records);
     this.ScriptTables = makeStructy(tables);

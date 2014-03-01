@@ -5,7 +5,7 @@ define(["struct", "dataBuilding"], function(struct, dataBuilder) {
     if(!this.parse(input)) {
       input = input || {};
       input.Components = input.Components || [];
-      input.CompCount = input.Components.length;
+      input.CompCount = 1 + input.Components.length;
       this.fill(input);
     }
   };

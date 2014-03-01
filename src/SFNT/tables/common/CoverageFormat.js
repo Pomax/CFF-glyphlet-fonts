@@ -1,5 +1,6 @@
-define(["struct"], function(struct) {
+define(["struct", "makeStructy", "dataBuilding"], function(struct, makeStructy, dataBuilder) {
 	"use strict";
+
 
   /**
    * Format 1 encodes an, effectively, unordered list of glyphs
@@ -9,6 +10,11 @@ define(["struct"], function(struct) {
     if(!this.parse(input)) {
       input = input || {};
       input.CoverageFormat = 1;
+      var data = [];
+      input.GlyphArray.forEach(function(v) {
+        data = data.concat(dataBuilder.encoder.GlyphID(v));
+      });
+      input.GlyphArray = data;
       this.fill(input);
     }
   };
@@ -18,6 +24,7 @@ define(["struct"], function(struct) {
     , ["GlyphCount",     "USHORT",  "number of glyphs"]
     , ["GlyphArray",     "LITERAL", "array of glyphs covered by this table"]
   ]);
+
 
 
   /**
@@ -43,7 +50,17 @@ define(["struct"], function(struct) {
     if(!this.parse(input)) {
       input = input || {};
       input.CoverageFormat = 2;
+      input.RangeCount = input.startGlyphs.length;
+      input.RangeRecords = input.startGlyphs.map(function(glyph, idx) {
+        return new RangeRecord({
+          Start: glyph,
+          End: glyph,
+          StartCoverageIndex: idx
+        })
+      });
+      delete input.startGlyphs;
       this.fill(input);
+      makeStructy(input.RangeRecords);
     }
   };
 
@@ -54,6 +71,7 @@ define(["struct"], function(struct) {
   ]);
 
 
+  // return a selection object based on the format
   return {
     "1": CoverageFormat1,
     "2": CoverageFormat2

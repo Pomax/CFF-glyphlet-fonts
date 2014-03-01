@@ -33,11 +33,11 @@ define(["struct", "makeStructy", "lookups", "dataBuilding"], function(struct, ma
     this.SubTableCount = this.tables.length;
     var subtables = [];
     var offsets = [];
-    var offset = 0;
+    var offset = 6 + this.tables.length * 2; // USHORT offsets
     this.tables.forEach(function(v) {
-      offsets = offsets.concat(dataBuilder.encoder.USHORT(offset));
       v.finalize()
       subtables.push(v);
+      offsets = offsets.concat(dataBuilder.encoder.USHORT(offset));
       offset += v.toData().length;
     });
     this.SubtableOffsets = offsets;
