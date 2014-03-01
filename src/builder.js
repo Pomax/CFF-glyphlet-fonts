@@ -133,7 +133,6 @@ define(["SFNT", "formGlobals", "asChars", "asGlyphIDs", "addLabelSubstitution"],
       addLabelSubstitution(font, globals)
 
 
-
       return sfnt;
     }
   };
