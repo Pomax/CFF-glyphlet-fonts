@@ -2,9 +2,9 @@ define(["SFNT", "formGlobals", "asChars", "asGlyphIDs", "addLabelSubstitution"],
   "use strict";
 
   return {
-  	build: function (options) {
-	    var sfnt = new SFNT();
-	    sfnt.use(["CFF ","GSUB", "OS/2","cmap","head","hhea","hmtx","maxp","name","post"]);
+    build: function (options) {
+      var sfnt = new SFNT();
+      sfnt.use(["CFF ","GSUB", "OS/2","cmap","head","hhea","hmtx","maxp","name","post"]);
       var font = sfnt.stub;
       var globals = formGlobals(options);
 
@@ -135,7 +135,7 @@ define(["SFNT", "formGlobals", "asChars", "asGlyphIDs", "addLabelSubstitution"],
 
 
       return sfnt;
-	  }
+    }
   };
 
 });
