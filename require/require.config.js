@@ -12,7 +12,7 @@
   };
 
   // Font-related filed
-  extend("utils",                     ["atou", "buildTables", "convertOutline", "dataBuilding", "Mapper", "shimie", "struct", "toWOFF", "addStyleSheet", "asHex", "asChars", "asNumbers", "makeStructy"]);
+  extend("utils",                     ["atou", "buildTables", "convertOutline", "dataBuilding", "Mapper", "shimFname", "struct", "toWOFF", "addStyleSheet", "asHex", "asChars", "asNumbers", "asGlyphIDs", "makeStructy"]);
   extend("SFNT",                      ["SFNT", "SFNTHeader", "DirectoryEntry", "tables"]);
   extend("SFNT/tables",               ["BASE", "CFF_", "cmap", "GDEF", "GPOS", "GSUB", "head", "hhea", "hmtx", "JSTF", "maxp", "name", "OS_2", "post"]);
   extend("SFNT/tables/common",        ["CoverageFormat", "FeatureList", "FeatureRecord", "FeatureTable", "LangSysTable", "LookupList", "LookupTable", "RangeRecord", "ScriptList", "ScriptRecord", "ScriptTable"]);
@@ -26,5 +26,7 @@
 	  baseDir:'./',
 	  paths: paths
 	});
+
+  require(["shimFname"], function(_) { /* shim the function 'name' property if necessary */ });
 
 }());

@@ -6,14 +6,6 @@ define(["struct", "dataBuilding"], function(struct, dataBuilder) {
       input = input || {};
       input.Components = input.Components || [];
       input.CompCount = input.Components.length;
-      input.Components = (function(list) {
-        console.log(list);
-        var data = [];
-        list.forEach(function(v) {
-          data.push(dataBuilder.encoder.USHORT(v));
-        })
-        return data;
-      }(input.Components));
       this.fill(input);
     }
   };
@@ -25,6 +17,11 @@ define(["struct", "dataBuilding"], function(struct, dataBuilder) {
   ]);
 
   LigatureTable.prototype.finalize = function() {
+    var data = [];
+    this.Components.forEach(function(v) {
+      data = data.concat(dataBuilder.encoder.GlyphID(v));
+    });
+    this.Components = data;
   };
 
   return LigatureTable;

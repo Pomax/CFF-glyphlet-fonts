@@ -1,3 +1,3 @@
 define(function() {
-	return function(v) { return v.charCodeAt(0); };
+	return function asNumbers(v) { return v.charCodeAt(0); };
 });

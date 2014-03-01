@@ -20,6 +20,7 @@ define(["struct", "makeStructy", "ScriptRecord", "ScriptTable"], function(struct
       ScriptTag: options.ScriptTag ? options.ScriptTag : "DFLT"
     });
     delete options.ScriptTag;
+
     var scriptTable = new ScriptTable(options);
     this.pairs.push({
       record: scriptRecord,
@@ -32,6 +33,18 @@ define(["struct", "makeStructy", "ScriptRecord", "ScriptTable"], function(struct
     return scriptTable;
   };
 
+  var duplicateTable = function(tables, table) {
+    var todata = function(v) { return v.toData(); };
+    var collapse = function (arr) { return arr.map(todata).join(''); };
+    var i, a, b;
+    for(var i=0, last=tables.length; i<last; i++) {
+      a = collapse(tables[i].langsystables);
+      b = collapse(table.langsystables);
+      if(a == b) return true;
+    }
+    return false;
+  }
+
   ScriptList.prototype.finalize = function() {
     this.ScriptCount = this.pairs.length;
     this.pairs.sort(function(a,b) {
@@ -40,9 +53,12 @@ define(["struct", "makeStructy", "ScriptRecord", "ScriptTable"], function(struct
     var records = [],
         tables = [];
     this.pairs.forEach(function(p, idx) {
-      p.finalize(idx);
-      records.push(p.record);
-      tables.push(p.table);
+      if(duplicateTable(tables, p.table)) return;
+      if(tables.indexOf(p.table) === -1) {
+        p.finalize(idx);
+        records.push(p.record);
+        tables.push(p.table);
+      }
     });
     this.ScriptRecords = makeStructy(records);
     this.ScriptTables = makeStructy(tables);

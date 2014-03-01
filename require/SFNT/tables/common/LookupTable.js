@@ -1,4 +1,4 @@
-define(["struct", "makeStructy", "lookups"], function(struct, makeStructy, lookups) {
+define(["struct", "makeStructy", "lookups", "dataBuilding"], function(struct, makeStructy, lookups, dataBuilder) {
   "use strict";
 
   var LookupTable = function(input) {
@@ -18,8 +18,9 @@ define(["struct", "makeStructy", "lookups"], function(struct, makeStructy, looku
       ["LookupType",       "USHORT",  "defined in the GSUB and GPOS tables"]
     , ["LookupFlag",       "USHORT",  "lookup qualifiers (see 'LookupFlag bit enumeration' in the 'Common Table Formats' docs)"]
     , ["SubTableCount",    "USHORT",  "the number of subtables (=actual lookup objects) for this lookup"]
-    , ["SubTables",        "LITERAL", "the array of subtables"]
+    , ["SubtableOffsets",  "LITERAL", "Array of offsets to SubTables-from beginning of Lookup table"]
     , ["MarkFilteringSet", "USHORT",  "Index (base 0) into GDEF mark glyph sets structure. This field is only present if bit UseMarkFilteringSet of lookup flags is set."]
+    , ["SubTables",        "LITERAL", "the array of subtables"]
   ]);
 
   LookupTable.prototype.addSubTable = function(options) {
@@ -31,10 +32,15 @@ define(["struct", "makeStructy", "lookups"], function(struct, makeStructy, looku
   LookupTable.prototype.finalize = function(idx) {
     this.SubTableCount = this.tables.length;
     var subtables = [];
+    var offsets = [];
+    var offset = 0;
     this.tables.forEach(function(v) {
+      offsets = offsets.concat(dataBuilder.encoder.USHORT(offset));
       v.finalize()
       subtables.push(v);
+      offset += v.toData().length;
     });
+    this.SubtableOffsets = offsets;
     this.SubTables = makeStructy(subtables);
     this.lookupListIndex = idx;
   }

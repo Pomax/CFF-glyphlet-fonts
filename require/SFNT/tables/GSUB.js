@@ -53,8 +53,8 @@ define(["struct", "ScriptList", "FeatureList", "LookupList", "LangSysTable"], fu
     this.FeatureList = this.features;
     this.scripts.finalize();
     this.ScriptList  = this.scripts;
-    this.FeatureListOffset = this.ScriptListOffset + this.ScriptList.length;
-    this.LookupListOffset = this.FeatureListOffset + this.FeatureList.length;
+    this.FeatureListOffset = this.ScriptListOffset + this.ScriptList.toData().length;
+    this.LookupListOffset = this.FeatureListOffset + this.FeatureList.toData().length;
   }
 
   return GSUB;

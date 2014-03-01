@@ -24,7 +24,11 @@ define(["struct", "makeStructy", "dataBuilding"], function(struct, makeStructy, 
   ]);
 
   LangSysTable.prototype.finalize = function() {
-    this.FeatureIndex = makeStructy(this.features.slice());
+    var data = [];
+    this.features.forEach(function(_,i) {
+      data = data.concat(dataBuilder.encoder.USHORT(i));
+    });
+    this.FeatureIndex = data;
   };
 
   return LangSysTable;

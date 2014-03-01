@@ -2,7 +2,7 @@ define(["struct", "makeStructy"], function(struct, makeStructy) {
   "use strict";
 
   var ScriptTable = function(input) {
-    this.tables = [];
+    this.langsystables = [];
     if(!this.parse(input)) {
       input = input || {};
       input.defaultLangSys = 4;
@@ -10,8 +10,7 @@ define(["struct", "makeStructy"], function(struct, makeStructy) {
       delete input.LangSysTables;
       this.fill(input);
       if(langsystables) {
-        this.tables = langsystables;
-        this.LangSysCount = this.tables.length;
+        this.langsystables = langsystables;
       }
     }
   };
@@ -23,8 +22,9 @@ define(["struct", "makeStructy"], function(struct, makeStructy) {
   ]);
 
   ScriptTable.prototype.finalize = function(lookups) {
+    this.LangSysCount = this.langsystables - 1; // offset for DFLT
     var langsystables = []
-    this.tables.forEach(function(v){
+    this.langsystables.forEach(function(v){
       v.finalize();
       langsystables.push(v);
     });

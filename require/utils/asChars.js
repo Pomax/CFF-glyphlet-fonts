@@ -1,3 +1,3 @@
 define(function() {
-	return function(v) { return String.fromCharCode(v); };
+  return function asChars(v) { return String.fromCharCode(v); };
 });

@@ -1,4 +1,4 @@
-define(["SFNT", "formGlobals", "asChars", "asNumbers", "shimie"], function(SFNT, formGlobals, asChars, asNumbers) {
+define(["SFNT", "formGlobals", "asChars", "asGlyphIDs"], function(SFNT, formGlobals, asChars, asGlyphIDs) {
   "use strict";
 
   return {
@@ -148,7 +148,9 @@ define(["SFNT", "formGlobals", "asChars", "asNumbers", "shimie"], function(SFNT,
         var converage = subtable.addCoverage({
           format: 1,
           GlyphCount: 1,
-          GlyphArray: [globals.label[0]]
+          GlyphArray: [
+            globals.letters.indexOf(globals.label[0]) + 1 // offset for .notdef
+          ]
         });
 
         var ligatureSet = subtable.addLigatureSet();
@@ -156,7 +158,7 @@ define(["SFNT", "formGlobals", "asChars", "asNumbers", "shimie"], function(SFNT,
         // ultimately, this is the thing we really care about:
         var ligatureTable = ligatureSet.addLigatureTable({
           LigGlyph: globals.letters.length,
-          Components: globals.letters.slice(1, globals.letters.length-1).map(asNumbers)
+          Components: globals.letters.map(function(_,idx) { return idx; }).slice(1, globals.letters.length-1)
                       // we don't need letters[0] because the coverage table will imply the first letter in the ligature
         });
 
@@ -182,9 +184,9 @@ define(["SFNT", "formGlobals", "asChars", "asNumbers", "shimie"], function(SFNT,
         // TODO: verify and fix where this is not the case.
         require(["asHex"], function(asHex) {
           console.log( font.GSUB.toData() );
-          console.log( font.GSUB.toString() );
           console.log( font.GSUB.toData().map(asHex).join(',') );
           console.log( font.GSUB.toData().map(asChars).join(',') );
+          console.log( font.GSUB.toString() );
         });
       }
 
