@@ -43,7 +43,6 @@ define(["struct", "dataBuilding"], function(struct, dataBuilder){
     for(i=0; i<cff.length; i++) {
       s = e;
       e += serialize(cff[i]).length;
-      //mapper.addMapping(cff[i][0], s, e, "cff");
     }
   };
 

@@ -1,4 +1,4 @@
-define(["dataBuilding", "tables", "SFNTHeader", "DirectoryEntry"], function(dataBuilding, tables, SFNTHeader, DirectoryEntry) {
+define(["dataBuilding", "tables", "SFNTHeader", "DirectoryEntry", "Mapper"], function(dataBuilding, tables, SFNTHeader, DirectoryEntry, Mapper) {
   "use strict";
 
   var header = SFNTHeader("CFF");
@@ -21,6 +21,7 @@ define(["dataBuilding", "tables", "SFNTHeader", "DirectoryEntry"], function(data
       post:   tables.post
     };
     this.header = new header();
+    this.fontStructs = false;
   };
 
   SFNT.prototype = {
@@ -107,9 +108,40 @@ define(["dataBuilding", "tables", "SFNTHeader", "DirectoryEntry"], function(data
       // table is based on the final serialized font data.
       var font = headerBlock.concat(directoryBlock).concat(dataBlock);
       var checksum = dataBuilding.computeChecksum(font);
+      var checkSumAdjustment = 0xB1B0AFBA - checksum;
+      this.stub.head.checkSumAdjustment = checkSumAdjustment;
+
+      // the data layout in this font can now be properly mapped,
+      // if the user wants to call the getMappings() function.
+      this.fontStructs = {
+        header: header,
+        directoryOrder: sorted,
+        directory: tags,
+        tableOrder: preferred
+      };
+
+      // return the font with the correct checksumadjustment.
       return font.slice(0, offsets["head"] + 8)
-                 .concat(dataBuilding.encoder.ULONG(0xB1B0AFBA - checksum))
+                 .concat(dataBuilding.encoder.ULONG(checkSumAdjustment))
                  .concat(font.slice(offsets["head"] + 12));
+    },
+    getMappings: function() {
+      if(this.fontStructs === false) return false;
+      var mapper = new Mapper();
+      var self = this;
+      var offset = 0;
+      this.fontStructs.header.toData(offset, mapper);
+      offset = mapper.last().end;
+      this.fontStructs.directoryOrder.forEach(function(tag) {
+        self.fontStructs.directory[tag].toData(offset, mapper);
+        offset = mapper.last().end;
+      });
+      this.fontStructs.tableOrder.forEach(function(tag) {
+        self.stub[tag].toData(offset, mapper);
+        offset = mapper.last().end;
+      });
+      mapper.sort();
+      return mapper.mappings;
     }
   };
 

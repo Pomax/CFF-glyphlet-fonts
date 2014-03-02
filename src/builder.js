@@ -1,6 +1,6 @@
 define(
-  ["SFNT", "formGlobals", "asChars", "asGlyphIDs", "addLabelSubstitution", "mapper"],
-  function(SFNT, formGlobals, asChars, asGlyphIDs, addLabelSubstitution, mapper) {
+  ["SFNT", "formGlobals", "asChars", "asGlyphIDs", "addLabelSubstitution"],
+  function(SFNT, formGlobals, asChars, asGlyphIDs, addLabelSubstitution) {
 
   "use strict";
 
@@ -134,11 +134,12 @@ define(
        */
       addLabelSubstitution(font, globals)
 
-      Object.keys(font).forEach(function(table) {
-        if(font[table].toData) {
-          console.log(table, font[table].toData().length);
-        }
-      });
+
+//      Object.keys(font).forEach(function(table) {
+//        if(font[table].toData) {
+//          console.log(table, font[table].toData().length);
+//        }
+//      });
 
 
       return sfnt;

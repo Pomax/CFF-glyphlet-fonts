@@ -3,9 +3,14 @@ define(function() {
     array.toJSON = function() {
       return this.map(function(r) { return r.toJSON(); });
     };
-    array.toData = function() {
-      var data = [];
-      this.forEach(function(r) { data = data.concat(r.toData()); });
+    array.toData = function(offset, mappings) {
+      offset = offset || 0;
+      var data = [], val;
+      this.forEach(function(r) {
+        val = r.toData(offset, mappings);
+        data = data.concat(val);
+        offset += val.length;
+      });
       return data;
     };
     array.toString = function() {

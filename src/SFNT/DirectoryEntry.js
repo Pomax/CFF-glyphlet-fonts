@@ -8,7 +8,7 @@ define(["struct"], function(struct) {
     }
   };
 
-  DirectoryEntry.prototype = new struct([
+  DirectoryEntry.prototype = new struct("DirectoryEntry", [
       ["tag",      "CHARARRAY", "4-byte identifier"]
     , ["checkSum", "ULONG", "sum-as-ULONGs for this table"]
     , ["offset",   "ULONG", "offset to this table from the beginning of the file"]

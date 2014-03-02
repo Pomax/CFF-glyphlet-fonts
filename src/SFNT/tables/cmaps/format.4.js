@@ -75,7 +75,7 @@ define(["struct", "Segments"], function(struct, Segments){
     this.glyphIdArray = glyphIdArray;
 
     // set up the toString, toJSON, and toData functions.
-    // FIXME: this should be necessary with properly written code.
+    // FIXME: this shouldn't be necessary with properly written code.
     [endCount, startCount, idDelta, idRangeOffset, glyphIdArray].forEach(function(arr) {
       arr.toData = function() { return arr; };
       arr.toJSON = function() { return { data: arr}; };

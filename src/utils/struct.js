@@ -1,4 +1,4 @@
-define(["dataBuilding", "mapper"], function(dataBuilder, mapper) {
+define(["dataBuilding"], function(dataBuilder) {
   "use strict";
 
   var encoder = dataBuilder.encoder,
@@ -36,9 +36,6 @@ define(["dataBuilding", "mapper"], function(dataBuilder, mapper) {
           Object.defineProperty(self, fieldName, {
             // decode the stored value
             get: function() {
-              if(self.values[fieldName] && self.values[fieldName].encode) {
-                return self.values[fieldName];
-              }
               return self.values[fieldName] !== undefined ? decoder[fieldType](self.values[fieldName]) : "-";
             },
             // store values so that they're already encoded correctly
@@ -101,14 +98,15 @@ define(["dataBuilding", "mapper"], function(dataBuilder, mapper) {
     toString: function() {
       return JSON.stringify(this.toJSON(), false, 2);
     },
-    toData: function() {
+    toData: function(offset, mapper) {
+      offset = offset || 0;
       var self = this,
           data = [],
           val;
       Object.keys(this.fields).forEach(function(field) {
         if(self.fields[field] === "LITERAL") {
           if(self.values[field].toData) {
-            val = self.values[field].toData();
+            val = self.values[field].toData(offset, mapper);
           }
           else {
             val = self.values[field];
@@ -117,11 +115,16 @@ define(["dataBuilding", "mapper"], function(dataBuilder, mapper) {
         else {
           val = self.values[field];
         }
-        mapper.addMapping({
-          length: val.length,
-          name: (self.name ? self.name : '') + ":" + field,
-          value: self[field]
-        });
+
+        if(mapper) {
+          mapper.addMapping(offset, {
+            length: val.length,
+            name: (self.name ? self.name : '') + ":" + field,
+            value: self[field]
+          });
+        }
+        offset += val.length;
+
         data = data.concat(val);
       });
       return data;

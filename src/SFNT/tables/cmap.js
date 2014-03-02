@@ -1,4 +1,4 @@
-define(["struct", "EncodingRecord", "subtables"], function(struct, EncodingRecord, subtables){
+define(["struct", "makeStructy", "EncodingRecord", "subtables"], function(struct, makeStructy, EncodingRecord, subtables){
   "use strict";
 
   var cmap = function(input) {
@@ -36,24 +36,7 @@ define(["struct", "EncodingRecord", "subtables"], function(struct, EncodingRecor
   };
 
   cmap.prototype.finalise = function() {
-
-    var encodingrecords = (function(encodingrecords) {
-      encodingrecords.toJSON = function() {
-        return this.map(function(r) { return r.toJSON(); });
-      };
-      encodingrecords.toString = function() {
-        return JSON.stringify(this.toJSON(), false, 2);
-      }
-      encodingrecords.toData = function() {
-        var data = [];
-        this.forEach(function(r) {
-          data = data.concat(r.toData());
-        });
-        return data;
-      };
-      return encodingrecords;
-    }([]));
-
+    var encodingrecords = [];
     var offset = 4 + (this.numTables * 8); // sizeOf(EncodingRecord) is 8
     for(var i=0; i<this.numTables; i++) {
       encodingrecords.push(new EncodingRecord({
@@ -63,9 +46,8 @@ define(["struct", "EncodingRecord", "subtables"], function(struct, EncodingRecor
       }));
       offset += this.tables[i].length;
     }
-
     this.subTables = this.tables;
-    this.encodingRecords = encodingrecords;
+    this.encodingRecords = makeStructy(encodingrecords);
   };
 
   return cmap;
