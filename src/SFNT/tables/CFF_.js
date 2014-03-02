@@ -287,12 +287,12 @@ define(["struct", "dataBuilding"], function(struct, dataBuilder){
       input = input || {};
       this.fill(input);
       var CFFStruct = createCFF(globals)
-      this.datablock = serialize(CFFStruct);
+      this["CFF data block"] = serialize(CFFStruct);
     }
   };
 
   CFF.prototype = new struct([
-    ["datablock", "LITERAL", "we're not going to do this as a struct build-up right now."]
+    ["CFF data block", "LITERAL", "we're not going to do this as a struct build-up right now."]
   ]);
 
   CFF.prototype.constructor = CFF;

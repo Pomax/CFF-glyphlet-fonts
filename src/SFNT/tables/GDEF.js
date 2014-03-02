@@ -8,7 +8,7 @@ define(["struct"], function(struct){
     }
   };
 
-  GDEF.prototype = new struct([
+  GDEF.prototype = new struct("GDEF table", [
     //...
   ]);
 

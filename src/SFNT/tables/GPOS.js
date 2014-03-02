@@ -8,7 +8,7 @@ define(["struct"], function(struct){
     }
   };
 
-  GPOS.prototype = new struct([
+  GPOS.prototype = new struct("GPOS table", [
     //...
   ]);
 

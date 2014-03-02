@@ -17,7 +17,7 @@ define(["struct"], function(struct){
     }
   };
 
-  post.prototype = new struct([
+  post.prototype = new struct("post table", [
     ["version",            "FIXED", "post table format"]
   , ["italicAngle",        "FIXED", ""]
   , ["underlinePosition",  "FWORD", ""]

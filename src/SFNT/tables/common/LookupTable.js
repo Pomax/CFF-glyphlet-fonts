@@ -14,7 +14,7 @@ define(["struct", "makeStructy", "lookups", "dataBuilding"], function(struct, ma
     }
   };
 
-  LookupTable.prototype = new struct([
+  LookupTable.prototype = new struct("LookupTable", [
       ["LookupType",       "USHORT",  "defined in the GSUB and GPOS tables"]
     , ["LookupFlag",       "USHORT",  "lookup qualifiers (see 'LookupFlag bit enumeration' in the 'Common Table Formats' docs)"]
     , ["SubTableCount",    "USHORT",  "the number of subtables (=actual lookup objects) for this lookup"]

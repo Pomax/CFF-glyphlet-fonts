@@ -9,7 +9,7 @@ define(["struct"], function(struct) {
     }
   };
 
-  ScriptRecord.prototype = new struct([
+  ScriptRecord.prototype = new struct("ScriptRecord", [
       ["ScriptTag", "CHARARRAY", "script name ('DFLT' for the default script)"]
     , ["Offset",    "OFFSET",    "Offset to the associated ScriptTable (offset from the start of the ScriptList)"]
   ]);

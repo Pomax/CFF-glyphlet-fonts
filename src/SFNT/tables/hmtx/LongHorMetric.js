@@ -14,7 +14,7 @@ define(["struct"], function(struct){
   /**
    *
    */
-  LongHorMetric.prototype = new struct([
+  LongHorMetric.prototype = new struct("LongHorMetric", [
       ["advanceWidth", "USHORT", ""]
     , ["lsb",          "SHORT",  ""]
   ]);

@@ -9,7 +9,7 @@ define(["struct", "makeStructy", "FeatureRecord", "FeatureTable"], function(stru
     }
   };
 
-  FeatureList.prototype = new struct([
+  FeatureList.prototype = new struct("FeatureList", [
       ["FeatureCount",    "USHORT", "Number of features in this feature list"]
     , ["FeatureRecords",  "LITERAL", "Array of FeatureRecords; zero-based (first feature has FeatureIndex = 0), listed alphabetically by FeatureTag"]
     , ["FeatureTables",   "LITERAL", "the list of feature tables"]

@@ -9,7 +9,7 @@ define(["struct", "makeStructy", "ScriptRecord", "ScriptTable"], function(struct
     }
   };
 
-  ScriptList.prototype = new struct([
+  ScriptList.prototype = new struct("ScriptList", [
       ["ScriptCount",   "USHORT",  "Number of ScriptRecords"]
     , ["ScriptRecords", "LITERAL", "Array of ScriptRecords, listed alphabetically by ScriptTag"]
     , ["ScriptTables",  "LITERAL", "The ScriptTables in this script list"]

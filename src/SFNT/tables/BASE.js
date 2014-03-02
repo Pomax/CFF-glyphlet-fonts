@@ -8,7 +8,7 @@ define(["struct"], function(struct){
     }
   };
 
-  BASE.prototype = new struct([
+  BASE.prototype = new struct("BASE table", [
     //...
   ]);
 

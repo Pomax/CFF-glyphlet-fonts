@@ -19,7 +19,7 @@ define(["struct", "makeStructy", "dataBuilding"], function(struct, makeStructy, 
     }
   };
 
-  CoverageFormat1.prototype = new struct([
+  CoverageFormat1.prototype = new struct("Coverage format 1", [
       ["CoverageFormat", "USHORT",  "format 1"]
     , ["GlyphCount",     "USHORT",  "number of glyphs"]
     , ["GlyphArray",     "LITERAL", "array of glyphs covered by this table"]
@@ -40,7 +40,7 @@ define(["struct", "makeStructy", "dataBuilding"], function(struct, makeStructy, 
     }
   };
 
-  RangeRecord.prototype = new struct([
+  RangeRecord.prototype = new struct("RangeRecord", [
       ["Start",              "GlyphID", "First GlyphID in the range"]
     , ["End",                "GlyphID", "Last GlyphID in the range"]
     , ["StartCoverageIndex", "USHORT",  "Coverage Index of first GlyphID in range"]
@@ -64,7 +64,7 @@ define(["struct", "makeStructy", "dataBuilding"], function(struct, makeStructy, 
     }
   };
 
-  CoverageFormat2.prototype = new struct([
+  CoverageFormat2.prototype = new struct("Coverage format 2", [
       ["CoverageFormat", "USHORT",  "format 1"]
     , ["RangeCount",     "USHORT",  "number of ranges"]
     , ["RangeRecords",   "LITERAL", "array of range records covered by this table"]

@@ -8,7 +8,7 @@ define(["struct"], function(struct) {
     }
 	};
 
-  RangeRecord.prototype = new struct([
+  RangeRecord.prototype = new struct("RangeRecord", [
       ["start",              "GlyphID", "start of the coverage range"]
     , ["end",                "GlyphID", "end of the coverage range"]
     , ["StartCoverageIndex", "USHORT",  "Coverage Index of first GlyphID in range"]

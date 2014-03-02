@@ -15,7 +15,7 @@ define(["struct"], function(struct){
     }
   };
 
-  maxp.prototype = new struct([
+  maxp.prototype = new struct("maxp table", [
     ["version",               "FIXED",  "table version. For CFF this must be 0.5, for TTF it must be 1.0"]
   , ["numGlyphs",             "USHORT", "number of glyphs in the font"]
     // --- v0.5 only uses the previous two fields. 1.0 uses the rest as well ---

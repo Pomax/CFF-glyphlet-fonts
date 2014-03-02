@@ -1,4 +1,4 @@
-define(["dataBuilding"], function(dataBuilder) {
+define(["dataBuilding", "mapper"], function(dataBuilder, mapper) {
   "use strict";
 
   var encoder = dataBuilder.encoder,
@@ -6,7 +6,12 @@ define(["dataBuilding"], function(dataBuilder) {
       sizeOf = dataBuilder.sizeOf,
       serialize = encoder.serialize;
 
-	var Struct = function(structData) {
+	var Struct = function(name, structData) {
+    if(!structData) {
+      structData = name;
+      name = "";
+    }
+    this.name = name;
     this.definition = structData;
     // the real magic happens in .fill()
   };
@@ -38,7 +43,6 @@ define(["dataBuilding"], function(dataBuilder) {
             },
             // store values so that they're already encoded correctly
             set: function(v) {
-//              console.log(fieldName, "-", v);
               self.values[fieldName] = v.encode ? v.encode() : encoder[fieldType](v);
             }
           });
@@ -79,14 +83,8 @@ define(["dataBuilding"], function(dataBuilder) {
       if(typeof data === "string") data = data.split('').map(function(v) { return v.charCodeAt(0); });
       // TODO: code goes here
     },
-    finalise: function(){},
-    serialize: function() {
-      var self = this;
-      var data = [];
-      Object.keys(this.values).forEach(function(fieldName) {
-        data = data.concat(self.values[fieldName]);
-      });
-      return data;
+    finalise: function(){
+      // a struct is considered final by default.
     },
     valueOf: function() {
       return this.toString();
@@ -109,7 +107,6 @@ define(["dataBuilding"], function(dataBuilder) {
           val;
       Object.keys(this.fields).forEach(function(field) {
         if(self.fields[field] === "LITERAL") {
-//          console.log(field);
           if(self.values[field].toData) {
             val = self.values[field].toData();
           }
@@ -117,7 +114,14 @@ define(["dataBuilding"], function(dataBuilder) {
             val = self.values[field];
           }
         }
-        else { val = self.values[field]; }
+        else {
+          val = self.values[field];
+        }
+        mapper.addMapping({
+          length: val.length,
+          name: (self.name ? self.name : '') + ":" + field,
+          value: self[field]
+        });
         data = data.concat(val);
       });
       return data;

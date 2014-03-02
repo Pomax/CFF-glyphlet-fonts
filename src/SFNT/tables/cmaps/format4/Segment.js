@@ -8,7 +8,7 @@ define(["struct"], function(struct) {
     }
   };
 
-  Segment.prototype = new struct([
+  Segment.prototype = new struct("Segment", [
   	  ["end",     "USHORT", "end code for this segment"]
   	, ["start",   "USHORT", "start code for this segment"]
   	, ["delta",   "SHORT",  "delta to ensure continuous sequence wrt previous segments"]

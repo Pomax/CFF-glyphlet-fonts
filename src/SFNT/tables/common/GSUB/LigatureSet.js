@@ -10,7 +10,7 @@ define(["struct", "makeStructy", "dataBuilding", "LigatureTable"], function(stru
     }
   };
 
-  LigatureSet.prototype = new struct([
+  LigatureSet.prototype = new struct("LigatureSet", [
       ["LigatureCount",   "USHORT",  "Number of Ligature tables in this set"]
     , ["LigatureOffsets", "LITERAL", "Array of USHORT offsets to Ligature tables, from beginning of the LigatureSet; assumed ordered by preference"]
     , ["Ligatures",       "LITERAL", ""]

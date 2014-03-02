@@ -10,7 +10,7 @@ define(["struct"], function(struct) {
       }
     };
 
-    SFNTHeader.prototype = new struct([
+    SFNTHeader.prototype = new struct("SFNT header", [
         ["version", type === "CFF" ? "CHARARRAY" : "FIXED", "either 0x0001000 for TTF, or 'OTTO' for CFF"]
       , ["numTables",     "USHORT", "number of tables in this font"]
       , ["searchRange",   "USHORT", "(Maximum power of 2 <= numTables) x 16"]

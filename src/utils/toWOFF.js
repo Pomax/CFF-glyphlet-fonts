@@ -3,7 +3,7 @@ define(["struct", "dataBuilding"], function(struct, dataBuilder) {
   /**
    * repackage an SFNT block as WOFF
    */
-  return function formWOFF(font) {
+  return function toWOFF(font) {
     var data = font.toData();
     var numTables = font.header.numTables;
 
@@ -18,6 +18,7 @@ define(["struct", "dataBuilding"], function(struct, dataBuilder) {
         input.metaOrigLength = 0;
         input.privOffset = 0;
         input.privLength = 0;
+        input.length = 0;
         this.fill(input);
       }
     };

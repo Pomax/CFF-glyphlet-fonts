@@ -9,7 +9,7 @@ define(["struct", "makeStructy", "LookupTable", "dataBuilding"], function(struct
     }
   };
 
-  LookupList.prototype = new struct([
+  LookupList.prototype = new struct("LookupList", [
       ["LookupCount",  "USHORT",  "number of lookups in the list"]
     , ["LookupOffsets", "LITERAL", "Array of offsets to the Lookup tables, from beginning of LookupList"]
     , ["LookupTables", "LITERAL", "the list of lookups"]

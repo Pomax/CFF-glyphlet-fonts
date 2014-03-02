@@ -25,7 +25,7 @@ define(["struct", "atou", "dataBuilding", "NameRecords"], function(struct, atou,
   /**
    * Name table definition
    */
-  name.prototype = new struct([
+  name.prototype = new struct("name table", [
     ["format",       "USHORT", "<name> table format"]
   , ["count",        "USHORT", "Number of name records in this table"]
   , ["stringOffset", "OFFSET", "offset to the string data, relative to the table start"]

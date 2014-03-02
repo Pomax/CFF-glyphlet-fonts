@@ -16,7 +16,7 @@ define(["struct"], function(struct){
     }
   };
 
-  hhea.prototype = new struct([
+  hhea.prototype = new struct("hhea table", [
     ["version",             "FIXED",     "Table version (must be 0x00010000"]
   , ["Ascender",            "FWORD",     "Typographic ascender"]
   , ["Descender",           "FWORD",     "Typographic descender"]

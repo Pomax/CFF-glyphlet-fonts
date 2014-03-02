@@ -1,15 +1,38 @@
 define(function() {
   "use strict";
 
-  var Mapper = function() {
-  	this.mappings = [];
+  var mappings, locked, offset = 0;
+
+  var reset = function reset() {
+    mappings = [];
   };
 
-  Mapper.prototype = {
-    addMapping: function addMapping(name, start, end, type, description, value) {
-      this.mappings.push({name:name, start:start, end:end, type:type, description:description, value:value});
+  var addMapping = function addMapping(options) {
+    if(locked || !mappings) return;
+    var mapping = {
+      name: options.name || '',
+      start: offset,
+      end: offset + options.length,
+      type: options.type || '',
+      description: options.description || '',
+      value: options.value || false
+    };
+//    offset += options.length;
+    mappings.push(mapping);
+    return mapping;
+  };
+
+  var lock = function lock() {
+    locked = true;
+  };
+
+  return {
+    reset: reset,
+    lock: lock,
+    addMapping: addMapping,
+    getMappings: function() {
+      return mappings;
     }
   };
 
-  return Mapper;
 });

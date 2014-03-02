@@ -15,7 +15,7 @@ define(["struct", "makeStructy"], function(struct, makeStructy) {
     }
   };
 
-  ScriptTable.prototype = new struct([
+  ScriptTable.prototype = new struct("ScriptTable", [
       ["defaultLangSys", "OFFSET",  "the langsys record to use in absence of a specific language, from start of script table"]
     , ["LangSysCount",   "USHORT",  "how many language systam tables are used?"]
     , ["LangSysTables",  "LITERAL", "the collection of LangSys objects"]

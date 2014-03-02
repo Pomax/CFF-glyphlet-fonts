@@ -1,41 +1,28 @@
-define(["struct", "LongHorMetric"], function(struct, LongHorMetric){
+define(["struct", "makeStructy", "LongHorMetric"], function(struct, makeStructy, LongHorMetric){
   "use strict";
 
   var hmtx = function(input, numberOfHMetrics) {
-    this.hMetrics = [];
     if(!this.parse(input)) {
+      this.fill({});
       this.build(input, numberOfHMetrics);
     }
   };
 
-  // FIXME: don't bypass the struct concept, even though this table
-  //        only contains a single array?
-
-  hmtx.prototype = new struct();
-  hmtx.prototype.constructor = hmtx;
+  hmtx.prototype = new struct("hmtx table", [
+    ["hMetrics", "LITERAL", "the array of horizontal metrics for the glyphs in this font"]
+  ]);
 
   hmtx.prototype.build = function(globals, numberOfHMetrics) {
+    var data = []
     for(var i=0; i < numberOfHMetrics - 1; i++) {
-      this.hMetrics.push(new LongHorMetric({ advanceWidth: 0, lsb: 0 }));
+      data.push(new LongHorMetric({ advanceWidth: 0, lsb: 0 }));
     }
-    this.hMetrics.push(new LongHorMetric({
+    data.push(new LongHorMetric({
       advanceWidth: globals.xMax - globals.xMin,
       lsb: globals.xMin
     }));
-  };
-
-  hmtx.prototype.toJSON = function() {
-    return {
-      hMetrics: this.hMetrics.map(function(v) { return v.toJSON(); })
-    };
-  };
-
-  hmtx.prototype.toData = function() {
-    var data = [];
-    this.hMetrics.forEach(function(v) {
-      data = data.concat(v.toData());
-    });
-    return data;
+    makeStructy(data);
+    this.hMetrics = data;
   };
 
   return hmtx;

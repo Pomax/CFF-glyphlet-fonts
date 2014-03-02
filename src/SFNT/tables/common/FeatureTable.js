@@ -11,7 +11,7 @@ define(["struct", "dataBuilding"], function(struct, dataBuilder) {
     }
   };
 
-  FeatureTable.prototype = new struct([
+  FeatureTable.prototype = new struct("FeatureTable", [
       ["FeatureParams", "PADDING2", "reserved"]
     , ["LookupCount",   "USHORT",   "The number of lookups used in this feature"]
     , ["LookupListIndex", "LITERAL", "USHORT[lookupcount] of indices in the lookup list"]

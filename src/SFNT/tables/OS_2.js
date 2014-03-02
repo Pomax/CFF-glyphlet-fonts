@@ -55,7 +55,7 @@ define(["struct"], function(struct){
     }
   };
 
-  OS_2.prototype = new struct([
+  OS_2.prototype = new struct("OS/2 table", [
     ["version",             "USHORT",    "OS/2 table version"]
   , ["xAvgCharWidth",       "SHORT",     "xAvgCharWidth"]
   , ["usWeightClass",       "USHORT",    "usWeightClass"]

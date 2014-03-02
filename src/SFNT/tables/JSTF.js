@@ -8,7 +8,7 @@ define(["struct"], function(struct){
     }
   };
 
-  JSTF.prototype = new struct([
+  JSTF.prototype = new struct("JSTF table", [
     //...
   ]);
 

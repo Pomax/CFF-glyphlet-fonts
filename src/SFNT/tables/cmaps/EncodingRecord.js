@@ -8,7 +8,7 @@ define(["struct"], function(struct) {
     }
   };
 
-  EncodingRecord.prototype = new struct([
+  EncodingRecord.prototype = new struct("EncodingRecord", [
      ["platformID", "USHORT", "Platform ID"]
    , ["encodingID", "USHORT", "Platform-specific encoding ID"]
    , ["offset",     "ULONG",  "Byte offset from beginning of table to the subtable for this encoding"]

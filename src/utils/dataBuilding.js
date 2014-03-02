@@ -1,4 +1,4 @@
-define(["Mapper"], function(Mapper) {
+define([], function() {
   "use strict";
 
   var sizeOf = {},
@@ -215,20 +215,16 @@ define(["Mapper"], function(Mapper) {
   /**
    * Serialise a record structure into byte code
    */
-  encoder.serialize = function serialize(base_record, mapper, basename, offset) {
-    basename = basename || "";
-    offset = offset || 0;
+  encoder.serialize = function serialize(base_record) {
     var data = [];
-    var map = mapper ? new Mapper() : false;
     (function _serialize(record, prefix) {
       if(prefix == parseInt(prefix,10)) {
         prefix = "";
       } else if(prefix !== "") { prefix += "."; }
-      var start = offset + data.length;
       if (typeof record[LABEL] !== "string") {
         try {
-          record.forEach(function(_r, idx) {
-            _serialize(_r, prefix + "[" + idx + "]");
+          record.forEach(function(_r) {
+            _serialize(_r);
           });
         } catch(e) { console.error(record); throw e; }
       }
@@ -238,32 +234,14 @@ define(["Mapper"], function(Mapper) {
       else {
         var nested = record[NESTED_RECORD];
         if(nested instanceof Array) {
-          _serialize(nested, prefix + "." + record[LABEL]);
+          _serialize(nested);
         }
         else {
           console.error(record);
           throw new Error("what?");
         }
       }
-      var end = offset + data.length;
-      if(map && typeof record[LABEL] === "string") {
-        var value = false;
-        if(typeof record[DATA] === "number" || typeof record[DATA] === "string") {
-          value = record[DATA];
-        }
-        map.addMapping(prefix + record[LABEL], start, end, "field", record[DESCRIPTION], value);
-      }
-    }(base_record, basename));
-
-    if(map) {
-      map.mappings.sort(function(a,b) {
-        if(a.start !== b.start) {
-          return a.start - b.start;
-        }
-        return a.end - b.end;
-      });
-      mapper.mappings = mapper.mappings.concat(map.mappings);
-    }
+    }(base_record));
     return data;
   };
 

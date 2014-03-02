@@ -22,7 +22,7 @@ define(["struct"], function(struct){
     }
   };
 
-  head.prototype = new struct([
+  head.prototype = new struct("head table", [
     ["version",            "FIXED",        "table version (should be 0x00010000)"]
   , ["fontRevision",       "FIXED",        "font reversion number"]
   , ["checkSumAdjustment", "ULONG",        "0xB1B0AFBA minus (ULONG sum of the entire font, computed with this value set to 0)"]

@@ -24,11 +24,8 @@ define(["dataBuilding", "tables", "SFNTHeader", "DirectoryEntry"], function(data
   };
 
   SFNT.prototype = {
-    use: function(tags) {
-      var self = this,
-          keys = Object.keys(this.stub),
-          remove = keys.filter(function(v) { return tags.indexOf(v) === -1; });
-      remove.forEach(function(tag) { delete self.stub[tag]; });
+    toString: function() {
+      return JSON.stringify(this.toJSON(), false, 2);
     },
     toJSON: function() {
       var self = this,

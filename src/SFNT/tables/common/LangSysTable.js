@@ -16,7 +16,7 @@ define(["struct", "makeStructy", "dataBuilding"], function(struct, makeStructy, 
     }
   };
 
-  LangSysTable.prototype = new struct([
+  LangSysTable.prototype = new struct("LangSysTable", [
       ["LookupOrder",     "PADDING2",  "reserved value. Because why not"]
     , ["ReqFeatureIndex", "USHORT",  "the one required feature that must always be enabled, or 0xFFFF if there are none"]
     , ["FeatureCount",    "USHORT",  "Number of FeatureIndex values for this language system, excluding the required one"]

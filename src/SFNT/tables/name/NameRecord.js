@@ -14,7 +14,7 @@ define(["struct"], function(struct){
   /**
    * Name table definition
    */
-  NameRecord.prototype = new struct([
+  NameRecord.prototype = new struct("NameRecord", [
       ["platform", "USHORT", "which platform?"]
     , ["encoding", "USHORT", "which platform-specific encoding?"]
     , ["language", "USHORT", "which platform-specific language"]
@@ -22,7 +22,6 @@ define(["struct"], function(struct){
     , ["length",   "USHORT", "the length of this string"]
     , ["offset",   "USHORT", "offset for this string in the string heap"]
   ]);
-  NameRecord.prototype.constructor = NameRecord;
 
   /**
    * first half of a name record, encoding {platform, encoding, language} triplet

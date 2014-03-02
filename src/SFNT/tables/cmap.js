@@ -20,7 +20,7 @@ define(["struct", "EncodingRecord", "subtables"], function(struct, EncodingRecor
     }
   };
 
-  cmap.prototype = new struct([
+  cmap.prototype = new struct("cmap table", [
       ["version", "USHORT", "cmap table version"]
     , ["numTables", "USHORT", "number of subtables"]
     , ["encodingRecords", "LITERAL", "array[numTables] of encoding records"]

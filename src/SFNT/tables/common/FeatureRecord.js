@@ -8,7 +8,7 @@ define(["struct"], function(struct) {
     }
   };
 
-  FeatureRecord.prototype = new struct([
+  FeatureRecord.prototype = new struct("FeatureRecord", [
       ["FeatureTag", "CHARARRAY", "The feature name (4 characters)"]
     , ["Offset",     "OFFSET", "Offset to Feature table, from beginning of FeatureList"]
   ]);

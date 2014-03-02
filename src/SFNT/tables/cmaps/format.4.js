@@ -10,7 +10,7 @@ define(["struct", "Segments"], function(struct, Segments){
     }
   };
 
-  format4.prototype = new struct([
+  format4.prototype = new struct("cmap format 4", [
     ["format",   "USHORT", "format 4 subtable"]
   , ["length",   "USHORT", "table length in bytes"]
   , ["language", "USHORT", "language"]

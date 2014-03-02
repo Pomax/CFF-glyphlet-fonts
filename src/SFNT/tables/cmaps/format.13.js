@@ -9,7 +9,7 @@ define(["struct"], function(struct){
     }
   };
 
-  format13.prototype = new struct([
+  format13.prototype = new struct("cmap format 13", [
     ["format", "USHORT", "subtable format"]
   ]);
 

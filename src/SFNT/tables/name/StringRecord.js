@@ -14,7 +14,7 @@ define(["struct", "atou"], function(struct, atou){
   /**
    * Name table definition
    */
-  StringRecord.prototype = new struct([
+  StringRecord.prototype = new struct("StringRecord", [
     ["string", "CHARARRAY", "The string to be encoded"]
   ]);
   StringRecord.prototype.constructor = StringRecord;

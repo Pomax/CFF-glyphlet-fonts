@@ -14,7 +14,7 @@ define(["struct", "ScriptList", "FeatureList", "LookupList", "LangSysTable"], fu
     }
   };
 
-  GSUB.prototype = new struct([
+  GSUB.prototype = new struct("GSUB table", [
       // GSUB header is four fields
       ["version",           "FIXED",  "Version of the GSUB table; initially set to 0x00010000"]
     , ["ScriptListOffset",  "OFFSET", "Offset to ScriptList table, from beginning of GSUB table"]

@@ -11,7 +11,7 @@ define(["struct", "makeStructy", "dataBuilding", "CoverageFormat", "LigatureSet"
     }
   };
 
-  LookupType4.prototype = new struct([
+  LookupType4.prototype = new struct("GSUB Lookup type 4", [
       ["SubstFormat",        "USHORT",  "lookup type 4 must be format 1"]
     , ["CoverageOffset",     "OFFSET",  "Offset to Coverage table, from beginning of Substitution table"]
     , ["LigSetCount",        "USHORT",  "Number of ligature sets"]
