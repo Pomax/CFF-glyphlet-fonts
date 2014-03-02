@@ -1,4 +1,4 @@
-define(["struct", "Segments"], function(struct, Segments){
+define(["struct", "makeStructy",  "Segments"], function(struct, makeStructy, Segments){
   "use strict";
 
   var format4 = function(input) {
@@ -76,8 +76,18 @@ define(["struct", "Segments"], function(struct, Segments){
 
     // set up the toString, toJSON, and toData functions.
     // FIXME: this shouldn't be necessary with properly written code.
-    [endCount, startCount, idDelta, idRangeOffset, glyphIdArray].forEach(function(arr) {
-      arr.toData = function() { return arr; };
+    var names = ["endCount", "startCount", "idDelta", "idRangeOffset", "glyphIdArray"];
+    [endCount, startCount, idDelta, idRangeOffset, glyphIdArray].forEach(function(arr,idx) {
+      arr.toData = function(offset, mapper) {
+        if(mapper) {
+          offset = offset || 0;
+          mapper.addMapping(offset, {
+            name: "cmap format4:"+names[idx],
+            length: arr.length
+          });
+        }
+        return arr;
+      };
       arr.toJSON = function() { return { data: arr}; };
       arr.toString = function() { return JSON.stringify(arr.toJSON(), false, 2); };
     });

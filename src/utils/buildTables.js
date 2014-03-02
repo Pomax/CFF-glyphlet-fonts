@@ -1,14 +1,14 @@
 define(["toWOFF", "asHex", "asChars"], function(toWOFF, asHex, asChars) {
   "use strict";
 
-  return function buildTables(font, mappings, context, selector, cssFontFamily, tableCaption) {
+  return function buildTables(font, context, selector, cssFontFamily, tableCaption) {
 
     // top element
     var top = document.querySelector(selector);
     var create = function(v) { return document.createElement(v); };
 
     // array to HTML table function
-    function makeTable(data, mappings, limit) {
+    function makeTable(data, limit) {
       limit = limit || 16;
       var tdCount = 0;
       var table = create("table");
@@ -65,10 +65,10 @@ define(["toWOFF", "asHex", "asChars"], function(toWOFF, asHex, asChars) {
       return table;
     }
 
-    function formTables(font, mappings, hexmap, charmap) {
+    function formTables(font, hexmap, charmap) {
       top.classList.add("tables");
-      top.appendChild(makeTable(hexmap, mappings));
-      top.appendChild(makeTable(charmap, mappings));
+      top.appendChild(makeTable(hexmap));
+      top.appendChild(makeTable(charmap));
 
       var downloads = create("div");
       downloads.classList.add("downloads");
@@ -96,7 +96,7 @@ define(["toWOFF", "asHex", "asChars"], function(toWOFF, asHex, asChars) {
     var binary = font.toData();
     var hexmap = binary.map(asHex);
     var charmap = binary.map(asChars);
-    formTables(font, mappings, hexmap, charmap);
+    formTables(font, hexmap, charmap);
   };
 
 });

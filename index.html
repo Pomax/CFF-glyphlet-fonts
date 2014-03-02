@@ -79,8 +79,8 @@
 
     <!-- scripts last, to make sure the page is "done" as much as possible, first -->
     <script>require(
-      ["builder", "buildTables", "addStyleSheet"],
-      function(builder, buildTables, addStyleSheet) {
+      ["builder", "buildTables", "addStyleSheet", "addMappings"],
+      function(builder, buildTables, addStyleSheet, addMappings) {
         "use strict";
 
         var y = -120;
@@ -99,8 +99,8 @@
         addStyleSheet(font, "customfont", "custom");
         var mappings = font.getMappings();
         console.log(mappings);
-        buildTables(font, mappings, window, "#tables", "custom font", "The byte layout views for our small, custom font.");
-
+        buildTables(font, window, "#tables", "custom font", "The byte layout views for our small, custom font.");
+        addMappings("#tables", mappings);
     });</script>
   </body>
 

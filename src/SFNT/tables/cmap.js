@@ -2,8 +2,8 @@ define(["struct", "makeStructy", "EncodingRecord", "subtables"], function(struct
   "use strict";
 
   var cmap = function(input) {
-    this.tables = [];
-
+    this.tables = makeStructy([]);
+/*
     this.tables.toJSON = function() {
       return this.map(function(r) { return r.toJSON(); });
     };
@@ -12,6 +12,7 @@ define(["struct", "makeStructy", "EncodingRecord", "subtables"], function(struct
       this.forEach(function(r) { data = data.concat(r.toData()); });
       return data;
     };
+*/
 
     if(!this.parse(input)) {
       input = input || {};
