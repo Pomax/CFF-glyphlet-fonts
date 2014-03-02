@@ -6,20 +6,27 @@
     <title>Font building</title>
     <link rel="stylesheet" href="style.css">
     <script src="require.js"></script>
-    <!-- can't turn this into data-main, because then paths resolve completely wrong -->
     <script src="src/main.js"></script>
   </head>
 
   <body>
-    <h1>A bit of font generation</h1>
+    <header>
+      <h1>A bit of font generation</h1>
+      <h2>a brief excursion into OpenType, by <a href="http://twitter.com/TheRealPomax">Pomax</a></h2>
+      <hr>
+    </header>
 
-    <p>Let's make a font that lets use type a letter with an outline shape defined by the SVG path "<span id="svg"></span>". We're going to have this shape sit in the spot of the tilde, "~", but because it might be more useful to have it automatically show up when we type a full word (like on <a hef="http://symbolset.com">symbolset.com</a>), we're also going to make it show up when we type the word "custom".</p>
+    <p>Let's make a font that lets us type a letter with an outline shape defined by the SVG path "<span id="svg"></span>", which is a neat way to say "it looks like a rectangle with a smaller rectangle cut out of it". We're going to have this shape sit in the spot of the tilde, "~", but because it might be more useful to have it automatically show up when we type a full word (like you can see expertly demonstrated over at <a href="http://symbolset.com">symbolset.com</a>), we're also going to make it show up when we type the word "custom".</p>
 
     <p>Implementing this using a library to build custom single-glyph font, that font has actually just been built by your browser, and has been added as a webfont to this page (using a @font-face CSS rule and a styling class),  so let's see what your browser made of it. The character ~, with our font applied, is now styled as <span class="custom">~</span>, and the string "custom" is similarly styled (as ligature) as <span class="custom">custom</span>. Now, because this is essentially just in-font magic, copy-pasting the first rectangle should lead to you pasting the plain string "~", and copy-pasting the second rectangle should lead to you pasting the plain string "custom".</p>
 
-    <h2>This is also how icon fonts work</h2>
+    <h2>This is also how icon fonts work.</h2>
 
     <p>So, we have a font that models "a shape", and we have a label that we can type that magically gets converted into that shape. Basically, this is how every (good) icon font that you've ever seen works. But, <em>how</em> do they work? Let's dive in.</p>
+
+    <h4>(It's actually also how, for instance, French works...)</h4>
+
+    <p>While letters like é exist "on their own", they can also be written as the sequence [e´]. Intelligent fonts can actually either reposition the accent, so that the combination looks like an é, or they can perform a "ligature" substittion and replace the two characters [e]+[´] with the single character [é].</p>
 
     <h2>Let's look at the actual font layout.</h2>
 
@@ -29,21 +36,46 @@
 
     <h2>So what do the numbers tell us?</h2>
 
-    <p>First of all, a little primer on how OpenType fonts work. A font file is actually a collection of "tables", each describing a different aspect of the font. Some contain information on the font's name, license text, who made it, etc. and some contain metrics information, like what the overall character height is, how many letters are in the font, etc. Of all the tables in a font (and there are a fair number), typically only one table will contain what you might think of as actual letters. In the little font on this page, that's the "CFF" table (a "compact font format" table). Looking at the font's bytecode we can tell (or, if you know how to read it) that of the 1,372 bytes that our font takes up, only 211 bytes (D3 in hex, see if you can spot it) are taken up by the CFF table. That's... really not that much. What on earth is all the rest for?</p>
+    <p>First of all, a little primer on how OpenType fonts work. A font file is actually a collection of "tables", each describing a different aspect of the font. Some contain information on the font's name, license text, who made it, etc. and some contain metrics information, like what the overall character height is, how many letters are in the font, etc. Of all the tables in a font (and there are a fair number), typically only one table will contain what you might think of as actual letters. In the little font on this page, that's the "CFF" table (a "compact font format" table). Looking at the font's bytecode we can tell (or, if you know how to read it) that of the 948 bytes that our font takes up, only 211 bytes (D3 in hex, see if you can spot it) are taken up by the CFF table. That's... really not that much. What on earth is all the rest for?</p>
 
     <h3>OpenType is about describing <em>everything</em>.</h3>
 
     <p>The CFF table is to an OpenType font what a typeface is to a book: essential, but really not the part that makes a font special. What makes OpenType fonts special is that they describe every aspect that you might be able to think of when you think of putting letters together to form words. In addition to the obvious "this is what letters look like" information, OpenType fonts also specify things like the name of each letter that is available in the font, how much of the <a href="http://unicode.org">Unicode</a> standard the font implements, which horizontal and vertical metrics apply to which letters, exactly how the letters are arranged inside the font so that they can quickly be read out, what kind of font classifications apply (is it a fantasy font? is it bold face? is it fixed width? etc), what kind of memory allocation a printer needs to perform in order to be able to even load the font, etc. etc. etc.</p>
 
-    <p>And then, there are the two most important tables a font can have: the GSUB and GPOS tables. These tables are used, respectively, to define all the substitutions that the font can perform and how to position letters in relation to each other.</p>
+    <p>In fact, the biggest table in this font is the "name" table, which contains all the strings that describe things like the font name, the font family name, who made it, which version it's on, what (simplified) license applies, who owns the copyright, which preview text to use in font previewers, and more such things. This table is a whopping 519 bytes, almost half the font! The reason it's so big is that even though computers these days don't really care about which operating system you use, OpenType fonts still "have to" contain strings in both "Macintosh" and "Windows" format, which really means ASCII and UTF16. So a string "Version 1.0", which is 11 letters (including the space) would normally take up 11 bytes, but because it also needs to be recorded in UTF16, which turns it into "0V0e0r0si0o0n0 010.00" —with zero-bytes in front of every actual letter, due to how UTF16 encodes the letters that you find in the ASCII block— which is an additional 22 bytes. If we didn't have to encode the data twice, we could do without almost two thirds of the table. While it's good that OpenType is about describing everything, sometimes it's a little over the top.</p>
+
+    <p>In a normal font, however, the name table will generally be much smaller than the two most important tables an OpenType font can have: the GSUB and GPOS tables. These tables are used, respectively, to define all the substitutions that the font can perform and how to position letters in relation to each other.</p>
+
+    <h4>GSUB - glyph substition magic</h4>
 
     <p>For instance, a font that uses GSUB might contain two different sets of the numbers 0 through 9, one set for "normal typesetting", and another for "when historically used versions" are required. In "the old days" you would need to use two separate fonts, with the old-style number font applied to each number in your text, but with a modern OpenType font, the font itself can do the substitutions and you don't need to worry about whether all the numbers got styled correctly. But it can also be used to substitute single letters, or multiple letters, with other single or multiple letters. <em>And</em> it can be used to change what letters look like depending on where in a word they are. That might sound weird, but Arabic has four different shapes for <em>each</em> letter, depending on whether it's on its own, or used at the start, middle, or end of a word. Good luck trying to do that with a bunch of separate fonts for each of the positions in a word.</p>
+
+    <h4>GPOS - glyph positioning magic</h4>
 
     <p>A font with GPOS (and in older OpenType fonts, the "kern" table), can make sure that letters are positioned correctly; both in terms of what looks nice (like moving a V a little closer to A in "AV", so that it doesn't look like there's "too much" space between them) but also to ensure things are correct, like forming the Vietnames letter ở by combining the base letter "o" with the two diacritic marks required to make it the correct letter.</p>
 
     <p>Our little font only has one letter, so it doesn't use a GPOS table (what would we reposition?) but the GSUB table just for replacing "custom" with "~", is 98 bytes. That's almost half the size of the CFF table. So, why so big?</p>
 
-    <p>Good reasons, actually, but I'll explain them later =)</p>
+    <h2>Scripts, features, lookups, oh my!</h2>
+
+    <p>One of the more important aspects of modern fonts is that they're not just for "styling letters", they are for styling full strings, for specific scripts, in specific contexts, in a way that lets a font specify what to do in case of different scripts and different contexts. Things you might think you would need to specify in a word processor are actually things that fonts, not the word processor, can do entirely automatically.</p>
+
+    <p>For instance, Chinese and Japanese both use the "<a href="http://en.wikipedia.org/wiki/CJK_Unified_Ideographs">CJK Unified Ideographs</a>" set of characters defined by Unicode. However, while they use the same characters in principle, they don't always look the same in the two languages. As such, a modern OpenType font can contain instructions to apply certain rules when the font is used in a Chinese script context, and use other rules in a Japanese script context. Even within the same script, we might have different ways that text needs to be style. In keeping with Asiatic languages, both Chinese and Japanese can be written either horizontally (from left to right, one line below the previous), or vertically (from top to bottom, one line to the left of the previous). Depending on which writing mode the font is used in, the character metrics will be different. So for GSUB and GPOS tables, the idea is that "things to apply for styling" are encoded as "lookups" (for instance, the GSUB lookup type 4 encodes how to turn several letters into a single other letter, like turning the letter sequence "custom" into a rectangle), and "features" can link to one or more lookups; features marked as "liga", for instance, encode the notion that "there are ligatures available in this font", and then point to specific lookups that can be used to perform the actual substitutions. Finally, fonts will have a list of supported scripts (including a "DFLT" script for when nothing else applies) which can each indicate that one or more features should be active. You might want to have small-caps replacements active for English scripts, for instance, but not for Greek and Coptic.</p>
+
+    <p>In this simple font, just to get the word "custom" replaced with our little rectangle, we need have a GSUB lookup defined, with a feature called "liga" that points to that lookup, with a featureset that contains just that single feature, and two scripts —the DFLT script as well as a "latn" script, which covers most western written characters— that both point to the same featureset. Clearly, the script/feature/lookup idea is pretty useful, but it's also pretty complex, and for simple things like a single substitution rule, perhaps a little overkill.</p>
+
+    <h2>TrueType or OpenType? Apples and <s>Oranges</s> Fruit.</h2>
+
+    <p>Another consideration that OpenType fonts allow is which kind of outline description to use. You may have heard of TrueType fonts, especially contrasted to OpenType fonts, but actually TrueType is to OpenType what Ford or Porche are to cars: OpenType is "the thing", and TrueType is simply one flavour of OpenType font. The main other is the "Type 2" or "CFF" flavour.</p>
+
+    <p>What's the difference? TrueType was historically Microsoft's way of modeling outline shapes, and is a relatively straightforward way to describe lines and curves that are necessary to draw letters. It's easy to define shapes in, but its simplicity unfortunately comes at a cost: it's also not a very efficient way to describe outlines. CFF, on the other hand, has a very rich instruction set for describing outline graphics using Adobe's "type 2 charstrings". These things are extremely efficient at describing rich shapes, but they can also be terribly complex. Generally if you font models relatively few characters, or their shape doesn't require a lot of complex outline graphics, then TrueType flavoured OpenType fonts are a good idea. However, for fonts with very large character sets (such as East-Asian fonts) or fonts with highly detailed graphical characters, CFF flavoured OpenType fonts might be a much better idea.</p>
+
+    <p>Despite using a relatively simple graphic for our font on this page, we're still using a CFF font. Why? Because doing so lets us more about how fonts work than if we used TrueType outlines. In face, while TrueType data is mostly just a table of outline instructions and a second table for resolving character codes to 'where in the outline block is the data for this character', a CFF block is a full font in an of itself. While it was never designed to be used on its own (always meant to be inside a wrapper that holds all the meta data), a CFF block pretty much has everything that would qualify it as a font. It knows which characters it supports, it has outlines for them, it has general metadata on character metrics, font name and version, and even whether it's an ultra thin or bold font. That makes it far more interesting to look at, in addition to use the Type 2 charstring instructions for outlines, which are almost like a programming language for graphics. Come to think of it, scratch that "almost". Type 2 charstrings are really, <em>really</em> powerful.</p>
+
+
+     <h2>Peeking under the CFF bonnet.</h2>
+
+     <p>Next time we'll be looking at what makes the CFF block tick.</p>
 
     <!-- scripts last, to make sure the page is "done" as much as possible, first -->
     <script>require(
@@ -53,14 +85,14 @@
 
         var y = -120;
         var outline = "M  20 "+(100 + y) + " L  20 "+(800 + y) + " 700 "+(800 + y) + " 700 "+(100 + y) + " 20 "+(100 + y)
-                    + "M 170 "+(250 + y) + " L 550 "+(250 + y) + " 550 "+(650 + y) + " 170 "+(650 + y);
+                   + " M 170 "+(250 + y) + " L 550 "+(250 + y) + " 550 "+(650 + y) + " 170 "+(650 + y);
         outline = outline.replace(/\s+/g,' ');
         document.getElementById("svg").innerHTML = outline;
 
         var options = {
           outline: outline,
           label: "custom",
-          minimal: false
+          minimal: true
         };
 
         var font = builder.build(options);

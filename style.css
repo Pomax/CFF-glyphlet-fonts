@@ -1,3 +1,45 @@
+/**
+ *
+ * General page styling
+ *
+ **/
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 60em;
+  margin: 0 auto;
+}
+
+header h1 {
+  font-size: 300%;
+  margin-bottom: -0.4em;
+}
+
+header h2 {
+  font-size: 120%;
+  margin-left: 1em;
+}
+
+p {
+  text-align: justify;
+  line-height: 1.5em;
+  text-indent: 1.2em;
+}
+
+#svg { font-family: monospace; }
+
+
+/**
+ *
+ * Byte table styling
+ *
+ **/
+
+
 .tables { display: inline-block; }
 table { margin: auto; width: 40%; display: inline-block; font-family: monospace; font-size: 12px; border-collapse: collapse; width: auto; }
 table+table { margin-left: 2em; }
@@ -21,5 +63,3 @@ code { font-family: monospace; color: darkgray; background: rgba(0,0,0,0.1); }
 .tables td { cursor:default; }
 .downloads { clear: both; font-size: 80%; margin-bottom: 3em; text-align: center; text-indent: -2em; margin-top: -1em; }
 .downloads * + * { margin-left: 10px; }
-
-#svg { font-family: monospace; }
