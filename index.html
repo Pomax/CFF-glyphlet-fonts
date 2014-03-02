@@ -98,7 +98,6 @@
         var font = builder.build(options);
         addStyleSheet(font, "customfont", "custom");
         var mappings = font.getMappings();
-        console.log(mappings);
         buildTables(font, window, "#tables", "custom font", "The byte layout views for our small, custom font.");
         addMappings("#tables", mappings);
     });</script>
