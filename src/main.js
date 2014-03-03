@@ -21,10 +21,13 @@
   extend("SFNT/tables/name",          ["NameRecord", "NameRecords", "StringRecord"]);
 
   // Set up require.js for this project
-  require.config({
+  var config = {
     baseUrl: ".",
     paths: paths,
     shim: { "shimFname": {} }
-  });
+  };
+  require.config(config);
+
+  console.log(JSON.stringify(config,false,2));
 
 }());
