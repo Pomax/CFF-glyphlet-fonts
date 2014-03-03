@@ -42,10 +42,17 @@
     <h3>OpenType is about describing <em>everything</em>.</h3>
 
     <p>The CFF table is to an OpenType font what a typeface is to a book: essential, but really not the part that makes a font special. What makes OpenType fonts special is that they describe every aspect that you might be able to think of when you think of putting letters together to form words. In addition to the obvious "this is what letters look like" information, OpenType fonts also specify things like the name of each letter that is available in the font, how much of the <a href="http://unicode.org">Unicode</a> standard the font implements, which horizontal and vertical metrics apply to which letters, exactly how the letters are arranged inside the font so that they can quickly be read out, what kind of font classifications apply (is it a fantasy font? is it bold face? is it fixed width? etc), what kind of memory allocation a printer needs to perform in order to be able to even load the font, etc. etc. etc.</p>
-
+<!--
     <p>In fact, the biggest table in this font is the "name" table, which contains all the strings that describe things like the font name, the font family name, who made it, which version it's on, what (simplified) license applies, who owns the copyright, which preview text to use in font previewers, and more such things. This table is a whopping 519 bytes, almost half the font! The reason it's so big is that even though computers these days don't really care about which operating system you use, OpenType fonts still "have to" contain strings in both "Macintosh" and "Windows" format, which really means ASCII and UTF16. So a string "Version 1.0", which is 11 letters (including the space) would normally take up 11 bytes, but because it also needs to be recorded in UTF16, which turns it into "0V0e0r0si0o0n0 010.00" —with zero-bytes in front of every actual letter, due to how UTF16 encodes the letters that you find in the ASCII block— which is an additional 22 bytes. If we didn't have to encode the data twice, we could do without almost two thirds of the table. While it's good that OpenType is about describing everything, sometimes it's a little over the top.</p>
 
     <p>In a normal font, however, the name table will generally be much smaller than the two most important tables an OpenType font can have: the GSUB and GPOS tables. These tables are used, respectively, to define all the substitutions that the font can perform and how to position letters in relation to each other.</p>
+-->
+
+    <p>Generally, the bulk of OpenType data is taken up by three tables: 1) the "cmap" table, which gives the character mapping from "character code" (generally the unicode for a "letter") to font-internal id, 2) the "GSUB" table, for glyph substitution rules, and 3) the "GPOS" table, for positioning glyphs in relation to other glyphs.</p>
+
+    <h4>cmap - the character map into a font</h4>
+
+    <p>I'll be explaining this in more detail later.</p>
 
     <h4>GSUB - glyph substition magic</h4>
 
