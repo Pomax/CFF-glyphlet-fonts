@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <title>Font building</title>
     <link rel="stylesheet" href="style.css">
+    <script>var optimized = true;</script>
   </head>
 
   <body>
@@ -16,13 +17,15 @@
 
     <p>Let's make a font that lets us type a letter with an outline shape defined by the SVG path "<span id="svg"></span>", which is a neat way to say "it looks like a rectangle with a smaller rectangle cut out of it". We're going to have this shape sit in the spot of the tilde, "~", but because it might be more useful to have it automatically show up when we type a full word (like you can see expertly demonstrated over at <a href="http://symbolset.com">symbolset.com</a>), we're also going to make it show up when we type the word "custom".</p>
 
-    <p>Implementing this using a library to build custom single-glyph font, that font has actually just been built by your browser, and has been added as a webfont to this page (using a @font-face CSS rule and a styling class),  so let's see what your browser made of it. The character ~, with our font applied, is now styled as <span class="custom">~</span>, and the string "custom" is similarly styled (as ligature) as <span class="custom">custom</span>. Now, because this is essentially just in-font magic, copy-pasting the first rectangle should lead to you pasting the plain string "~", and copy-pasting the second rectangle should lead to you pasting the plain string "custom".</p>
+    <p>As it so happens, this page is running a JavaScript library that can build custom fonts like the one just suggested, and said font has actually just been built by your browser. The library also loaded the resulting font as a webfont for this page (using a @font-face CSS rule and a styling class),  so let's see what your browser made of it!</p>
+
+    <p>The character ~, with our font applied, is now styled as <span class="custom">~</span>, and the string "custom" is similarly styled (as ligature) as <span class="custom">custom</span>. Now, because this is essentially just in-font magic, copy-pasting the first rectangle should lead to you pasting the plain string "~", and copy-pasting the second rectangle should lead to you pasting the plain string "custom".</p>
 
     <h2>This is also how icon fonts work.</h2>
 
     <p>So, we have a font that models "a shape", and we have a label that we can type that magically gets converted into that shape. Basically, this is how every (good) icon font that you've ever seen works. But, <em>how</em> do they work? Let's dive in.</p>
 
-    <h4>(It's actually also how, for instance, French works...)</h4>
+    <h4>(It's actually also how, for instance, many accented letters works...)</h4>
 
     <p>While letters like é exist "on their own", they can also be written as the sequence [e´]. Intelligent fonts can actually either reposition the accent, so that the combination looks like an é, or they can perform a "ligature" substittion and replace the two characters [e]+[´] with the single character [é].</p>
 
@@ -78,11 +81,21 @@
 
     <!-- scripts last, to make sure the page is "done" as much as possible, first -->
     <script src="require.js"></script>
-    <!--
-      <script src="src/main.js"></script>
-      <script src="buildFont.js"></script>
-    -->
-    <script src="generator.js"></script>
+    <script>
+      if (optimized === false) {
+        var config = document.createElement("script");
+        config.src = "src/require.config.js";
+        config.onload = function() {
+          var main = document.createElement("script");
+          main.src = "main.js";
+          document.head.appendChild(main); };
+        document.head.appendChild(config); }
+
+      else {
+        var main = document.createElement("script");
+        main.src = "generator.js";
+        document.head.appendChild(main); }
+    </script>
   </body>
 
 </html>

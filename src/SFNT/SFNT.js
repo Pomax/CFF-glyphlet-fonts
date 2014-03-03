@@ -129,25 +129,33 @@ define(["dataBuilding", "tables", "SFNTHeader", "DirectoryEntry", "Mapper"], fun
       if(this.fontStructs === false) return false;
       var mapper = new Mapper();
       var self = this;
-      var offset = 0,
-          tablemark;
+      var offset = 0, mark = 0;
 
       this.fontStructs.header.toData(offset, mapper);
       offset = mapper.last().end;
+      mapper.addMapping(mark, {
+        name: "SFNT header",
+        length: offset - mark
+      });
 
       this.fontStructs.directoryOrder.forEach(function(tag) {
+        mark = offset
         self.fontStructs.directory[tag].toData(offset, mapper);
         offset = mapper.last().end;
+        mapper.addMapping(mark, {
+          name: tag + " directory",
+          length: offset - mark
+        });
       });
 
       this.fontStructs.tableOrder.forEach(function(tag) {
-        tablemark = offset;
+        mark = offset;
         self.stub[tag].toData(offset, mapper);
         offset = mapper.last().end;
-        mapper.addMapping(tablemark, {
+        mapper.addMapping(mark, {
           name: tag + " table",
-          length: offset - tablemark
-        })
+          length: offset - mark
+        });
         while(offset % 4 !== 0) { offset++; }
       });
 

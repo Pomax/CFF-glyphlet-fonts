@@ -1,7 +1,7 @@
 ({
   baseUrl: '.',
   out: 'generator.js',
-  name: 'buildFont',
+  name: 'main',
   paths: {
     "builder": "src/./builder",
     "formGlobals": "src/./formGlobals",

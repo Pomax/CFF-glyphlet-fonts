@@ -28,6 +28,4 @@
   };
   require.config(config);
 
-  console.log(JSON.stringify(config,false,2));
-
 }());
