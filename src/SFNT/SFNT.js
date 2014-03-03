@@ -135,7 +135,8 @@ define(["dataBuilding", "tables", "SFNTHeader", "DirectoryEntry", "Mapper"], fun
       offset = mapper.last().end;
       mapper.addMapping(mark, {
         name: "SFNT header",
-        length: offset - mark
+        length: offset - mark,
+        structure: self.fontStructs.header.toJSON()
       });
 
       this.fontStructs.directoryOrder.forEach(function(tag) {
@@ -144,7 +145,8 @@ define(["dataBuilding", "tables", "SFNTHeader", "DirectoryEntry", "Mapper"], fun
         offset = mapper.last().end;
         mapper.addMapping(mark, {
           name: tag + " directory",
-          length: offset - mark
+          length: offset - mark,
+          structure: self.fontStructs.directory[tag].toJSON()
         });
       });
 
@@ -154,7 +156,8 @@ define(["dataBuilding", "tables", "SFNTHeader", "DirectoryEntry", "Mapper"], fun
         offset = mapper.last().end;
         mapper.addMapping(mark, {
           name: tag + " table",
-          length: offset - mark
+          length: offset - mark,
+          structure: self.stub[tag].toJSON()
         });
         while(offset % 4 !== 0) { offset++; }
       });

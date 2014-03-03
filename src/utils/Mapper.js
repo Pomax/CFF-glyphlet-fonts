@@ -16,7 +16,8 @@ define(function() {
         end: offset + options.length,
         type: options.type || '',
         description: options.description || '',
-        value: options.value !== undefined ? options.value instanceof Array ? "<structured>" : options.value : false
+        value: options.value !== undefined ? options.value instanceof Array ? "<structured>" : options.value : false,
+        structure: options.structure || false
       };
       this.mappings.push(mapping);
       return mapping;

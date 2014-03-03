@@ -9,9 +9,16 @@ define(["getColor"], function(getColor) {
     return qs.join(",");
   }
 
+  var curHighlight = false;
+
   // highlight an element
-  var highlight = function(e, mapping, coloridx) {
-    e.style.background = getColor(coloridx);
+  var highlight = function(e, mapping, idx) {
+    if(idx === 0 && curHighlight !== mapping && mapping.structure) {
+      // console.log( mapping.name );
+      // console.log( JSON.stringify(mapping.structure, false, 2) );
+      // curHighlight = mapping;
+    }
+    e.style.background = getColor(idx);
     var name = mapping.name.replace(/\.+/g,'.').replace(/\.\[/g,'[');
     var value = mapping.value;
     if(value && value.replace) { value = value.replace(/\u0000/g,' 0x00 '); }
@@ -30,6 +37,7 @@ define(["getColor"], function(getColor) {
   var restore = function(e, last) {
     e.style.background = e.getAttribute("data-background");
     e.removeAttribute("title");
+    curHighlight = false;
   };
 
   // set up event tracking

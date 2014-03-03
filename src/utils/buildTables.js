@@ -67,6 +67,8 @@ define(["toWOFF", "asHex", "asChars"], function(toWOFF, asHex, asChars) {
 
     function formTables(font, hexmap, charmap) {
       top.classList.add("tables");
+
+      // data maps (binary visualisation)
       top.appendChild(makeTable(hexmap));
       top.appendChild(makeTable(charmap));
 

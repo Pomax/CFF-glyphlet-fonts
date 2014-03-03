@@ -32,6 +32,11 @@ p {
 
 #svg { font-family: monospace; }
 
+.structure {
+  white-space: pre;
+  text-align: left;
+  font-family: monospace;
+}
 
 /**
  *

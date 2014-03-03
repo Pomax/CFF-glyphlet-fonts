@@ -88,8 +88,8 @@ define(["struct", "makeStructy",  "Segments"], function(struct, makeStructy, Seg
         }
         return arr;
       };
-      arr.toJSON = function() { return { data: arr}; };
-      arr.toString = function() { return JSON.stringify(arr.toJSON(), false, 2); };
+      arr.toJSON = function() { return { data: arr.slice() }; };
+      arr.toString = function() { return JSON.stringify(arr, false, 2); };
     });
 
     // And record the size of this subtable
