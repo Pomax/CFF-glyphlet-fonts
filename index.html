@@ -17,7 +17,7 @@
 
     <p>Let's make a font that lets us type a letter with an outline shape defined by the SVG path "<span id="svg"></span>", which is a neat way to say "it looks like a rectangle with a smaller rectangle cut out of it". We're going to have this shape sit in the spot of the tilde, "~", but because it might be more useful to have it automatically show up when we type a full word (like you can see expertly demonstrated over at <a href="http://symbolset.com">symbolset.com</a>), we're also going to make it show up when we type the word "custom".</p>
 
-    <p>As it so happens, this page is running a JavaScript library that can build custom fonts like the one just suggested, and said font has actually just been built by your browser. The library also loaded the resulting font as a webfont for this page (using a @font-face CSS rule and a styling class),  so let's see what your browser made of it!</p>
+    <p>As it so happens, this page is running a <a href="https://github.com/pomax/CFF-glyphlet-fonts">JavaScript library</a> that can build custom fonts like the one just suggested, and said font has actually just been built by your browser. The library also loaded the resulting font as a webfont for this page (using a @font-face CSS rule and a styling class),  so let's see what your browser made of it!</p>
 
     <p>The character ~, with our font applied, is now styled as <span class="custom">~</span>, and the string "custom" is similarly styled (as ligature) as <span class="custom">custom</span>. Now, because this is essentially just in-font magic, copy-pasting the first rectangle should lead to you pasting the plain string "~", and copy-pasting the second rectangle should lead to you pasting the plain string "custom".</p>
 
