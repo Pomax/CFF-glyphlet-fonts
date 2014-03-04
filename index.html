@@ -72,7 +72,7 @@
 
     <h3>How much do those things cost?</h3>
 
-    <p>Our little font only has one letter, so it doesn't use a GPOS table (what would we reposition?) but the GSUB table just for replacing the string "custom" with the glyph for "~" clocks in at 98 bytes. That's almost half the size of the CFF table. So, why so big?</p>
+    <p>Our little font only has one real letter, so it doesn't use a GPOS table (what would we reposition?) but the cmap table for mapping the seven letters "c", "u", "s", "t", "o", "m", and "~" takes up 106 bytes (thanks to being highly fragmented character codes), and the GSUB table, used only to replace the string "custom" with the glyph for "~", clocks in at 98 bytes. That's almost half the size of the CFF table. We kind of know why the cmap table is so big (the proportional size goes down the more letters we actually implement, to fill in the gaps that this font very clearly has), but why is the GSUB table so big?</p>
 
     <h2>Scripts, features, lookups, oh my!</h2>
 
