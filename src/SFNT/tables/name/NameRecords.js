@@ -1,10 +1,10 @@
-define(["makeStructy", "NameRecord", "StringRecord"], function(makeStructy, NameRecord, StringRecord) {
+define(["struct", "makeStructy", "NameRecord", "StringRecord"], function(struct, makeStructy, NameRecord, StringRecord) {
   "use strict";
 
   var NameRecords = function() {
     var self = this;
-    self.records = makeStructy([]);
-    self.strings = makeStructy([]);
+    self.records = makeStructy([], "name record");
+    self.strings = makeStructy([], "name string");
     self.strings.toJSON = function() {
       return this.map(function(r) {
         return r.values["string"].map(function(i) {

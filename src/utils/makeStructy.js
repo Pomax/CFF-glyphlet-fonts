@@ -1,5 +1,5 @@
 define(function() {
-	return function makeStructy(array) {
+	return function makeStructy(array, name) {
     array.toJSON = function() {
       return this.map(function(r) { return r.toJSON(); });
     };
@@ -9,6 +9,13 @@ define(function() {
       this.forEach(function(r) {
         val = r.toData(offset, mappings);
         data = data.concat(val);
+        if(mappings) {
+          mappings.addMapping(offset, {
+            name: name,
+            length: val.length,
+            structure: r.toJSON()
+          });
+        }
         offset += val.length;
       });
       return data;

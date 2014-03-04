@@ -135,11 +135,14 @@ define(
       addLabelSubstitution(font, globals)
 
 
-//      Object.keys(font).forEach(function(table) {
-//        if(font[table].toData) {
-//          console.log(table, font[table].toData().length);
-//        }
-//      });
+      /*
+      console.log(sfnt.toData().length);
+      Object.keys(font).forEach(function(table) {
+        if(font[table].toData) {
+          console.log(table, font[table].toData().length);
+        }
+      });
+      */
 
 
       return sfnt;

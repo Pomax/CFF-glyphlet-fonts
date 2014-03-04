@@ -10,8 +10,16 @@ html, body {
 }
 
 body {
-  width: 60em;
   margin: 0 auto;
+}
+
+body > * {
+  width: 60rem;
+  margin: 0.7rem auto;
+}
+
+h1,h2,h3,h4,h5,h6 {
+  margin: 1em auto;
 }
 
 header h1 {
@@ -45,8 +53,7 @@ p {
  **/
 
 
-.tables { display: inline-block; }
-table { margin: auto; width: 40%; display: inline-block; font-family: monospace; font-size: 12px; border-collapse: collapse; width: auto; }
+table { margin: auto; width: 32%; display: inline-block; font-family: monospace; font-size: 12px; border-collapse: collapse; width: auto; }
 table+table { margin-left: 2em; }
 table, tr, td { padding: 0; margin : 0 0 1em 0; }
 tr { margin: -1px 0; }

@@ -15,7 +15,7 @@ require(
     var options = {
       outline: outline,
       label: "custom",
-      minimal: true
+      minimal: false
     };
 
     var font = builder.build(options);

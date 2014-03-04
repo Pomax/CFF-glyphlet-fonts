@@ -23,24 +23,5 @@ define(["struct"], function(struct){
     , ["offset",   "USHORT", "offset for this string in the string heap"]
   ]);
 
-  /**
-   * first half of a name record, encoding {platform, encoding, language} triplet
-   */
-  NameRecord.prototype.setPEL = function(platform, encoding, language) {
-    this.platform = platform;
-    this.encoding = encoding;
-    this.language = language;
-  };
-
-  /**
-   * second half of a name record, encoding {recordID, length, offset} triplet
-   */
-  NameRecord.prototype.setRLO = function(recordID, length, offset) {
-    this.recordID = recordID;
-    this.length = length;
-    this.offset = offset;
-  };
-
-
   return NameRecord
 });

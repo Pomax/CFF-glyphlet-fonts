@@ -37,7 +37,6 @@ define(["getColor"], function(getColor) {
   var restore = function(e, last) {
     e.style.background = e.getAttribute("data-background");
     e.removeAttribute("title");
-    curHighlight = false;
   };
 
   // set up event tracking
