@@ -13,19 +13,29 @@ define(["getColor"], function(getColor) {
 
   // highlight an element
   var highlight = function(e, mapping, idx) {
+    /*
     if(idx === 0 && curHighlight !== mapping && mapping.structure) {
-      // console.log( mapping.name );
-      // console.log( JSON.stringify(mapping.structure, false, 2) );
-      // curHighlight = mapping;
+      console.log( mapping.name );
+      console.log( JSON.stringify(mapping.structure, false, 2) );
+      curHighlight = mapping;
     }
+    */
     e.style.background = getColor(idx);
+    /*
     var name = mapping.name.replace(/\.+/g,'.').replace(/\.\[/g,'[');
     var value = mapping.value;
     if(value && value.replace) { value = value.replace(/\u0000/g,' 0x00 '); }
     var description = mapping.description;
     var dec = mapping.start+"-"+(mapping.end-1);
     var hex = mapping.start.toString(16).toUpperCase()+"-"+(mapping.end-1).toString(16).toUpperCase();
-    e.title = name + (description? "\ndesc: " + description : '') + (value !== undefined? "\nvalue: " + value : '') + "\npos (dec): " + dec + "\npos (hex): " + hex;
+    e.title = [
+        name
+      , description? "desc: " + description : ''
+      , value !== undefined? "\nvalue: " + value : ''
+      , "pos (dec): " + dec
+      , "pos (hex): " + hex
+    ].join("\n");
+    */
   };
 
   // cache the background color so we can restore it later

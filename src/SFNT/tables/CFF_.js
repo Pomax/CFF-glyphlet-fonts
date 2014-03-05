@@ -1,4 +1,6 @@
-define(["struct", "dataBuilding"], function(struct, dataBuilder){
+define(
+["struct", "dataBuilding", "CFFHeader", "NameIndex", "TopDictIndex"],
+function(struct, dataBuilder, CFFHeader, NameIndex, TopDictIndex) {
   "use strict";
 
   var encoder = dataBuilder.encoder,
@@ -269,7 +271,13 @@ define(["struct", "dataBuilding"], function(struct, dataBuilder){
       return Math.ceil(bits/8);
     }(serialized.length));
 
-    return cff;
+    var sh = serialize(cff[0]), header_length = sh.length;
+    var si = serialize(cff[1]), index_length = si.length;
+/*
+    var st = serialize(cff[2]), top_length = st.length;
+    return serialize(cff).slice(header_length + index_length + top_length);
+*/
+    return serialize(cff).slice(header_length + index_length);
   };
 
 
@@ -279,22 +287,45 @@ define(["struct", "dataBuilding"], function(struct, dataBuilder){
    *
    **/
 
-
-  var CFF = function(globals) {
-    var input;
+  var CFF = function(input) {
     if(!this.parse(input)) {
       input = input || {};
       this.fill(input);
-      var CFFStruct = createCFF(globals)
-      this["CFF data block"] = serialize(CFFStruct);
+
+      this.header = new CFFHeader({
+        major: 1,
+        minor: 0,
+        offSize: 1
+      });
+
+      this["name index"] = new NameIndex({
+        strings: [input.postscriptName]
+      });
+/*
+      this["top dict index"] = new TopDictIndex({
+        property: "value"
+      });
+*/
+      var CFFStruct = createCFF(input)
+      this["CFF data block"] = CFFStruct;
     }
   };
 
   CFF.prototype = new struct([
-    ["CFF data block", "LITERAL", "we're not going to do this as a struct build-up right now."]
+      ["header",             "LITERAL", "the CFF header"]
+    , ["name index",         "LITERAL", "the name index for this font"]
+    , ["CFF data block",     "LITERAL", "we're not going to do this as a struct build-up right now."]
+/*
+    , ["top dict index",     "LITERAL", "the global font dict"]
+    , ["string index",       "LITERAL", "the strings used in this font (there are 390 by-spec strings already)"]
+    , ["global subroutines", "LITERAL", "the global subroutines that all charstrings can use"]
+    , ["charset",            "LITERAL", "the font's character set"]
+    , ["encoding",           "LITERAL", "the encoding information for this font"]
+    , ["charstring index",   "LITERAL", "the charstring definition for all encoded glyphs"]
+    , ["private dict",       "LITERAL", "the private dicts; each dict maps a partial font."]
+*/
   ]);
 
-  CFF.prototype.constructor = CFF;
 
   return CFF;
 
