@@ -153,6 +153,33 @@ define([], function() {
     return [29, (v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF];
   };
 
+  decoder.NUMBER = function NUMBER(bytes) {
+    var b0 = bytes.splice(0,1)[0];
+    if(b0 === 28) {
+      var b1 = bytes.splice(0,1)[0];
+      var b2 = bytes.splice(0,1)[0];
+      return (b1 << 8) | b2;
+    }
+    if(b0 === 29) {
+      var b1 = bytes.splice(0,1)[0];
+      var b2 = bytes.splice(0,1)[0];
+      var b3 = bytes.splice(0,1)[0];
+      var b4 = bytes.splice(0,1)[0];
+      return (b1 << 8) | b2;
+    }
+    if(b0 >= 32 && b0 <= 246) {
+      return b0 - 139;
+    }
+    if(b0 >= 247 && b0 <= 250) {
+      var b1 = bytes.splice(0,1)[0];
+      return ((b0-247) << 8) + b1 + 108;
+    }
+    if(b0 >= 251 && b0 <= 254) {
+      var b1 = bytes.splice(0,1)[0];
+      return -((b0-251) << 8) - b1 - 108;
+    }
+  };
+
   encoder.OPERAND = function OPERAND(v1, v2) {
     var opcode = encoder.BYTE(v1);
     if(v2 !== undefined) { opcode.concat(BYTE(v2)); }
@@ -187,6 +214,109 @@ define([], function() {
   decoder.OffSize = decoder.BYTE;
   encoder.OffsetX = [undefined, encoder.BYTE, encoder.USHORT, encoder.UINT24, encoder.ULONG];
   decoder.OffsetX = [undefined, decoder.BYTE, decoder.USHORT, decoder.UINT24, decoder.ULONG];
+
+  encoder.BOOLEAN = function(v) { return v ? [1] : [0]; };
+  decoder.BOOLEAN = function(v) { return !!v[0]; };
+  sizeOf.BOOLEAN  = function()  { return 1; };
+
+  encoder.NUMBERS = function(v) {
+    var data = [];
+    v.forEach(function(c) {
+      data = data.concat(encoder.NUMBER(c));
+    })
+    return data;
+  };
+  decoder.NUMBERS = function(v) {
+    var numbers = [];
+    while(v.length > 0) {
+      numbers.push(decoder.NUMBER(v));
+    }
+    return numbers;
+  };
+  sizeOf.NUMBERS  = function(v)  { return v.length; };
+
+  // type2 opcode encoding/decoding
+  (function(encoder, decoder, sizeOf) {
+    var CFFtypes = [
+      // Top dict values
+      ["version",            "NUMBER",   [0]      ]
+    , ["Notice",             "NUMBER",   [1]      ]
+    , ["Copyright",          "NUMBER",   [12, 0]  ]
+    , ["FullName",           "NUMBER",   [2]      ]
+    , ["FamilyName",         "NUMBER",   [3]      ]
+    , ["Weight",             "NUMBER",   [4]      ]
+    , ["isFixedPitch",       "BOOLEAN",  [12, 1]  ]
+    , ["ItalicAngle",        "NUMBER",   [12, 2]  ]
+    , ["UnderlinePosition",  "NUMBER",   [12, 3]  ]
+    , ["UnderlineThickness", "NUMBER",   [12, 4]  ]
+    , ["PaintType",          "NUMBER",   [12, 5]  ]
+    , ["CharstringType",     "NUMBER",   [12, 6]  ]
+    , ["FontMatrix",         "NUMBERS",  [12, 7]  ]
+    , ["UniqueID",           "NUMBER",   [13]     ]
+    , ["FontBBox",           "NUMBERS",  [5]      ]
+    , ["StrokeWidth",        "NUMBER",   [12, 8]  ]
+    , ["XUID",               "NUMBERS",  [14]     ]
+    , ["charset",            "NUMBER",   [15]     ]
+    , ["Encoding",           "NUMBER",   [16]     ]
+    , ["CharStrings",        "NUMBER",   [17]     ]
+    , ["Private",            "NUMBERS",  [18]     ]
+    , ["SyntheticBase",      "NUMBER",   [12, 20] ]
+    , ["PostScript",         "NUMBER",   [12, 21] ]
+    , ["BaseFontName",       "NUMBER"    [12, 22] ]
+    , ["BaseFontBlend",      "NUMBER",   [12, 23] ]
+      // CID font specific values
+    , ["ROS",                "NUMBERS",  [12, 30] ]
+    , ["CIDFontVersion",     "NUMBER",   [12, 31] ]
+    , ["CIDFontRevision",    "NUMBER",   [12, 32] ]
+    , ["CIDFontType",        "NUMBER",   [12, 33] ]
+    , ["CIDCount",           "NUMBER",   [12, 34] ]
+    , ["UIDBase",            "NUMBER",   [12, 35] ]
+    , ["FDArray",            "NUMBER",   [12, 36] ]
+    , ["FDSelect",           "NUMBER",   [12, 37] ]
+    , ["FontName",           "NUMBER",   [12, 38] ]
+      // Private dict values
+    , ["BlueValues",         "NUMBERS",  [6]      ]
+    , ["OtherBlues",         "NUMBERS",  [7]      ]
+    , ["FamilyBlues",        "NUMBERS",  [8]      ]
+    , ["FamilyOtherBlues",   "NUMBERS",  [9]      ]
+    , ["BlueScale",          "NUMBER",   [12,  9] ]
+    , ["BlueShift",          "NUMBER",   [12, 10] ]
+    , ["BlueFuzz",           "NUMBER",   [12, 11] ]
+    , ["StdHW",              "NUMBER",   [10]     ]
+    , ["StdVW",              "NUMBER",   [11]     ]
+    , ["StemSnapH",          "NUMBER",   [12, 12] ]
+    , ["StemSnapV",          "NUMBER",   [12, 13] ]
+    , ["ForceBold",          "BOOLEAN",  [12, 14] ]
+    , ["LanguageGroup",      "NUMBER",   [12, 17] ]
+    , ["ExpansionFactor",    "NUMBER",   [12, 18] ]
+    , ["initialRandomSeed",  "NUMBER",   [12, 19] ]
+    , ["Subrs",              "NUMBER",   [19]     ]
+    , ["defaultWidthX",      "NUMBER",   [20]     ]
+    , ["nominalWidthX",      "NUMBER",   [21]     ]
+    ];
+
+    encoder.CFF = {};
+    decoder.CFF = {};
+    sizeOf.CFF = {};
+
+    CFFtypes.forEach(function(r) {
+      encoder.CFF[r[0]] = function(v) {
+        return encoder[r[1]](v).concat(r[2]);
+      };
+      decoder.CFF[r[0]] = function(v) {
+        v.splice(-r[2].length, r[2].length);
+        return decoder[r[1]](v);
+      };
+      sizeOf.CFF[r[0]] = function(v) {
+        return sizeOf[r[1]](v) + r[2].length;
+      };
+    });
+
+    encoder.types = CFFtypes.map(function(v) { return v[0]; });
+    decoder.types = encoder.types;
+
+  }(encoder, decoder, sizeOf));
+
 
   /**
    * Helper function for copying data regions

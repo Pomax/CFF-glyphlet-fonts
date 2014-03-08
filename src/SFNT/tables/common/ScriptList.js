@@ -25,8 +25,8 @@ define(["struct", "makeStructy", "ScriptRecord", "ScriptTable"], function(struct
     this.pairs.push({
       record: scriptRecord,
       table: scriptTable,
-      finalize: function(scriptCount, offset) {
-        this.table.finalize();
+      finalise: function(scriptCount, offset) {
+        this.table.finalise();
         this.record.Offset = 2 + scriptCount * 6 + offset;
       }
     });
@@ -47,7 +47,7 @@ define(["struct", "makeStructy", "ScriptRecord", "ScriptTable"], function(struct
     return false;
   }
 
-  ScriptList.prototype.finalize = function() {
+  ScriptList.prototype.finalise = function() {
     var count = this.pairs.length;
     this.ScriptCount = count;
     this.pairs.sort(function(a,b) {
@@ -59,12 +59,12 @@ define(["struct", "makeStructy", "ScriptRecord", "ScriptTable"], function(struct
         offset = 0;
     this.pairs.forEach(function(p, idx) {
       if(alreadyReferenced(tables, p.table)) {
-        p.finalize(count, oldoffset);
+        p.finalise(count, oldoffset);
         records.push(p.record);
         return;
       }
       oldoffset = offset;
-      p.finalize(count, offset);
+      p.finalise(count, offset);
       records.push(p.record);
       tables.push(p.table);
       // FIXME: use a sizeOf

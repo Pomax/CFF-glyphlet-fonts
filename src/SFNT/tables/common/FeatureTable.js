@@ -17,7 +17,7 @@ define(["struct", "dataBuilding"], function(struct, dataBuilder) {
     , ["LookupListIndex", "LITERAL", "USHORT[lookupcount] of indices in the lookup list"]
   ]);
 
-  FeatureTable.prototype.finalize = function(idx) {
+  FeatureTable.prototype.finalise = function(idx) {
     this.LookupCount = this.lookups.length;
     var data = []
     this.lookups.forEach(function(v){

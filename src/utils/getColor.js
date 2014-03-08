@@ -18,7 +18,7 @@ define(function() {
     return v;
   }
 
-  return function getColor(idx) {
+  function getColor(idx) {
     var h = (idx/10);
     var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
     var p = 2 * l - q;
@@ -28,4 +28,10 @@ define(function() {
     return "#" + tohex(r) + tohex(g) + tohex(b);
   };
 
+  var colors = [];
+  for(var i=0; i<255; i++) {
+    colors.push(getColor(i));
+  }
+
+  return colors;
 });

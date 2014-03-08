@@ -46,12 +46,12 @@ define(["struct", "ScriptList", "FeatureList", "LookupList", "LangSysTable"], fu
 
   // finalise in reverse order: first the lookup list,
   // then the feature list, then the script list.
-  GSUB.prototype.finalize = function() {
-    this.lookups.finalize();
+  GSUB.prototype.finalise = function() {
+    this.lookups.finalise();
     this.LookupList = this.lookups;
-    this.features.finalize();
+    this.features.finalise();
     this.FeatureList = this.features;
-    this.scripts.finalize();
+    this.scripts.finalise();
     this.ScriptList  = this.scripts;
     this.FeatureListOffset = this.ScriptListOffset + this.ScriptList.toData().length;
     this.LookupListOffset = this.FeatureListOffset + this.FeatureList.toData().length;

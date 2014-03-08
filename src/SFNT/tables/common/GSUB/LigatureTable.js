@@ -16,7 +16,7 @@ define(["struct", "dataBuilding"], function(struct, dataBuilder) {
     , ["Components", "LITERAL",  "GlyphID[compcount-1], list all the component glyphids in sequence, except for the first (which comes from the coverage table)"]
   ]);
 
-  LigatureTable.prototype.finalize = function() {
+  LigatureTable.prototype.finalise = function() {
     var data = [];
     this.Components.forEach(function(v) {
       data = data.concat(dataBuilder.encoder.GlyphID(v));

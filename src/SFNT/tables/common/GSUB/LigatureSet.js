@@ -22,13 +22,13 @@ define(["struct", "makeStructy", "dataBuilding", "LigatureTable"], function(stru
     return table;
   }
 
-  LigatureSet.prototype.finalize = function() {
+  LigatureSet.prototype.finalise = function() {
     var ligatures = [],
         offsets = [];
     this.LigatureCount = this.tables.length;
     this.tables.forEach(function(v) {
       offsets.push(ligatures.length);
-      v.finalize();
+      v.finalise();
       ligatures.push(v);
     });
     this.Ligatures = makeStructy(ligatures);

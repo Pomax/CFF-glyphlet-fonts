@@ -1,6 +1,6 @@
 define(
-["struct", "dataBuilding", "CFFHeader", "NameIndex", "TopDictIndex"],
-function(struct, dataBuilder, CFFHeader, NameIndex, TopDictIndex) {
+["struct", "dataBuilding", "asHex", "CFFHeader", "NameIndex", "StringIndex", "TopDictIndex", "Subroutines", "Charset", "Encoding", "CharStringIndex", "PrivateDict"],
+function(struct, dataBuilder, asHex, CFFHeader, NameIndex, StringIndex, TopDictIndex, Subroutines, Charset, Encoding, CharStringIndex, PrivateDict) {
   "use strict";
 
   var encoder = dataBuilder.encoder,
@@ -126,7 +126,7 @@ function(struct, dataBuilder, CFFHeader, NameIndex, TopDictIndex) {
         NUMBER(globals.xMax).concat(OPERAND(20))
       ]
     , ["nominalWidthX", DICTINSTRUCTION, "nominal width used in width correction",
-        NUMBER(globals.xMax).concat(OPERAND(20))
+        NUMBER(globals.xMax).concat(OPERAND(21))
       ]
     ]];
 
@@ -139,8 +139,8 @@ function(struct, dataBuilder, CFFHeader, NameIndex, TopDictIndex) {
         private_dict_offset = charstring_index_offset + serialize(charstring_index).length;
 
     // if we need to encode these values, how many bytes would they take up?
-    // We assumed 1 + 1 + 2 in the top dict. We need to check if we were, and
-    // then by how much. However, because updating the number of bytes
+    // We assumed 1 + 1 + 2 in the top dict. We need to check if we were right
+    // and then by how much. However, because updating the number of bytes
     // necessary to encode the values also increases the values (since they
     // represent offset) we need to recompute until stable.
     var bytediff = 0;
@@ -298,23 +298,65 @@ function(struct, dataBuilder, CFFHeader, NameIndex, TopDictIndex) {
         offSize: 1
       });
 
-      this["name index"] = new NameIndex({
-        strings: [input.postscriptName]
+      var nameIndex = new NameIndex([
+        input.postscriptName
+      ]);
+      this["name index"] = nameIndex;
+
+      var stringIndex = new StringIndex([
+        input.fontVersion,
+        input.fontName,
+        input.fontFamily
+      ].concat(input.letters));
+      this["string index"] = stringIndex;
+
+      var subroutines = new Subroutines();
+      this["global subroutines"] = subroutines;
+
+      var charset = new Charset(stringIndex, input);
+      this["charset"] = charset;
+
+      var encoding = new Encoding(input);
+      this["encoding"] = encoding;
+
+      var charStringIndex = new CharStringIndex(input.letters, input.charString);
+      this["charstring index"] = charStringIndex;
+
+      var topDictIndex = new TopDictIndex({
+          "version":     stringIndex.getStringId(input.fontVersion)
+        , "full name":   stringIndex.getStringId(input.fontName)
+        , "family name": stringIndex.getStringId(input.fontFamily)
+        , "weight":      389   // one of the 390 default strings in the CFF string catalog
+        , "uniqueID":      1   // really this just has to be 'anything'
+        , "FontBBox":   [input.xMin, input.yMin, input.xMax, input.yMax]
+        , "charset":       0   // placeholder for offset to charset block, from the beginning of the CFF file
+        , "Encoding":      0   //          "   "            encoding block               "    "
+        , "CharStrings":   0   //          "   "            charstrings block            "    "
+        , "Private":   [0, 0]  //          "   "            private dict block           "    "
       });
-/*
-      this["top dict index"] = new TopDictIndex({
-        property: "value"
+      this["top dict index"] = topDictIndex;
+
+      //FIXME: DICT objects seem to clobber each other's value/bindings
+
+      var privateDict = new PrivateDict({
+          "BlueValues":  [0, 0]
+        , "FamilyBlues": [0, 0]
+        , "StdHW": 10
+        , "StdVW": 10
+        , "defaultWidthX": input.xMax
+        , "nominalWidthX": input.xMax
       });
-*/
-      var CFFStruct = createCFF(input)
-      this["CFF data block"] = CFFStruct;
+      this["private dict"] = privateDict;
+
+
+      // generate the rest of the CFF data old-style
+      this["CFF data block"] = createCFF(input);
     }
   };
 
   CFF.prototype = new struct([
       ["header",             "LITERAL", "the CFF header"]
     , ["name index",         "LITERAL", "the name index for this font"]
-    , ["CFF data block",     "LITERAL", "we're not going to do this as a struct build-up right now."]
 /*
     , ["top dict index",     "LITERAL", "the global font dict"]
     , ["string index",       "LITERAL", "the strings used in this font (there are 390 by-spec strings already)"]
@@ -324,6 +366,7 @@ function(struct, dataBuilder, CFFHeader, NameIndex, TopDictIndex) {
     , ["charstring index",   "LITERAL", "the charstring definition for all encoded glyphs"]
     , ["private dict",       "LITERAL", "the private dicts; each dict maps a partial font."]
 */
+    , ["CFF data block",     "LITERAL", "we're not going to do this as a struct build-up right now."]
   ]);
 
 

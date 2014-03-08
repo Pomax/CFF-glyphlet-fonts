@@ -24,15 +24,15 @@ define(["struct", "makeStructy", "FeatureRecord", "FeatureTable"], function(stru
     this.pairs.push({
       record: featureRecord,
       table: featureTable,
-      finalize: function(featureCount, idx, offset) {
-        this.table.finalize(idx);
+      finalise: function(featureCount, idx, offset) {
+        this.table.finalise(idx);
         this.record.Offset = 2 + featureCount * 6 + offset;
       }
     });
     return featureTable;
   };
 
-  FeatureList.prototype.finalize = function() {
+  FeatureList.prototype.finalise = function() {
     var count = this.pairs.length;
     this.FeatureCount = count;
     this.pairs.sort(function(a,b) {
@@ -42,7 +42,7 @@ define(["struct", "makeStructy", "FeatureRecord", "FeatureTable"], function(stru
         tables = [],
         offset = 0;
     this.pairs.forEach(function(p, idx) {
-      p.finalize(count, idx, offset);
+      p.finalise(count, idx, offset);
       records.push(p.record);
       tables.push(p.table);
       // FIXME: use a sizeOf

@@ -21,11 +21,11 @@ define(["struct", "makeStructy"], function(struct, makeStructy) {
     , ["LangSysTables",  "LITERAL", "the collection of LangSys objects"]
   ]);
 
-  ScriptTable.prototype.finalize = function(lookups) {
+  ScriptTable.prototype.finalise = function(lookups) {
     this.LangSysCount = this.langsystables - 1; // offset for DFLT
     var langsystables = []
     this.langsystables.forEach(function(v){
-      v.finalize();
+      v.finalise();
       langsystables.push(v);
     });
     this.LangSysTables = makeStructy(langsystables);

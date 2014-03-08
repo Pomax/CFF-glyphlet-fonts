@@ -13,18 +13,21 @@ define(["dataBuilding"], function(dataBuilder) {
     }
     this.name = name;
     this.definition = structData;
+    this.fields = {};
+    this.values = {};
+    this.descriptions = {};
     // the real magic happens in .fill()
   };
 
   Struct.prototype = {
     fill: function(values) {
-      this.fields = {};
-      this.values = {};
       this.bindFields(this.definition);
       var self = this;
       if (values) {
         Object.keys(values).forEach(function(key) {
-          self[key] = values[key];
+          if(self.fields[key]) {
+            self[key] = values[key];
+          }
         })
       }
     },
@@ -33,14 +36,24 @@ define(["dataBuilding"], function(dataBuilder) {
       structData.forEach(function(record) {
         (function(fieldName, fieldType, fieldDesc) {
           self.fields[fieldName] = fieldType;
+          self.descriptions[fieldName] = fieldDesc;
           Object.defineProperty(self, fieldName, {
             // decode the stored value
             get: function() {
-              return self.values[fieldName] !== undefined ? decoder[fieldType](self.values[fieldName]) : "-";
+              if (self.values[fieldName] === undefined) return "-";
+              var val = self.values[fieldName];
+              if(fieldType.indexOf("CFF.") === 0) {
+                return decoder.CFF[fieldType.replace("CFF.",'')](val);
+              }
+            return decoder[fieldType](val);
             },
             // store values so that they're already encoded correctly
             set: function(v) {
-              self.values[fieldName] = v.encode ? v.encode() : encoder[fieldType](v);
+              if(fieldType.indexOf("CFF.") === 0) {
+                self.values[fieldName] = encoder.CFF[fieldType.replace("CFF.",'')](v);
+              } else {
+                self.values[fieldName] = encoder[fieldType](v);
+              }
             }
           });
           // ensure padding fields are always zero, rather than uninitialised
@@ -50,6 +63,14 @@ define(["dataBuilding"], function(dataBuilder) {
         }(record[0], record[1], record[2]));
       });
     },
+    // only use the fields indicated
+    use: function(fields) {
+      var unused = Object.keys(this.fields).filter(function(f) {
+        return fields.indexOf(f) === -1;
+      });
+      this.unset(unused);
+    },
+    // remove all the fields indicated
     unset: function(fields) {
       var self = this;
       fields.forEach(function(fieldName) {
@@ -120,7 +141,8 @@ define(["dataBuilding"], function(dataBuilder) {
           mapper.addMapping(offset, {
             length: val.length,
             name: (self.name ? self.name : '') + ":" + field,
-            value: self[field]
+            value: self[field],
+            description: self.descriptions[field]
           });
         }
         offset += val.length;

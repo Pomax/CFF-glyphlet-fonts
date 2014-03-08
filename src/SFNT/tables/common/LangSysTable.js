@@ -23,7 +23,7 @@ define(["struct", "makeStructy", "dataBuilding"], function(struct, makeStructy, 
     , ["FeatureIndex",    "LITERAL", "The indices of all the features that should be used, from the feature list (USHORT[featurecount])"]
   ]);
 
-  LangSysTable.prototype.finalize = function() {
+  LangSysTable.prototype.finalise = function() {
     var data = [];
     this.features.forEach(function(_,i) {
       data = data.concat(dataBuilder.encoder.USHORT(i));

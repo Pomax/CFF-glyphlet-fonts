@@ -51,7 +51,7 @@ define(function() {
       font.GSUB.addScript({ ScriptTag: "latn", LangSysTables: [singleLangSys] });
 
       // Now, wasn't that fun? Step last: make all these bindings stick.
-      font.GSUB.finalize();
+      font.GSUB.finalise();
     }
   };
 });

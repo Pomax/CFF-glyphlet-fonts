@@ -21,14 +21,14 @@ define(["struct", "makeStructy", "LookupTable", "dataBuilding"], function(struct
     return table;
   }
 
-  LookupList.prototype.finalize = function() {
+  LookupList.prototype.finalise = function() {
     this.LookupCount = this.tables.length;
     var lookuptables = [];
     var offsets = [];
     var offset = 2 + this.tables.length * 2; // USHORT values
     this.tables.forEach(function(t,idx) {
       offsets = offsets.concat(dataBuilder.encoder.USHORT(offset));
-      t.finalize(idx);
+      t.finalise(idx);
       lookuptables.push(t);
       offset += t.toData().length;
     });

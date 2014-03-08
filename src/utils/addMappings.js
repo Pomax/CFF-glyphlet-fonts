@@ -1,4 +1,4 @@
-define(["getColor"], function(getColor) {
+define(["getColor"], function(color) {
 
   // create a query selector based on a mapping region
   function formQuery(mapping) {
@@ -20,8 +20,9 @@ define(["getColor"], function(getColor) {
       curHighlight = mapping;
     }
     */
-    e.style.background = getColor(idx);
-    /*
+
+    e.style.background = color[idx];
+
     var name = mapping.name.replace(/\.+/g,'.').replace(/\.\[/g,'[');
     var value = mapping.value;
     if(value && value.replace) { value = value.replace(/\u0000/g,' 0x00 '); }
@@ -29,13 +30,12 @@ define(["getColor"], function(getColor) {
     var dec = mapping.start+"-"+(mapping.end-1);
     var hex = mapping.start.toString(16).toUpperCase()+"-"+(mapping.end-1).toString(16).toUpperCase();
     e.title = [
-        name
-      , description? "desc: " + description : ''
-      , value !== undefined? "\nvalue: " + value : ''
-      , "pos (dec): " + dec
-      , "pos (hex): " + hex
+        "field name: " + name
+      , description? "explanation: " + description : ''
+      , value !== undefined? "value: " + value : ''
+      , "hex position: " + hex
+      , "dec position: " + dec
     ].join("\n");
-    */
   };
 
   // cache the background color so we can restore it later
@@ -114,13 +114,13 @@ define(["getColor"], function(getColor) {
 
     // add mouse-over handling
     var moverfn = function moverfn(evt) {
-      var idx = e.eventListeners.mouseover.indexOf(moverfn);
-      list.forEach(function(e2) {
-        highlight(e2, mapping, idx);
-      });
+      for(var i=0, last=list.length; i<last; i++) {
+        highlight(list[i], mapping, moverfn.idx);
+      }
     };
     moverfn.mapping = mapping;
     e.eventListeners.add("mouseover", moverfn);
+    moverfn.idx = e.eventListeners.mouseover.indexOf(moverfn);
 
     // add mouse-out handling
     var moutfn = function moutfn(evt) {
@@ -140,7 +140,9 @@ define(["getColor"], function(getColor) {
       if(query) {
         var nodelist = container.querySelectorAll(query);
         var list = Array.prototype.slice.call(nodelist);
-        var fn = function(e) { colorize(list, e, mapping); };
+        var fn = function(e) {
+          colorize(list, e, mapping);
+        };
         list.forEach(fn);
       }
     });

@@ -29,13 +29,13 @@ define(["struct", "makeStructy", "lookups", "dataBuilding"], function(struct, ma
     return subtable;
   }
 
-  LookupTable.prototype.finalize = function(idx) {
+  LookupTable.prototype.finalise = function(idx) {
     this.SubTableCount = this.tables.length;
     var subtables = [];
     var offsets = [];
     var offset = 6 + this.tables.length * 2; // USHORT offsets
     this.tables.forEach(function(v) {
-      v.finalize()
+      v.finalise()
       subtables.push(v);
       offsets = offsets.concat(dataBuilder.encoder.USHORT(offset));
       offset += v.toData().length;
