@@ -1,13 +1,13 @@
 define(["struct", "dataBuilding"], function(struct, dataBuilder) {
   "use strict";
 
-  // FIXME: technically this is only the format1 charset object
+  // FIXME: technically this is only the format0 charset object
 
   var Charset = function(stringIndex, input) {
     var glyphs = [];
     if(!this.parse(input)) {
       input = input || {};
-      input.format = 1;
+      input.format = 0;
       input.letters = input.letters || [];
       this.fill(input);
       input.letters.forEach(function(letter) {

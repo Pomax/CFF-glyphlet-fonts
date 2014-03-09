@@ -71,6 +71,17 @@
     "LongHorMetric": "src/SFNT/tables/hmtx/LongHorMetric",
     "NameRecord": "src/SFNT/tables/name/NameRecord",
     "NameRecords": "src/SFNT/tables/name/NameRecords",
-    "StringRecord": "src/SFNT/tables/name/StringRecord"
+    "StringRecord": "src/SFNT/tables/name/StringRecord",
+    "INDEX": "src/SFNT/tables/cff/INDEX",
+    "DICT": "src/SFNT/tables/cff/DICT",
+    "CFFHeader": "src/SFNT/tables/cff/CFFHeader",
+    "NameIndex": "src/SFNT/tables/cff/NameIndex",
+    "StringIndex": "src/SFNT/tables/cff/StringIndex",
+    "TopDictIndex": "src/SFNT/tables/cff/TopDictIndex",
+    "SubroutineIndex": "src/SFNT/tables/cff/SubroutineIndex",
+    "Charset": "src/SFNT/tables/cff/Charset",
+    "Encoding": "src/SFNT/tables/cff/Encoding",
+    "CharStringIndex": "src/SFNT/tables/cff/CharStringIndex",
+    "PrivateDict": "src/SFNT/tables/cff/PrivateDict"
   }
 })

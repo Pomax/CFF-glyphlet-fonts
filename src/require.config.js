@@ -21,6 +21,7 @@
   extend("SFNT/tables/name",          ["NameRecord", "NameRecords", "StringRecord"]);
   extend("SFNT/tables/cff",           ["INDEX",  "DICT", "CFFHeader", "NameIndex", "StringIndex", "TopDictIndex", "SubroutineIndex", "Charset", "Encoding", "CharStringIndex", "PrivateDict"]);
 
+
   // Set up require.js for this project
   var config = {
     baseUrl: ".",
@@ -28,5 +29,9 @@
     shim: { "shimFname": {} }
   };
   require.config(config);
+
+// uncomment the following to get the paths for build.js
+//
+//console.log(JSON.stringify(paths,false,2));
 
 }());

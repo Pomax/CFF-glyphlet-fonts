@@ -125,7 +125,6 @@ define(
        */
       font["CFF "] = new font["CFF "](globals);
 
-
       /**
        * Finally, if there was a "label", we need some GSUB magic.
        * note: this shit is complex. Like, properly, which is why
