@@ -93,7 +93,36 @@
 
      <h2>Peeking under the CFF bonnet.</h2>
 
-     <p>Next time we'll be looking at what makes the CFF block tick.</p>
+     <p>Let's take a closer look at that CFF table, because it's an entire font on its own, and unlike OpenType fonts, is all about describing as little as possible to make sure no space is wasted. Combined with all the metadata already stored in the OpenType tables, this might very well be a winning combination.</p>
+
+     <div id="CFF-table"></div>
+
+     <p>Every CFF definition consists of a number of fixed sections, each with as few bytes as, reasonably, possible:</p>
+
+     <ol>
+        <li>All of 4 bytes worth of header.
+            <div id="cffheader"></div></li>
+        <li>A "name" index, which is a little bit like the "name" table, but much smaller.
+            <div id="cffname"></div></li>
+        <li>The master "DICT" structure. This contains some metadata about the CFF font, as well as the pointers that say where in the CFF data the "charset", "encoding", "charstrings" and "private DICTs" can be found. What are these, you ask? They're coming up in a bit.
+            <div id="cfftopdict"></div></li>
+        <li>The "string" index, which (except for the name index) is the only place where strings exist. Anything that uses strings instead points to indices in this section instead. There are also 390 "standard-defined" strings, which aren't encoded in the font at all. That means the first custom string in this index has index 391, the second is 392, and so on.
+            <div id="cffstring"></div></li>
+        <li>The list of globally accessible "subroutines". Subroutines are on of the true powers of CFF fonts: any outline definition can contain instructions to fetch "some data" from the list of global subroutines, and insert it into the outline definition at the point the "fetch" instruction was found. And that can happen at <em>any</em> time. In the middle of a line instruction? Yep. Before we've even started? Sure. Subroutines are a way to take all the charstrings in a font, go "which of them share <em>any</em> substrings that are more than two or three bytes long", and then rip those out, store them as a subroutine instead, and replace them in the original charstrings with "drop into subroutine XYZ here".
+            <div id="cffgsubr"></div></li>
+        <li>Then the "charset". This is a little bit like the "cmap" table, except it doesn't bother with a platform or an encoding or any of that (in fact, the encoding is specified in a later section). The charset lets you say which characters are supported by this font. And there are even a few that are simply CFF-specification-defined, so if you implement all those characters, you don't even have to store anything in this table other than "this font uses the predefined charset 3", for instance. Nice and compact!
+            <div id="cffcharset"></div></li>
+        <li>After the charset comes the "encoding", which is the part that gives each encoded character its name. Of course, the actual strings are located in the string index, so this section typically looks like "I have X letters. The names for them are: 396, 397, 398, 399, 400, 401, ..." which is really compact. One number for each letter name! And if you're using one of the predefined charsets, you don't even have to list these names because the characters are already going to be ordered in a way that lets you find their name simply based on a predefined list.
+            <div id="cffencoding"></div></li>
+        <li>Second to last we find the "charstring" section. This is what it's all about. This is where each character's outline data can be found. But: not necessarily, since we have access to subroutines. It'd be more accurate to say that this is where an engine starts looking for a character's outline, and the data it finds might lead it to different places.
+            <div id="cffcharstring"></div></li>
+        <li>Lastly, we find the "private dict" section. This houses a bit more metadata specific to the set of characters it belongs to, as well as the "local" subroutines that are accessible only to those characters. It makes quite a lot of sense, for instance, to have different sets of subroutines for Latin characters, and another private dict for far East-Asian characters. If we wanted to, we can define a CFF font as a multiple-sectioned font, using "font dicts", with each font dict pointing to its own charstrings and private dict, housing its own subroutines. Private dicts also describe <a href="http://partners.adobe.com/public/developer/en/font/T1_SPEC.PDF">older, Type 1</a> features like "Blue zones", which are used to for align purposes. If you need to combine multiple charstrings, and you have blue zones, all kinds of extremely mathematically precise things can happen.
+            <div id="cffprivate"></div></li>
+     </ol>
+
+     <p>The <a href="http://partners.adobe.com/public/developer/en/font/5176.CFF.pdf">CFF specification</a> in fact allows for a number of variations here that will efficiently encode different kinds of fonts (e.g. fonts that conform to a default character set, freeform fonts like this page's tiny font, huge unicode-spanning fonts, etc.) and lets you be either very verbose in terms of how accurately your outlines need to be rendered depending on the point size they're being rendered at. Effectively, CFF is an elaborate way to organise everything you need to make sure the Type 2 charstrings get rendered <em>exactly</em> the way the typeface designer(s) and font engineer(s) meant them to be rendered.</p>
+
+     <p>Did I mention that <a href="http://partners.adobe.com/public/developer/en/font/5177.Type2.pdf">Type 2</a> charstrings also let you write PostScript inside of them? Because just in case the designers and engineers didn't have enough power yet, you can also say "okay, you know what, we need to do things that Type2 can't do on its own. Here is a program that will actually do that thing. Run it when you read in this character". There are of course some safeguards here: the PostScript instructions that you can use don't let you do things like open files, it's just for manipulating numbers, and you can't do infinite recursion, your program stack can only contain 48 "things" before it's full, but it does mean you can do an insane amount of plotting instructions simply by knowing how to implement them in PostScript. Make the PostScript program a global subroutine, and now all your characters can make use of it. Fonts really are amazingly rich things.</p>
 
 
     <!-- scripts last, to make sure the page is "done" as much as possible, first -->

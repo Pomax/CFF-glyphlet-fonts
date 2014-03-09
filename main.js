@@ -20,7 +20,22 @@ require(
 
     var font = builder.build(options);
     addStyleSheet(font, "customfont", "custom");
-    var mappings = font.getMappings();
-    buildTables(font, window, "#tables", "custom font", "The byte layout views for our small, custom font.");
-    addMappings("#tables", mappings);
+    var mapper = font.getMapper();
+    var addDownloads = true;
+
+    buildTables(font, window, "#tables", "The byte layout views for our small, custom font.", addDownloads);
+    addMappings("#tables", mapper.mappings);
+
+    buildTables(font.stub["CFF "], window, "#CFF-table", "The byte layout views for our CFF table, specifically.");
+    addMappings("#CFF-table", mapper.mappings, mapper.find("CFF  table").start);
+
+    buildTables(font.stub["CFF "].header, window, "#cffheader", false, false, false, true);
+    buildTables(font.stub["CFF "]["name index"], window, "#cffname", false, false, false, true);
+    buildTables(font.stub["CFF "]["top dict index"], window, "#cfftopdict", false, false, false, true);
+    buildTables(font.stub["CFF "]["string index"], window, "#cffstring", false, false, false, true);
+    buildTables(font.stub["CFF "]["global subroutines"], window, "#cffgsubr", false, false, false, true);
+    buildTables(font.stub["CFF "]["charset"], window, "#cffcharset", false, false, false, true);
+    buildTables(font.stub["CFF "]["encoding"], window, "#cffencoding", false, false, false, true);
+    buildTables(font.stub["CFF "]["charstring index"], window, "#cffcharstring", false, false, false, true);
+    buildTables(font.stub["CFF "]["private dict"], window, "#cffprivate", false, false, false, true);
 });

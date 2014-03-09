@@ -125,7 +125,7 @@ define(["dataBuilding", "tables", "SFNTHeader", "DirectoryEntry", "Mapper"], fun
                  .concat(dataBuilding.encoder.ULONG(checkSumAdjustment))
                  .concat(font.slice(offsets["head"] + 12));
     },
-    getMappings: function() {
+    getMapper: function() {
       if(this.fontStructs === false) return false;
       var mapper = new Mapper();
       var self = this;
@@ -163,7 +163,7 @@ define(["dataBuilding", "tables", "SFNTHeader", "DirectoryEntry", "Mapper"], fun
       });
 
       mapper.sort();
-      return mapper.mappings;
+      return mapper;
     }
   };
 

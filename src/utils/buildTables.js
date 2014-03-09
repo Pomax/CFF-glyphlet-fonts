@@ -1,7 +1,7 @@
 define(["toWOFF", "asHex", "asChars"], function(toWOFF, asHex, asChars) {
   "use strict";
 
-  return function buildTables(font, context, selector, cssFontFamily, tableCaption) {
+  return function buildTables(font, context, selector, tableCaption, addDownloads, nohex, nochars) {
 
     // top element
     var top = document.querySelector(selector);
@@ -65,40 +65,45 @@ define(["toWOFF", "asHex", "asChars"], function(toWOFF, asHex, asChars) {
       return table;
     }
 
-    function formTables(font, hexmap, charmap) {
+    function formTables(font, hexmap, charmap, tableCaption, addDownloads) {
       top.classList.add("tables");
 
       // data maps (binary visualisation)
-      top.appendChild(makeTable(hexmap));
-      top.appendChild(makeTable(charmap));
+      if (!nohex)   { top.appendChild(makeTable(hexmap)); }
+      if (!nochars) { top.appendChild(makeTable(charmap)); }
 
-      var downloads = create("div");
-      downloads.classList.add("downloads");
+      if (tableCaption) {
+        var downloads = create("div");
+        downloads.classList.add("downloads");
 
-      // plain .otf file
-      var s = create("span");
-      s.innerHTML = tableCaption;
-      downloads.appendChild(s);
+        var s = create("span");
+        s.innerHTML = tableCaption;
+        downloads.appendChild(s);
 
-      var a = create("a");
-      a.innerHTML = "download as opentype font";
-      a.download = "customfont.otf";
-      a.href = "data:application/octet-stream;base64," + btoa(charmap.join(''));
-      downloads.appendChild(a);
+        if (addDownloads) {
+          // plain .otf file
+          var a = create("a");
+          a.innerHTML = "download as opentype font";
+          a.download = "customfont.otf";
+          a.href = "data:application/octet-stream;base64," + btoa(charmap.join(''));
+          downloads.appendChild(a);
 
-      a = create("a");
-      a.innerHTML = "download as WOFF version";
-      a.download = "customfont.woff";
-      a.href = "data:application/octet-stream;base64," + btoa(toWOFF(font).map(asChars).join(''));
-      downloads.appendChild(a);
+          // wOFF wrapped version
+          a = create("a");
+          a.innerHTML = "download as WOFF version";
+          a.download = "customfont.woff";
+          a.href = "data:application/octet-stream;base64," + btoa(toWOFF(font).map(asChars).join(''));
+          downloads.appendChild(a);
+        }
 
-      top.appendChild(downloads);
+        top.appendChild(downloads);
+      }
     }
 
     var binary = font.toData();
     var hexmap = binary.map(asHex);
     var charmap = binary.map(asChars);
-    formTables(font, hexmap, charmap);
+    formTables(font, hexmap, charmap, tableCaption, addDownloads);
   };
 
 });

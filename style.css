@@ -38,6 +38,10 @@ p {
   text-indent: 1.2em;
 }
 
+ol, ul {
+  padding-left: 5em;
+}
+
 #svg { font-family: monospace; }
 
 .structure {

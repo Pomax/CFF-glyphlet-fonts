@@ -1,9 +1,9 @@
 define(["getColor"], function(color) {
 
   // create a query selector based on a mapping region
-  function formQuery(mapping) {
+  function formQuery(mapping, o) {
     var qs = [];
-    for(var s=mapping.start, e=mapping.end; s<e; s++) {
+    for(var s=mapping.start-o, e=mapping.end-o; s<e; s++) {
       qs.push(".c"+s);
     }
     return qs.join(",");
@@ -133,10 +133,11 @@ define(["getColor"], function(color) {
   /**
    * Add mappings to all class="c123" elements inside a specific container
    */
-	return function addMappings(container, mappings) {
+	return function addMappings(container, mappings, globalOffset) {
+    globalOffset = typeof globalOffset === "undefined" ? 0 : globalOffset;
     container = (typeof container === "string" ? document.querySelector(container) : container);
     mappings.forEach(function(mapping) {
-      var query = formQuery(mapping);
+      var query = formQuery(mapping, globalOffset);
       if(query) {
         var nodelist = container.querySelectorAll(query);
         var list = Array.prototype.slice.call(nodelist);

@@ -30,11 +30,11 @@ define(["struct", "dataBuilding"], function(struct, dataBuilder) {
     return struct.prototype.toJSON.call(this);
   };
 
-  INDEX.prototype.toData = function() {
+  INDEX.prototype.toData = function(offset, mapper) {
     if(this.count === 0) {
       return [0,0];
     }
-    return struct.prototype.toData.call(this);
+    return struct.prototype.toData.call(this, offset, mapper);
   };
 
   INDEX.prototype.sizeOf = function(fieldName) {

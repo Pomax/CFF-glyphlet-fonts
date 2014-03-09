@@ -22,6 +22,11 @@ define(function() {
       this.mappings.push(mapping);
       return mapping;
     },
+    find: function(name) {
+      return this.mappings.filter(function(m) {
+        return m.name === name;
+      })[0];
+    },
     last: function() {
       return this.mappings[this.mappings.length-1];
     },
