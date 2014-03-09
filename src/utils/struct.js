@@ -13,9 +13,6 @@ define(["dataBuilding"], function(dataBuilder) {
     }
     this.name = name;
     this.definition = structData;
-    this.fields = {};
-    this.values = {};
-    this.descriptions = {};
     // the real magic happens in .fill()
   };
 
@@ -32,6 +29,9 @@ define(["dataBuilding"], function(dataBuilder) {
       }
     },
     bindFields: function(structData) {
+      this.fields = {};
+      this.values = {};
+      this.descriptions = {};
       var self = this;
       structData.forEach(function(record) {
         (function(fieldName, fieldType, fieldDesc) {
@@ -40,12 +40,21 @@ define(["dataBuilding"], function(dataBuilder) {
           Object.defineProperty(self, fieldName, {
             // decode the stored value
             get: function() {
-              if (self.values[fieldName] === undefined) return "-";
+              if (self.values[fieldName] === undefined) {
+                throw "Cannot find a value bound for " + fieldName;
+                //return false;
+              }
               var val = self.values[fieldName];
               if(fieldType.indexOf("CFF.") === 0) {
+                if(val.slice) {
+                  // CFF.NUMBER will splice an array, so we need to make
+                  // sure we pass around copies of the internal values,
+                  // to prevent content wiping!
+                  val = val.slice();
+                }
                 return decoder.CFF[fieldType.replace("CFF.",'')](val);
               }
-            return decoder[fieldType](val);
+              return decoder[fieldType](val);
             },
             // store values so that they're already encoded correctly
             set: function(v) {
@@ -91,8 +100,19 @@ define(["dataBuilding"], function(dataBuilder) {
       return 0;
     },
     sizeOf: function(fieldName) {
-      var val = this.values[fieldName] ? this[fieldName] : false;
-      return sizeOf[this.fields[fieldName]](val);
+      var self = this,
+          size = 0,
+          fields = fieldName ? [fieldName] : Object.keys(this.fields);
+      fields.forEach(function(fieldName) {
+        var val = self.values[fieldName] ? self[fieldName] : false;
+        var fieldType = self.fields[fieldName];
+        if(fieldType.indexOf("CFF.") === 0) {
+          size += sizeOf.CFF[fieldType.replace("CFF.",'')](val);
+        } else {
+          size += sizeOf[self.fields[fieldName]](val);
+        }
+      });
+      return size;
     },
     parse: function(data){
       this.values = {};
@@ -109,8 +129,9 @@ define(["dataBuilding"], function(dataBuilder) {
     },
     toJSON: function() {
       var self = this,
-          obj = {};
-      Object.keys(this.fields).forEach(function(field) {
+          obj = {},
+          keys = Object.keys(this.fields)
+      keys.forEach(function(field) {
         var f = self[field];
         obj[field] = f.toJSON ? f.toJSON() : f.toString();
       });

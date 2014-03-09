@@ -22,13 +22,13 @@ define(["struct", "makeStructy"], function(struct, makeStructy) {
   ]);
 
   ScriptTable.prototype.finalise = function(lookups) {
-    this.LangSysCount = this.langsystables - 1; // offset for DFLT
-    var langsystables = []
-    this.langsystables.forEach(function(v){
+    this.LangSysCount = this.langsystables.length - 1; // offset for DFLT
+    var data = [];
+    this.langsystables.forEach(function(v, idx){
       v.finalise();
-      langsystables.push(v);
+      data.push(v);
     });
-    this.LangSysTables = makeStructy(langsystables);
+    this.LangSysTables = makeStructy(data);
   };
 
   return ScriptTable;

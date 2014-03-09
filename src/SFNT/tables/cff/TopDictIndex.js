@@ -3,11 +3,15 @@ define(["INDEX", "DICT"], function(INDEX, DICT) {
 
   var TopDictIndex = function(input) {
     INDEX.call(this);
-    var topdict = new DICT(input);
-    this.addItem(topdict);
+    this.topdict = new DICT(input);
+    this.addItem(this.topdict);
   }
 
-  TopDictIndex.prototype = new INDEX();
+  TopDictIndex.prototype = Object.create(INDEX.prototype);
+
+  TopDictIndex.prototype.set = function(field, v) {
+  	this.topdict[field] = v;
+  }
 
   return TopDictIndex;
 

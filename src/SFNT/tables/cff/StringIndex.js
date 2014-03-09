@@ -12,7 +12,7 @@ define(["INDEX", "dataBuilding"], function(INDEX, dataBuilder) {
     this.strings = names;
   }
 
-  StringIndex.prototype = new INDEX();
+  StringIndex.prototype = Object.create(INDEX.prototype);
 
   // there are 390 predefined strings in CFF, so custom strings
   // start at index 391, rather than index 0!

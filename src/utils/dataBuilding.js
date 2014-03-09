@@ -180,6 +180,10 @@ define([], function() {
     }
   };
 
+  sizeOf.NUMBER = function(v) {
+    return encoder.NUMBER(v).length;
+  };
+
   encoder.OPERAND = function OPERAND(v1, v2) {
     var opcode = encoder.BYTE(v1);
     if(v2 !== undefined) { opcode.concat(BYTE(v2)); }
@@ -202,18 +206,31 @@ define([], function() {
 
   encoder.GlyphID = encoder.USHORT;
   decoder.GlyphID = decoder.USHORT;
+  sizeOf.GlyphID  = sizeOf.USHORT;
+
   encoder.Offset  = encoder.USHORT;
   decoder.Offset  = decoder.USHORT;
+  sizeOf.Offset   = sizeOf.USHORT;
+
   encoder.Card8   = encoder.BYTE;
   decoder.Card8   = decoder.BYTE;
+  sizeOf.Card8    = sizeOf.BYTE;
+
   encoder.Card16  = encoder.USHORT;
   decoder.Card16  = decoder.USHORT;
+  sizeOf.Card16   = sizeOf.USHORT;
+
   encoder.SID     = encoder.USHORT;
   decoder.SID     = decoder.USHORT;
+  sizeOf.SID   = sizeOf.USHORT;
+
   encoder.OffSize = encoder.BYTE;
   decoder.OffSize = decoder.BYTE;
+  sizeOf.OffSize    = sizeOf.BYTE;
+
   encoder.OffsetX = [undefined, encoder.BYTE, encoder.USHORT, encoder.UINT24, encoder.ULONG];
   decoder.OffsetX = [undefined, decoder.BYTE, decoder.USHORT, decoder.UINT24, decoder.ULONG];
+  sizeOf.OffsetX  = [undefined, sizeOf.BYTE,  sizeOf.USHORT,  sizeOf.UINT24,  sizeOf.ULONG];
 
   encoder.BOOLEAN = function(v) { return v ? [1] : [0]; };
   decoder.BOOLEAN = function(v) { return !!v[0]; };

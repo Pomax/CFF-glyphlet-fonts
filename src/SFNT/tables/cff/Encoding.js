@@ -17,7 +17,7 @@ define(["struct", "dataBuilding"], function(struct, dataBuilder) {
     }
   };
 
-  Encoding.prototype = new struct([
+  Encoding.prototype = new struct("CFF Encoding", [
       ["format", "BYTE",    "encoding format"]
     , ["nCodes", "BYTE",    "..."]
     , ["codes",  "LITERAL", ""]

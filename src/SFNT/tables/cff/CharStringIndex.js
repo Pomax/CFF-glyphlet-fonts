@@ -19,7 +19,7 @@ define(["INDEX", "dataBuilding"], function(INDEX, dataBuilder) {
     this.finalise();
   }
 
-  CharStringIndex.prototype = new INDEX();
+  CharStringIndex.prototype = Object.create(INDEX.prototype);
 
   return CharStringIndex;
 

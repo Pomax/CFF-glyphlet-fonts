@@ -19,7 +19,7 @@
   extend("SFNT/tables/cmaps/format4", ["Segment", "Segments"]);
   extend("SFNT/tables/hmtx",          ["LongHorMetric"]);
   extend("SFNT/tables/name",          ["NameRecord", "NameRecords", "StringRecord"]);
-  extend("SFNT/tables/cff",           ["INDEX",  "DICT", "CFFHeader", "NameIndex", "StringIndex", "TopDictIndex", "Subroutines", "Charset", "Encoding", "CharStringIndex", "PrivateDict"]);
+  extend("SFNT/tables/cff",           ["INDEX",  "DICT", "CFFHeader", "NameIndex", "StringIndex", "TopDictIndex", "SubroutineIndex", "Charset", "Encoding", "CharStringIndex", "PrivateDict"]);
 
   // Set up require.js for this project
   var config = {

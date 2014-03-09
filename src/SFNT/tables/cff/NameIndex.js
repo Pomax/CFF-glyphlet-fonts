@@ -11,7 +11,7 @@ define(["INDEX", "dataBuilding"], function(INDEX, dataBuilder) {
     });
   }
 
-  NameIndex.prototype = new INDEX();
+  NameIndex.prototype = Object.create(INDEX.prototype);
 
   return NameIndex;
 

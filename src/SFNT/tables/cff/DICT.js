@@ -1,6 +1,10 @@
 define(["struct", "dataBuilding"], function(struct, dataBuilder) {
   "use strict";
 
+  var dictionaryStructure = dataBuilder.encoder.types.map(function(record) {
+    return [record, "CFF." + record, record];
+  });
+
   var DICT = function(input) {
   	if(!this.parse(input)) {
       input = input || {};
@@ -10,11 +14,7 @@ define(["struct", "dataBuilding"], function(struct, dataBuilder) {
   	}
   };
 
-  var dictionaryStructure = dataBuilder.encoder.types.map(function(record) {
-    return [record, "CFF." + record, record];
-  });
-
-  DICT.prototype = new struct(dictionaryStructure);
+  DICT.prototype = new struct("CFF DICT", dictionaryStructure);
 
   DICT.prototype.finalise = function() {
     this.use(this.usedFields);

@@ -10,7 +10,7 @@ define(["struct", "dataBuilding"], function(struct, dataBuilder) {
     }
   }
 
-  INDEX.prototype = new struct([
+  INDEX.prototype = new struct("CFF INDEX", [
       ["count",   "Card16",  "number of stored items"]
     , ["offSize", "OffSize", "how many bytes do offset values use in this index"]
     , ["offset",  "LITERAL", "depending on offSize, this is actually BYTE[], USHORT[], UINT24[] or ULONG[]. Note that offsets are relative to the byte *before* the data block, so the first offset is (almost always) 1, not 0."]
@@ -19,13 +19,37 @@ define(["struct", "dataBuilding"], function(struct, dataBuilder) {
 
   INDEX.prototype.addItem = function(item) {
     this.items.push(item);
+    this.count++;
     this.finalise();
   };
 
+  INDEX.prototype.toJSON = function() {
+    if(this.count === 0) {
+      return { count: 0 };
+    }
+    return struct.prototype.toJSON.call(this);
+  };
+
+  INDEX.prototype.toData = function() {
+    if(this.count === 0) {
+      return [0,0];
+    }
+    return struct.prototype.toData.call(this);
+  };
+
+  INDEX.prototype.sizeOf = function(fieldName) {
+    if(this.count === 0) {
+      return 2;
+    }
+    return struct.prototype.sizeOf.call(this, fieldName);
+  };
+
   INDEX.prototype.finalise = function() {
-    var self = this,
-        count = this.items.length;
-    this.count = count;
+    var self = this;
+
+    if(this.count === 0) {
+      return;
+    }
 
     var data = [];
     this.items.forEach(function(item) {

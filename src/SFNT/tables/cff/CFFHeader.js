@@ -9,7 +9,7 @@ define(["struct"], function(struct) {
     }
   }
 
-  CFFHeader.prototype = new struct([
+  CFFHeader.prototype = new struct("CFF header", [
       ["major",   "Card8",   "major version"]
     , ["minor",   "Card8",   "minor version"]
     , ["length",  "Card8",   "header length in bytes"]

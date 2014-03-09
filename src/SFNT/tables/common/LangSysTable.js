@@ -28,6 +28,7 @@ define(["struct", "makeStructy", "dataBuilding"], function(struct, makeStructy, 
     this.features.forEach(function(_,i) {
       data = data.concat(dataBuilder.encoder.USHORT(i));
     });
+    console.log("data for FeatureIndex: ", data);
     this.FeatureIndex = data;
   };
 

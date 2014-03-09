@@ -19,7 +19,7 @@ define(["struct", "dataBuilding"], function(struct, dataBuilder) {
     }
   };
 
-  Charset.prototype = new struct([
+  Charset.prototype = new struct("CFF charset", [
       ["format", "BYTE", ""]
     , ["glyphs", "LITERAL", "actually a USHORT[]."]
   ]);
