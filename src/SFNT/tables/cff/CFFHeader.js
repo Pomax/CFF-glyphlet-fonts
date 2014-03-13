@@ -6,6 +6,7 @@ define(["struct"], function(struct) {
       input = input || {};
       input.length = 4;
       this.fill(input);
+      this.setName("CFFHeader");
     }
   }
 

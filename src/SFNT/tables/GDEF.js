@@ -12,7 +12,5 @@ define(["struct"], function(struct){
     //...
   ]);
 
-  GDEF.prototype.constructor = GDEF;
-
   return GDEF;
 });

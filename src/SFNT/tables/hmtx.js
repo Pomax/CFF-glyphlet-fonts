@@ -1,4 +1,4 @@
-define(["struct", "makeStructy", "LongHorMetric"], function(struct, makeStructy, LongHorMetric){
+define(["struct", "LongHorMetric"], function(struct, LongHorMetric) {
   "use strict";
 
   var hmtx = function(input, numberOfHMetrics) {
@@ -21,7 +21,6 @@ define(["struct", "makeStructy", "LongHorMetric"], function(struct, makeStructy,
       advanceWidth: globals.xMax - globals.xMin,
       lsb: globals.xMin
     }));
-    makeStructy(data);
     this.hMetrics = data;
   };
 

@@ -125,25 +125,19 @@ define(
        */
       font["CFF "] = new font["CFF "](globals);
 
+
       /**
        * Finally, if there was a "label", we need some GSUB magic.
        * note: this shit is complex. Like, properly, which is why
        * it's wrapped by a function, rather than being a simple
        * few constructor options. Seriously, GSUB is messed up.
        */
-      addLabelSubstitution(font, globals)
+      if(globals.label) {
+        font.GSUB = new font.GSUB(globals);
+        addLabelSubstitution(font, globals);
+      }
 
-
-      /*
-      console.log(sfnt.toData().length);
-      Object.keys(font).forEach(function(table) {
-        if(font[table].toData) {
-          console.log(table, font[table].toData().length);
-        }
-      });
-      */
-
-
+      // we're done...
       return sfnt;
     }
   };

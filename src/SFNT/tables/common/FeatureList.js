@@ -1,4 +1,4 @@
-define(["struct", "makeStructy", "FeatureRecord", "FeatureTable"], function(struct, makeStructy, FeatureRecord, FeatureTable) {
+define(["struct", "FeatureRecord", "FeatureTable"], function(struct, FeatureRecord, FeatureTable) {
   "use strict";
 
   var FeatureList = function(input) {
@@ -48,8 +48,8 @@ define(["struct", "makeStructy", "FeatureRecord", "FeatureTable"], function(stru
       // FIXME: use a sizeOf
       offset += p.table.toData().length;
     });
-    this.FeatureRecords = makeStructy(records);
-    this.FeatureTables = makeStructy(tables);
+    this.FeatureRecords = records;
+    this.FeatureTables = tables;
   };
 
   return FeatureList

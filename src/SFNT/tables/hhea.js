@@ -36,8 +36,6 @@ define(["struct"], function(struct){
   , ["numberOfHMetrics",    "USHORT",    "number of hMetric entries."]
   ]);
 
-  hhea.prototype.constructor = hhea;
-
   return hhea;
 
 });

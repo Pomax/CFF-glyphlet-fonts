@@ -17,7 +17,6 @@ define(["struct", "atou"], function(struct, atou){
   StringRecord.prototype = new struct("StringRecord", [
     ["string", "CHARARRAY", "The string to be encoded"]
   ]);
-  StringRecord.prototype.constructor = StringRecord;
 
   return StringRecord;
 });

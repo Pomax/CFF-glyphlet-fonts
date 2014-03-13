@@ -6,6 +6,7 @@ define(["INDEX", "dataBuilding"], function(INDEX, dataBuilder) {
   var CharStringIndex = function(letters, charString) {
     var self = this;
     INDEX.call(this);
+    this.setName("CharStringIndex");
     // .notdef
     this.addItem(dataBuilder.encoder.OPERAND(14));
     // all letters except the "real" letters

@@ -13,7 +13,5 @@ define(["struct"], function(struct){
     ["format", "USHORT", "subtable format"]
   ]);
 
-  format0.prototype.constructor = format0;
-
   return format0;
 });

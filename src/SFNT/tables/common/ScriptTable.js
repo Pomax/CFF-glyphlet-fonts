@@ -1,4 +1,4 @@
-define(["struct", "makeStructy"], function(struct, makeStructy) {
+define(["struct"], function(struct) {
   "use strict";
 
   var ScriptTable = function(input) {
@@ -28,7 +28,7 @@ define(["struct", "makeStructy"], function(struct, makeStructy) {
       v.finalise();
       data.push(v);
     });
-    this.LangSysTables = makeStructy(data);
+    this.LangSysTables = data;
   };
 
   return ScriptTable;

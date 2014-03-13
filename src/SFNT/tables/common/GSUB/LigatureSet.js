@@ -1,4 +1,4 @@
-define(["struct", "makeStructy", "dataBuilding", "LigatureTable"], function(struct, makeStructy, dataBuilder, LigatureTable) {
+define(["struct", "dataBuilding", "LigatureTable"], function(struct, dataBuilder, LigatureTable) {
   "use strict";
 
   var LigatureSet = function(input) {
@@ -31,7 +31,7 @@ define(["struct", "makeStructy", "dataBuilding", "LigatureTable"], function(stru
       v.finalise();
       ligatures.push(v);
     });
-    this.Ligatures = makeStructy(ligatures);
+    this.Ligatures = ligatures;
     offsets = offsets.map(function(v) {
       return v + 2 + 2*offsets.length;
     });

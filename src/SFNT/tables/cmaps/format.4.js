@@ -1,4 +1,4 @@
-define(["struct", "makeStructy",  "Segments"], function(struct, makeStructy, Segments){
+define(["struct",  "Segments"], function(struct, Segments) {
   "use strict";
 
   var format4 = function(input) {
@@ -30,8 +30,6 @@ define(["struct", "makeStructy",  "Segments"], function(struct, makeStructy, Seg
   , ["idRangeOffset", "LITERAL", ""]
   , ["glyphIdArray",  "LITERAL", ""]
   ]);
-
-  format4.prototype.constructor = format4;
 
   /**
    * Build the segment-based subtable

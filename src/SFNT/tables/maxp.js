@@ -34,8 +34,6 @@ define(["struct"], function(struct){
   , ["maxComponentDepth",     "USHORT", "Maximum levels of recursion; 1 for simple components."]
   ]);
 
-  maxp.prototype.constructor = maxp;
-
   return maxp;
 
 });

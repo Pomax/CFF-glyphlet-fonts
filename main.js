@@ -38,4 +38,11 @@ require(
     buildTables(font.stub["CFF "]["encoding"], window, "#cffencoding", false, false, false, true);
     buildTables(font.stub["CFF "]["charstring index"], window, "#cffcharstring", false, false, false, true);
     buildTables(font.stub["CFF "]["private dict"], window, "#cffprivate", false, false, false, true);
-});
+
+/*
+    // add the font to the page O_O
+    var SFNTHTML = font.toHTML();
+    document.body.appendChild(SFNTHTML);
+*/
+  }
+);

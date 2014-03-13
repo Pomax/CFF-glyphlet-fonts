@@ -8,11 +8,6 @@ define([], function() {
         sizeOf: sizeOf,
         encoder: encoder,
         decoder: decoder,
-        bind: function(obj) {
-          Object.keys(encoder).forEach(function(key) {
-            obj[key] = encoder[key];
-          });
-        },
         computeChecksum: function(chunk) {
           while(chunk.length % 4 !== 0) { chunk.push(0); }
           var tally = 0;
@@ -334,7 +329,6 @@ define([], function() {
 
   }(encoder, decoder, sizeOf));
 
-
   /**
    * Helper function for copying data regions
    */
@@ -342,55 +336,6 @@ define([], function() {
   decoder.LITERAL = encoder.LITERAL;
   sizeOf.LITERAL = function(v) { if(v.toData) return v.toData().length; return v.length; };
 
-  /**
-   * Helper function for decoding strings as ULONG
-   */
-  encoder.decodeULONG = function decodeULONG(ulong) {
-    var b = ulong.split ? ulong.split('').map(function(c) { return c.charCodeAt(0); }) : ulong;
-    var val = (b[0] << 24) + (b[1] << 16) + (b[2] << 8) + b[3];
-    if (val < 0 ) { val += Math.pow(2,32); }
-    return val;
-  };
-
-  // const, but const in strict mode is not allowed
-  var LABEL = 0;
-  var READER = 1;
-  var NESTED_RECORD = 1;
-  var DESCRIPTION = 2;
-  var DATA = 3;
-
-  /**
-   * Serialise a record structure into byte code
-   */
-  encoder.serialize = function serialize(base_record) {
-    var data = [];
-    (function _serialize(record, prefix) {
-      if(prefix == parseInt(prefix,10)) {
-        prefix = "";
-      } else if(prefix !== "") { prefix += "."; }
-      if (typeof record[LABEL] !== "string") {
-        try {
-          record.forEach(function(_r) {
-            _serialize(_r);
-          });
-        } catch(e) { console.error(record); throw e; }
-      }
-      else if (typeof record[READER] === "function") {
-        data = data.concat(record[READER](record[DATA]));
-      }
-      else {
-        var nested = record[NESTED_RECORD];
-        if(nested instanceof Array) {
-          _serialize(nested);
-        }
-        else {
-          console.error(record);
-          throw new Error("what?");
-        }
-      }
-    }(base_record));
-    return data;
-  };
 
   return builder;
 });

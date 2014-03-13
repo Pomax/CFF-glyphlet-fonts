@@ -26,8 +26,6 @@ define(["struct", "ScriptList", "FeatureList", "LookupList", "LangSysTable"], fu
     , ["LookupList",        "LITERAL", "the LookupList object for this table"]
   ]);
 
-  GSUB.prototype.constructor = GSUB;
-
   GSUB.prototype.addScript = function(options) {
     return this.scripts.addScript(options)
   };

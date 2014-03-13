@@ -42,8 +42,6 @@ define(["struct"], function(struct){
   , ["glyphDataFormat",    "SHORT",        "glyph data format. default value = 0"]
   ]);
 
-  head.prototype.constructor = head;
-
   return head;
 
 });

@@ -16,6 +16,7 @@ define(["struct", "dataBuilding"], function(struct, dataBuilder) {
         glyphs = glyphs.concat(SID);
       });
       this.glyphs = glyphs;
+      this.setName("Charset");
     }
   };
 

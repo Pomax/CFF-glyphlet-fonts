@@ -12,7 +12,5 @@ define(["struct"], function(struct){
     //...
   ]);
 
-  JSTF.prototype.constructor = JSTF;
-
   return JSTF;
 });

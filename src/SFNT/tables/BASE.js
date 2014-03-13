@@ -12,7 +12,5 @@ define(["struct"], function(struct){
     //...
   ]);
 
-  BASE.prototype.constructor = BASE;
-
   return BASE;
 });

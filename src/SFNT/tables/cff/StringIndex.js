@@ -5,6 +5,7 @@ define(["INDEX", "dataBuilding"], function(INDEX, dataBuilder) {
 
   var StringIndex = function(names) {
     INDEX.call(this);
+    this.setName("StringIndex");
     var self = this;
     names.forEach(function(name) {
       self.addItem(encode(name));

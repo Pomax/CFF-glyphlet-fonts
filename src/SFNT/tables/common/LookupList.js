@@ -1,4 +1,4 @@
-define(["struct", "makeStructy", "LookupTable", "dataBuilding"], function(struct, makeStructy, LookupTable, dataBuilder) {
+define(["struct", "LookupTable", "dataBuilding"], function(struct, LookupTable, dataBuilder) {
   "use strict";
 
   var LookupList = function(input) {
@@ -33,7 +33,7 @@ define(["struct", "makeStructy", "LookupTable", "dataBuilding"], function(struct
       offset += t.toData().length;
     });
     this.LookupOffsets = offsets;
-    this.LookupTables = makeStructy(lookuptables);
+    this.LookupTables = lookuptables;
   }
 
   return LookupList;

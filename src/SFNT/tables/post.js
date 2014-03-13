@@ -29,8 +29,6 @@ define(["struct"], function(struct){
   , ["maxMemType1",        "ULONG", ""]
   ]);
 
-  post.prototype.constructor = post;
-
   return post;
 
 });

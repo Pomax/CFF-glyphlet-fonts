@@ -3,6 +3,7 @@ define(["DICT"], function(DICT) {
 
   var PrivateDict = function(input) {
   	DICT.call(this, input);
+    this.setName("PrivateDict");
   }
 
   PrivateDict.prototype = Object.create(DICT.prototype);

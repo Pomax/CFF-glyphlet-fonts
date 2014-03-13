@@ -9,6 +9,7 @@ define(["INDEX", "dataBuilding"], function(INDEX, dataBuilder) {
     names.forEach(function(name) {
       self.addItem(encode(name));
     });
+    this.setName("NameIndex");
   }
 
   NameIndex.prototype = Object.create(INDEX.prototype);

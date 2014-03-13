@@ -1,4 +1,4 @@
-define(["dataBuilding", "tables", "SFNTHeader", "DirectoryEntry", "Mapper"], function(dataBuilding, tables, SFNTHeader, DirectoryEntry, Mapper) {
+define(["dataBuilding", "tables", "SFNTHeader", "DirectoryEntry", "Mapper", "nodeBuilder"], function(dataBuilding, tables, SFNTHeader, DirectoryEntry, Mapper, nodeBuilder) {
   "use strict";
 
   var header = SFNTHeader("CFF");
@@ -36,6 +36,40 @@ define(["dataBuilding", "tables", "SFNTHeader", "DirectoryEntry", "Mapper"], fun
           obj[tag] = self.stub[tag].toJSON();
         }
       });
+      return obj;
+    },
+    toHTML: function() {
+      if(!this.fontStructs) {
+        this.toData();
+      }
+
+      var self = this,
+          obj = nodeBuilder.create("div"),
+          font = this.stub,
+          directory = this.fontStructs.directory,
+          keys;
+      obj.setAttribute("class", "SFNT");
+
+      obj.appendChild(this.header.toHTML());
+
+      var dHTML = nodeBuilder.create("div");
+      dHTML.setAttribute("class", "Directory");
+      keys = Object.keys(directory),
+      keys.forEach(function(tag) {
+        dHTML.appendChild(directory[tag].toHTML());
+      });
+      obj.appendChild(dHTML);
+
+      var tHTML = nodeBuilder.create("div");
+      tHTML.setAttribute("class", "Tables");
+      keys = Object.keys(font),
+      keys.forEach(function(tag) {
+        if (font[tag].toHTML) {
+          tHTML.appendChild(font[tag].toHTML());
+        }
+      });
+      obj.appendChild(tHTML);
+
       return obj;
     },
     toData: function() {
@@ -101,7 +135,7 @@ define(["dataBuilding", "tables", "SFNTHeader", "DirectoryEntry", "Mapper"], fun
           tags[tag].offset = offsets[tag];
           directoryBlock = directoryBlock.concat(tags[tag].toData());
         }
-      })
+      });
 
       // And then assemble the final font data into one "file",
       // making sure the checkSumAdjustment value in the <head>

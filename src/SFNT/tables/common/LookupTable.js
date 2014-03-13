@@ -1,4 +1,4 @@
-define(["struct", "makeStructy", "lookups", "dataBuilding"], function(struct, makeStructy, lookups, dataBuilder) {
+define(["struct", "lookups", "dataBuilding"], function(struct, lookups, dataBuilder) {
   "use strict";
 
   var LookupTable = function(input) {
@@ -41,7 +41,7 @@ define(["struct", "makeStructy", "lookups", "dataBuilding"], function(struct, ma
       offset += v.toData().length;
     });
     this.SubtableOffsets = offsets;
-    this.SubTables = makeStructy(subtables);
+    this.SubTables = subtables;
     this.lookupListIndex = idx;
   }
 

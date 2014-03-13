@@ -5,6 +5,7 @@
   paths: {
     "builder": "src/./builder",
     "formGlobals": "src/./formGlobals",
+    "nodeBuilder": "src/utils/nodeBuilder",
     "atou": "src/utils/atou",
     "buildTables": "src/utils/buildTables",
     "convertOutline": "src/utils/convertOutline",
@@ -19,7 +20,6 @@
     "asNumbers": "src/utils/asNumbers",
     "asGlyphIDs": "src/utils/asGlyphIDs",
     "makeStructy": "src/utils/makeStructy",
-    "addLabelSubstitution": "src/utils/addLabelSubstitution",
     "addMappings": "src/utils/addMappings",
     "getColor": "src/utils/getColor",
     "SFNT": "src/SFNT/SFNT",
@@ -55,6 +55,7 @@
     "LookupType4": "src/SFNT/tables/common/GSUB/LookupType4",
     "LigatureSet": "src/SFNT/tables/common/GSUB/LigatureSet",
     "LigatureTable": "src/SFNT/tables/common/GSUB/LigatureTable",
+    "addLabelSubstitution": "src/SFNT/tables/common/GSUB/addLabelSubstitution",
     "format.0": "src/SFNT/tables/cmaps/format.0",
     "format.2": "src/SFNT/tables/cmaps/format.2",
     "format.4": "src/SFNT/tables/cmaps/format.4",

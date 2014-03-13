@@ -1,4 +1,4 @@
-define(["struct", "makeStructy", "dataBuilding"], function(struct, makeStructy, dataBuilder) {
+define(["struct", "dataBuilding"], function(struct, dataBuilder) {
   "use strict";
 
   var LangSysTable = function(input) {

@@ -14,6 +14,7 @@ define(["struct", "dataBuilding"], function(struct, dataBuilder) {
       input.nCodes = codes.length;
       input.codes = codes;
       this.fill(input);
+      this.setName("Encoding");
     }
   };
 

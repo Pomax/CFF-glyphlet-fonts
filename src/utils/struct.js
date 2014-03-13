@@ -1,10 +1,9 @@
-define(["dataBuilding"], function(dataBuilder) {
+define(["dataBuilding", "nodeBuilder", "makeStructy"], function(dataBuilder, nodeBuilder, makeStructy) {
   "use strict";
 
   var encoder = dataBuilder.encoder,
       decoder = dataBuilder.decoder,
-      sizeOf = dataBuilder.sizeOf,
-      serialize = encoder.serialize;
+      sizeOf  = dataBuilder.sizeOf;
 
 	var Struct = function(name, structData) {
     if(!structData) {
@@ -17,6 +16,9 @@ define(["dataBuilding"], function(dataBuilder) {
   };
 
   Struct.prototype = {
+    setName: function(name) {
+      this.name = name;
+    },
     fill: function(values) {
       this.bindFields(this.definition);
       var self = this;
@@ -42,7 +44,6 @@ define(["dataBuilding"], function(dataBuilder) {
             get: function() {
               if (self.values[fieldName] === undefined) {
                 throw "Cannot find a value bound for " + fieldName;
-                //return false;
               }
               var val = self.values[fieldName];
               if(fieldType.indexOf("CFF.") === 0) {
@@ -61,6 +62,9 @@ define(["dataBuilding"], function(dataBuilder) {
               if(fieldType.indexOf("CFF.") === 0) {
                 self.values[fieldName] = encoder.CFF[fieldType.replace("CFF.",'')](v);
               } else {
+                if(fieldType === "LITERAL" && !v.toData) {
+                  makeStructy(fieldName, v);
+                }
                 self.values[fieldName] = encoder[fieldType](v);
               }
             }
@@ -133,12 +137,42 @@ define(["dataBuilding"], function(dataBuilder) {
           keys = Object.keys(this.fields)
       keys.forEach(function(field) {
         var f = self[field];
-        obj[field] = f.toJSON ? f.toJSON() : f.toString();
+        if(f instanceof Array) {
+          if(f[0].toJSON) {
+            obj[field] = f.toJSON();
+          } else {
+            obj[field] = f.slice();
+          }
+        }
+        else if (f.toJSON) {
+          obj[field] = f.toJSON();
+        }
+        else {
+          obj[field] = f.toString();
+        }
       });
       return obj;
     },
     toString: function() {
       return JSON.stringify(this.toJSON(), false, 2);
+    },
+    toHTML: function() {
+      var self = this,
+          obj = nodeBuilder.create("div"),
+          keys = Object.keys(this.fields);
+      obj.setAttribute("class", this.name);
+      keys.forEach(function(field) {
+        if (self[field].toHTML) {
+          obj.appendChild(self[field].toHTML());
+        } else {
+          var d = nodeBuilder.create("div");
+          d.setAttribute("class", field);
+          d.setAttribute("data-value", self[field]);
+          d.setAttribute("data-type", self.fields[field]);
+          obj.appendChild(d);
+        }
+      });
+      return obj;
     },
     toData: function(offset, mapper) {
       offset = offset || 0;
@@ -173,8 +207,6 @@ define(["dataBuilding"], function(dataBuilder) {
       return data;
     }
   };
-
-  dataBuilder.bind(Struct);
 
   return Struct;
 })

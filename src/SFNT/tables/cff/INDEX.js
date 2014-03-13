@@ -30,6 +30,13 @@ define(["struct", "dataBuilding"], function(struct, dataBuilder) {
     return struct.prototype.toJSON.call(this);
   };
 
+  INDEX.prototype.toHTML = function() {
+    if(this.count === 0) {
+      this.unset(["offSize", "offset", "data"]);
+    }
+    return struct.prototype.toHTML.call(this);
+  };
+
   INDEX.prototype.toData = function(offset, mapper) {
     if(this.count === 0) {
       return [0,0];

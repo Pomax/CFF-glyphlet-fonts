@@ -32,7 +32,6 @@ define(["struct", "atou", "dataBuilding", "NameRecords"], function(struct, atou,
   , ["NameRecords",  "LITERAL", "The name record metadata"]
   , ["StringData",   "LITERAL", "The actual strings that describe this font"]
   ]);
-  name.prototype.constructor = name;
 
   /**
    * Turn an array of strings into a table structure that

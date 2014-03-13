@@ -100,7 +100,7 @@ function(struct, dataBuilder, asHex, CFFHeader, NameIndex, StringIndex, TopDictI
     }
   };
 
-  CFF.prototype = new struct([
+  CFF.prototype = new struct("CFF ", [
       ["header",             "LITERAL", "the CFF header"]
     , ["name index",         "LITERAL", "the name index for this font"]
     , ["top dict index",     "LITERAL", "the global font dict"]

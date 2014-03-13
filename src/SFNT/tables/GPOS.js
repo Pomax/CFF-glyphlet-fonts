@@ -12,7 +12,5 @@ define(["struct"], function(struct){
     //...
   ]);
 
-  GPOS.prototype.constructor = GPOS;
-
   return GPOS;
 });

@@ -107,8 +107,6 @@ define(["struct"], function(struct){
   , ["usMaxContext",        "USHORT",    ""]
   ]);
 
-  OS_2.prototype.constructor = OS_2;
-
   return OS_2;
 
 });

@@ -19,8 +19,5 @@ define(["struct"], function(struct){
     , ["lsb",          "SHORT",  ""]
   ]);
 
-  LongHorMetric.prototype.constructor = LongHorMetric;
-
-
   return LongHorMetric
 });

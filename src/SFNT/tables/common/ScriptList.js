@@ -1,4 +1,4 @@
-define(["struct", "makeStructy", "ScriptRecord", "ScriptTable"], function(struct, makeStructy, ScriptRecord, ScriptTable) {
+define(["struct", "ScriptRecord", "ScriptTable"], function(struct, ScriptRecord, ScriptTable) {
   "use strict";
 
   var ScriptList = function(input) {
@@ -70,8 +70,8 @@ define(["struct", "makeStructy", "ScriptRecord", "ScriptTable"], function(struct
       // FIXME: use a sizeOf
       offset += p.table.toData().length;
     });
-    this.ScriptRecords = makeStructy(records);
-    this.ScriptTables = makeStructy(tables);
+    this.ScriptRecords = records;
+    this.ScriptTables = tables;
   };
 
   return ScriptList;
