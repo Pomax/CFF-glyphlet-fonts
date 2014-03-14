@@ -167,8 +167,8 @@ define(["dataBuilding", "nodeBuilder", "makeStructy"], function(dataBuilder, nod
         } else {
           var d = nodeBuilder.create("div");
           d.setAttribute("class", field);
-          d.setAttribute("data-value", self[field]);
           d.setAttribute("data-type", self.fields[field]);
+          d.innerHTML = self[field];
           obj.appendChild(d);
         }
       });

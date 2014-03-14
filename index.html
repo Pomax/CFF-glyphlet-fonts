@@ -124,6 +124,12 @@
 
      <p>Did I mention that <a href="http://partners.adobe.com/public/developer/en/font/5177.Type2.pdf">Type 2</a> charstrings also let you write PostScript inside of them? Because just in case the designers and engineers didn't have enough power yet, you can also say "okay, you know what, we need to do things that Type2 can't do on its own. Here is a program that will actually do that thing. Run it when you read in this character". There are of course some safeguards here: the PostScript instructions that you can use don't let you do things like open files, it's just for manipulating numbers, and you can't do infinite recursion, your program stack can only contain 48 "things" before it's full, but it does mean you can do an insane amount of plotting instructions simply by knowing how to implement them in PostScript. Make the PostScript program a global subroutine, and now all your characters can make use of it. Fonts really are amazingly rich things.</p>
 
+     <h2>Our font as structured object</h2>
+
+     <p>We can also look at the font as a structured object, similar to a JSON or C "struct". While this isn't necessarily a very useful view, it's actually really useful when you're debugging a font. I'm note quite sure how to make this view work for you yet, but I'm working on it!</p>
+
+     <div id="sfntstructure"></div>
+
 
     <!-- scripts last, to make sure the page is "done" as much as possible, first -->
     <script src="require.js"></script>

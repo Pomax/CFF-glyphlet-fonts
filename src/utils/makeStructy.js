@@ -14,16 +14,21 @@ define(["nodeBuilder"], function(nodeBuilder) {
       var self = this,
           obj = nodeBuilder.create("div");
       obj.setAttribute("class", this.name);
-      this.forEach(function(field) {
-        if (field.toHTML) {
-          obj.appendChild(field.toHTML());
-        } else {
-          var d = nodeBuilder.create("div");
-          d.setAttribute("class", "value");
-          d.setAttribute("data-value", field);
-          obj.appendChild(d);
-        }
-      });
+      // numeric data we'll just leave as numbers
+      if (typeof this[0] === "number") {
+        obj.innerHTML = this.join(',');
+      } else {
+        this.forEach(function(field) {
+          if (field.toHTML) {
+            obj.appendChild(field.toHTML());
+          } else {
+            var d = nodeBuilder.create("div");
+            d.setAttribute("class", "value");
+            d.innerHTML = field;
+            obj.appendChild(d);
+          }
+        });
+      }
       return obj;
     };
     array.toData = function(offset, mappings) {

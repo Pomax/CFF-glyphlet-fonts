@@ -75,7 +75,7 @@ tr:nth-last-child(2) { border-bottom: 1px solid black; }
 tr:nth-last-child(1) { background: inherit!important; }
 th { color: rgb(200,200,220); }
 
-code { font-family: monospace; color: darkgray; background: rgba(0,0,0,0.1); }
+code { font-family: monospace; color: rgb(100,100,100); background: rgba(0,0,0,0.1); }
 .tables td { cursor:default; }
 .downloads { clear: both; font-size: 80%; margin-bottom: 3em; text-align: center; text-indent: -2em; margin-top: -1em; }
 .downloads * + * { margin-left: 10px; }
@@ -84,17 +84,16 @@ code { font-family: monospace; color: darkgray; background: rgba(0,0,0,0.1); }
 /**
  * SFNT as HTML
  */
-body > div.SFNT:after,
-body > div.SFNT *:after {
-  content: " : " attr(data-value);
-}
 
-body > div.SFNT * {
-  margin: 2px 2px 2px 1em;
+#sfntstructure div.SFNT * {
+  margin-left: 1em;
+  padding-left: 5px;
   border: 1px solid rgba(255,0,0,0.2);
+  border-width: 0 0 0 4px;
+  overflow: hidden;
 }
 
-body > div.SFNT:before,
-body > div.SFNT *:before {
-  content: attr(class);
+#sfntstructure div.SFNT:before,
+#sfntstructure div.SFNT *:before {
+  content: attr(class) ": ";
 }
