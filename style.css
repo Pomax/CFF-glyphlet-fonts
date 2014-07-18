@@ -22,6 +22,20 @@ h1,h2,h3,h4,h5,h6 {
   margin: 1em auto;
 }
 
+h1:before {
+  content: "☞ ";
+  margin-left: -1em;
+}
+
+h2:before {
+  content: "☛ ";
+}
+
+h3:before {
+  content: "⇨ ";
+}
+
+
 header h1 {
   font-size: 300%;
   margin-bottom: -0.4em;
@@ -32,6 +46,10 @@ header h2 {
   margin-left: 1em;
 }
 
+header h2:before {
+  content: none;
+}
+
 p {
   text-align: justify;
   line-height: 1.5em;
@@ -40,6 +58,15 @@ p {
 
 ol, ul {
   padding-left: 5em;
+}
+
+ol li ul {
+  padding: 0 0 0 3em;
+  margin-bottom: 1em;
+}
+
+ol li ul li {
+  margin: 0;
 }
 
 #svg { font-family: monospace; }

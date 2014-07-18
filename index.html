@@ -31,11 +31,14 @@
 
     <h2>Let's look at the actual font layout.</h2>
 
+
     <p>The following two tables are the kind of thing you would normally see in a hex editor, if you were to load up a (really) small font file. On the left we see the font's bytecode in hexadecimal numbering, and on the right we see the "as best as we can show it" table of bytes-as-letters (based on the <a href="http://en.wikipedia.org/wiki/ISO/IEC_8859-1">iso 8859-1 code page</a>). You can make out some words on the right like "name" and "License-free", but for the most part it kind of looks like gibberish. However, if you know how to read a font, this view holds no secrets: everything the font can do is right there, just written in a different language. It's not even obfuscated or compressed, it's literally just a different way of writing down a graph of numbers.</p>
+
+    <h4 style="text-align:center"><i>And try to mouse-over the data: Each block of data has a tooltip title explaining what you're hovered on!</i></h4>
 
     <div id="tables"></div>
 
-    <h2>So what do the numbers tell us?</h2>
+    <h1>So what do the numbers tell us?</h1>
 
     <p>First of all, a little primer on how OpenType fonts work. A font file is actually a collection of "tables", each describing a different aspect of the font. Some contain information on the font's name, license text, who made it, etc. and some contain metrics information, like what the overall character height is, how many letters are in the font, etc. Of all the tables in a font (and there are a fair number), typically only one table will contain what you might think of as actual letters. In the little font on this page, that's the "CFF" table (a "compact font format" table). Looking at the font's bytecode we can tell (that is, if you know how to read it) that of the 1372 bytes that our font takes up, only 211 bytes (D3 in hex, see if you can spot it) are taken up by the CFF table. That's... really not that much. What on earth is all the rest for?</p>
 
@@ -91,62 +94,130 @@
     <p>Despite using a relatively simple graphic for our font on this page, we're still using a CFF font. Why? Because doing so lets us more about how fonts work than if we used TrueType outlines. In face, while TrueType data is mostly just a table of outline instructions and a second table for resolving character codes to 'where in the outline block is the data for this character', a CFF block is a full font in an of itself. While it was never designed to be used on its own (always meant to be inside a wrapper that holds all the meta data), a CFF block pretty much has everything that would qualify it as a font. It knows which characters it supports, it has outlines for them, it has general metadata on character metrics, font name and version, and even whether it's an ultra thin or bold font. That makes it far more interesting to look at, in addition to use the Type 2 charstring instructions for outlines, which are almost like a programming language for graphics. Come to think of it, scratch that "almost". Type 2 charstrings are really, <em>really</em> powerful.</p>
 
 
-     <h2>Peeking under the CFF bonnet.</h2>
+    <h1>Peeking under the CFF bonnet.</h1>
 
-     <p>Let's take a closer look at that CFF table, because it's an entire font on its own, and unlike OpenType fonts, is all about describing as little as possible to make sure no space is wasted. Combined with all the metadata already stored in the OpenType tables, this might very well be a winning combination.</p>
+    <p>Let's take a closer look at that CFF table, because it's an entire font on its own, and unlike OpenType fonts, is all about describing as little as possible to make sure no space is wasted. Combined with all the metadata already stored in the OpenType tables, this might very well be a winning combination.</p>
 
-     <div id="CFF-table"></div>
+    <div id="CFF-table"></div>
 
-     <p>Every CFF definition consists of a number of fixed sections, each with as few bytes as, reasonably, possible:</p>
+    <p>Every CFF definition consists of a number of fixed sections, each with as few bytes as, reasonably, possible:</p>
 
-     <ol>
-        <li>All of 4 bytes worth of header.
-            <div id="cffheader"></div></li>
-        <li>A "name" index, which is a little bit like the "name" table, but much smaller.
-            <div id="cffname"></div></li>
-        <li>The master "DICT" structure. This contains some metadata about the CFF font, as well as the pointers that say where in the CFF data the "charset", "encoding", "charstrings" and "private DICTs" can be found. What are these, you ask? They're coming up in a bit.
-            <div id="cfftopdict"></div></li>
-        <li>The "string" index, which (except for the name index) is the only place where strings exist. Anything that uses strings instead points to indices in this section instead. There are also 390 "standard-defined" strings, which aren't encoded in the font at all. That means the first custom string in this index has index 391, the second is 392, and so on.
-            <div id="cffstring"></div></li>
-        <li>The list of globally accessible "subroutines". Subroutines are on of the true powers of CFF fonts: any outline definition can contain instructions to fetch "some data" from the list of global subroutines, and insert it into the outline definition at the point the "fetch" instruction was found. And that can happen at <em>any</em> time. In the middle of a line instruction? Yep. Before we've even started? Sure. Subroutines are a way to take all the charstrings in a font, go "which of them share <em>any</em> substrings that are more than two or three bytes long", and then rip those out, store them as a subroutine instead, and replace them in the original charstrings with "drop into subroutine XYZ here".
-            <div id="cffgsubr"></div></li>
-        <li>Then the "charset". This is a little bit like the "cmap" table, except it doesn't bother with a platform or an encoding or any of that (in fact, the encoding is specified in a later section). The charset lets you say which characters are supported by this font. And there are even a few that are simply CFF-specification-defined, so if you implement all those characters, you don't even have to store anything in this table other than "this font uses the predefined charset 3", for instance. Nice and compact!
-            <div id="cffcharset"></div></li>
-        <li>After the charset comes the "encoding", which is the part that gives each encoded character its name. Of course, the actual strings are located in the string index, so this section typically looks like "I have X letters. The names for them are: 396, 397, 398, 399, 400, 401, ..." which is really compact. One number for each letter name! And if you're using one of the predefined charsets, you don't even have to list these names because the characters are already going to be ordered in a way that lets you find their name simply based on a predefined list.
-            <div id="cffencoding"></div></li>
-        <li>Second to last we find the "charstring" section. This is what it's all about. This is where each character's outline data can be found. But: not necessarily, since we have access to subroutines. It'd be more accurate to say that this is where an engine starts looking for a character's outline, and the data it finds might lead it to different places.
-            <div id="cffcharstring"></div></li>
-        <li>Lastly, we find the "private dict" section. This houses a bit more metadata specific to the set of characters it belongs to, as well as the "local" subroutines that are accessible only to those characters. It makes quite a lot of sense, for instance, to have different sets of subroutines for Latin characters, and another private dict for far East-Asian characters. If we wanted to, we can define a CFF font as a multiple-sectioned font, using "font dicts", with each font dict pointing to its own charstrings and private dict, housing its own subroutines. Private dicts also describe <a href="http://partners.adobe.com/public/developer/en/font/T1_SPEC.PDF">older, Type 1</a> features like "Blue zones", which are used to for align purposes. If you need to combine multiple charstrings, and you have blue zones, all kinds of extremely mathematically precise things can happen.
-            <div id="cffprivate"></div></li>
-     </ol>
+    <ol>
+      <li>All of 4 bytes worth of header
+        <div id="cffheader"></div>
+        <ul>
+          <li>Major version 1 (01),
+          <li>minor version 0 (00),
+          <li>"4 bytes to this header" (04, which is a little silly, the CFF header for v1.0 has a fixed length), and
+          <li>'1' to indicate that offsets in this block will -for the most part- use values that fit in 1 byte (01).
+        </ul>
+      </li>
 
-     <p>The <a href="http://partners.adobe.com/public/developer/en/font/5176.CFF.pdf">CFF specification</a> in fact allows for a number of variations here that will efficiently encode different kinds of fonts (e.g. fonts that conform to a default character set, freeform fonts like this page's tiny font, huge unicode-spanning fonts, etc.) and lets you be either very verbose in terms of how accurately your outlines need to be rendered depending on the point size they're being rendered at. Effectively, CFF is an elaborate way to organise everything you need to make sure the Type 2 charstrings get rendered <em>exactly</em> the way the typeface designer(s) and font engineer(s) meant them to be rendered.</p>
+      <li>A "name" index, which is a little bit like the "name" table, but much smaller.
+        <div id="cffname"></div>
+        <ul>
+          <li>1 name string (00 01),
+          <li>offsets use 1 byte in this section (01),
+          <li>offsets to individual name strings (01 for first string, 0B for end of list), and
+          <li>the first name string: "customfont", ASCII encoded.
+        </ul>
+      </li>
 
-     <p>Did I mention that <a href="http://partners.adobe.com/public/developer/en/font/5177.Type2.pdf">Type 2</a> charstrings also let you write PostScript inside of them? Because just in case the designers and engineers didn't have enough power yet, you can also say "okay, you know what, we need to do things that Type2 can't do on its own. Here is a program that will actually do that thing. Run it when you read in this character". There are of course some safeguards here: the PostScript instructions that you can use don't let you do things like open files, it's just for manipulating numbers, and you can't do infinite recursion, your program stack can only contain 48 "things" before it's full, but it does mean you can do an insane amount of plotting instructions simply by knowing how to implement them in PostScript. Make the PostScript program a global subroutine, and now all your characters can make use of it. Fonts really are amazingly rich things.</p>
+      <li>The master "DICT" structure. This contains some metadata about the CFF font, as well as the pointers that say where in the CFF data the "charset", "encoding", "charstrings" and "private DICTs" can be found. What are these, you ask? They're coming up in a bit.
+        <div id="cfftopdict"></div>
+        <ul>
+          <li>1 dictionary (00 01)
+          <li>offsets use 1 byte in this section (01),
+          <li>offsets to individual dictionaries (01 for first dictionary, 23 for end of list)
+          <li>byte-encoded dictionary data (explained in the CFF documentation)
+        </ul>
+      </li>
 
-     <h2>Our font as structured object</h2>
+      <li>The "string" index, which (except for the name index) is the only place where strings exist. Anything that uses strings instead points to indices in this section instead. There are also 390 "standard-defined" strings, which aren't encoded in the font at all. That means the first custom string in this index has index 391, the second is 392, and so on.
+        <div id="cffstring"></div>
+        <ul>
+          <li>10 strings (0A
+          <li>offsets use 1 byte in this section (01),
+          <li>offsets to individual dictionaries (01, 0C, 1D, 23, 24, 25, 26, 27, 28, 29, 2A for end of list), and
+          <li>Our ten strings: "Version 1.0", "Custom Glyph Font", "Custom", "c", "m", "o", s", "t", "u", and "~", all ASCII encoded.
+        </ul>
+      </li>
 
-     <p>We can also look at the font as a structured object, similar to a JSON or C "struct". While this isn't necessarily a very useful view, it's actually really useful when you're debugging a font. I'm note quite sure how to make this view work for you yet, but I'm working on it!</p>
+      <li>The list of globally accessible "subroutines". Subroutines are on of the true powers of CFF fonts: any outline definition can contain instructions to fetch "some data" from the list of global subroutines, and insert it into the outline definition at the point the "fetch" instruction was found. And that can happen at <em>any</em> time. In the middle of a line instruction? Yep. Before we've even started? Sure. Subroutines are a way to take all the charstrings in a font, go "which of them share <em>any</em> substrings that are more than two or three bytes long", and then rip those out, store them as a subroutine instead, and replace them in the original charstrings with "drop into subroutine XYZ here".
+        <div id="cffgsubr"></div>
+        <ul>
+          <li>There are 0 global subroutines (00 00)
+        </ul>
+      </li>
 
-     <div id="sfntstructure"></div>
+      <li>Then the "charset". This is a little bit like the "cmap" table, except it doesn't bother with a platform or an encoding or any of that (in fact, the encoding is specified in a later section). The charset lets you say which characters are supported by this font. And there are even a few that are simply CFF-specification-defined, so if you implement all those characters, you don't even have to store anything in this table other than "this font uses the predefined charset 3", for instance. Nice and compact!
+        <div id="cffcharset"></div>
+        <ul>
+          <li>charset format 0 (00)
+          <li>The list of implemented glyphs, taking note that there are 390 predefined strings in CFF. Instead of using those, we're going to point to our own, so that for instance "c" is string 390 + 4 (because 'c' is the 4th string in the string index, listed above). Each glyph is references by string ID, and each id is stored as a two-byte value, so 'c', which has id 394, is stored as (01 8A).
+        </ul>
+      </li>
 
+      <li>After the charset comes the "encoding", which is the part that gives each encoded character its name. Of course, the actual strings are located in the string index, so this section typically looks like "I have X letters. The names for them are: 396, 397, 398, 399, 400, 401, ..." which is really compact. One number for each letter name! And if you're using one of the predefined charsets, you don't even have to list these names because the characters are already going to be ordered in a way that lets you find their name simply based on a predefined list.
+        <div id="cffencoding"></div>
+        <ul>
+          <li>There are seven characters that need to map to internal glyph ids (00 07)
+          <li>The first glyph from the charset will have internal id 1 (01), the second will have id 2 (02), etc.
+        </ul>
+      </li>
+
+      <li>Second to last we find the "charstring" section. This is what it's all about. This is where each character's outline data can be found. But: not necessarily, since we have access to subroutines. It'd be more accurate to say that this is where an engine starts looking for a character's outline, and the data it finds might lead it to different places.
+        <div id="cffcharstring"></div>
+        <ul>
+          <li>There are 8 outlines defined (00 08)
+          <li>We'll be using 1 byte for offsets (01, because this is very little data)
+          <li>The offsets to the outlines per glyph. For glyph zero (.notdef), offset 1 (01), and 'c', 'm', 'o', 's', 't' and 'u' are all 1 byte further, because they'll all implement the same thing as the .notdef character. Only '~' has a "real" outline, starting at offset 8 (08) and ending at offset 45 (2D)
+          <li>eight outlines, of which the first seven are basically blank (0E). The eight outline is a Type2 charstring for a rectangle with another, smaller, rectangle cutout.
+        </ul>
+      </li>
+
+      <li>Lastly, we find the "private dict" section. This houses a bit more metadata specific to the set of characters it belongs to, as well as the "local" subroutines that are accessible only to those characters. It makes quite a lot of sense, for instance, to have different sets of subroutines for Latin characters, and another private dict for far East-Asian characters. If we wanted to, we can define a CFF font as a multiple-sectioned font, using "font dicts", with each font dict pointing to its own charstrings and private dict, housing its own subroutines. Private dicts also describe <a href="http://partners.adobe.com/public/developer/en/font/T1_SPEC.PDF">older, Type 1</a> features like "Blue zones", which are used to for align purposes. If you need to combine multiple charstrings, and you have blue zones, all kinds of extremely mathematically precise things can happen.
+        <div id="cffprivate"></div>
+        <ul>
+          <li>three bytes to say the "blue values" are [0, 0] (8B 8B),
+          <li>three bytes to say the "family blues" are also [0, 0] (8B 8B),
+          <li>standard hw value of 10 (95),
+          <li>standard vw value of 10 (95),
+          <li>a default width value of 700 (F9 50), and
+          <li>a nominal width value of 700 (F9 50).
+        </ul>
+        All these numbers use Adobe's "number" encoding, which is a variable byte encoding that optimises for numbers [-107,107] in 1 byte, [-1131,1131] in 2 bytes (without the 1 byte range, obviously), [-32768,32767] in 3 bytes, and [-2³¹, 2³¹⁻¹] in 5 bytes.
+      </li>
+    </ol>
+
+    <h2>But this is by no means the only way to organise this data</h2>
+
+    <p>The <a href="http://partners.adobe.com/public/developer/en/font/5176.CFF.pdf">CFF specification</a> in fact allows for a number of variations here that will efficiently encode different kinds of fonts (e.g. fonts that conform to a default character set, freeform fonts like this page's tiny font, huge unicode-spanning fonts, etc.) and lets you be either very verbose in terms of how accurately your outlines need to be rendered depending on the point size they're being rendered at. Effectively, CFF is an elaborate way to organise everything you need to make sure the Type 2 charstrings get rendered <em>exactly</em> the way the typeface designer(s) and font engineer(s) meant them to be rendered.</p>
+
+    <p>Did I mention that <a href="http://partners.adobe.com/public/developer/en/font/5177.Type2.pdf">Type 2</a> charstrings also let you write PostScript inside of them? Because just in case the designers and engineers didn't have enough power yet, you can also say "okay, you know what, we need to do things that Type2 can't do on its own. Here is a program that will actually do that thing. Run it when you read in this character". There are of course some safeguards here: the PostScript instructions that you can use don't let you do things like open files, it's just for manipulating numbers, and you can't do infinite recursion, your program stack can only contain 48 "things" before it's full, but it does mean you can do an insane amount of plotting instructions simply by knowing how to implement them in PostScript. Make the PostScript program a global subroutine, and now all your characters can make use of it. Fonts really are amazingly rich things.</p>
+
+    <h1>Our font as structured object</h1>
+
+    <p>We can also look at the font as a structured object, similar to a JSON or C "struct". While this isn't necessarily a very useful view, it's actually really useful when you're debugging a font. I'm note quite sure how to make this view work for you yet, but I'm working on it!</p>
+
+    <div id="sfntstructure"></div>
 
     <!-- scripts last, to make sure the page is "done" as much as possible, first -->
     <script src="require.js"></script>
     <script>
       if (optimized === false) {
-        var config = document.createElement("script");
-        config.src = "src/require.config.js";
-        config.onload = function() {
-          var main = document.createElement("script");
-          main.src = "main.js";
-          document.head.appendChild(main); };
-        document.head.appendChild(config); }
+      var config = document.createElement("script");
+      config.src = "src/require.config.js";
+      config.onload = function() {
+        var main = document.createElement("script");
+        main.src = "main.js";
+        document.head.appendChild(main); };
+      document.head.appendChild(config); }
 
       else {
-        var main = document.createElement("script");
-        main.src = "generator.js";
-        document.head.appendChild(main); }
+      var main = document.createElement("script");
+      main.src = "generator.js";
+      document.head.appendChild(main); }
     </script>
   </body>
 
