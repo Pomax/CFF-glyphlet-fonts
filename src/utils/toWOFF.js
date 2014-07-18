@@ -23,7 +23,7 @@ define(["struct", "dataBuilding"], function(struct, dataBuilder) {
       }
     };
 
-    wOFFheader.prototype = new struct([
+    wOFFheader.prototype = new struct("wOFF format", [
         ["signature",      "CHARARRAY", "this has to be the string 'wOFF'..."]
       , ["flavour",        "CHARARRAY", "The sfnt version of the wrapped font"]
       , ["length",         "ULONG",     "Total size of the WOFF file (placeholder, we compute this later)."]
@@ -56,7 +56,7 @@ define(["struct", "dataBuilding"], function(struct, dataBuilder) {
         this.fill(input);
       }
     };
-    wOFFdictionaryEntry.prototype = new struct([
+    wOFFdictionaryEntry.prototype = new struct("wOFF dictionary entry", [
         ["tag",          "LITERAL", "tag name"]
       , ["offset",       "ULONG",   "Offset to the data, from beginning of WOFF file"]
       , ["compLength",   "LITERAL", "length of the compressed data table"]
