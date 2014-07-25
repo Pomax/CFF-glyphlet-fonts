@@ -179,12 +179,12 @@
       <li>Lastly, we find the "private dict" section. This houses a bit more metadata specific to the set of characters it belongs to, as well as the "local" subroutines that are accessible only to those characters. It makes quite a lot of sense, for instance, to have different sets of subroutines for Latin characters, and another private dict for far East-Asian characters. If we wanted to, we can define a CFF font as a multiple-sectioned font, using "font dicts", with each font dict pointing to its own charstrings and private dict, housing its own subroutines. Private dicts also describe <a href="http://partners.adobe.com/public/developer/en/font/T1_SPEC.PDF">older, Type 1</a> features like <a href="http://www.freetype.org/autohinting/blues.html">Blue zones</a>, which are used to for align purposes. If you need to combine multiple charstrings, and you have blue zones, all kinds of extremely mathematically precise things can happen.
         <div id="cffprivate"></div>
         <ul>
-          <li>three bytes to say the "blue values" are [0, 0] (8B 8B),
-          <li>three bytes to say the "family blues" are also [0, 0] (8B 8B),
-          <li>standard hw value of 10 (95),
-          <li>standard vw value of 10 (95),
-          <li>a default width value of 700 (F9 50), and
-          <li>a nominal width value of 700 (F9 50).
+          <li>three bytes to say the "blue values" are [0, 0] (8B 8B, 06 is the 'blue values' identifier),
+          <li>three bytes to say the "family blues" are also [0, 0] (8B 8B, 08 is the 'family' identifier),
+          <li>standard hw value of 10 (95, 0A is the StdHW identifier),
+          <li>standard vw value of 10 (95, 0B is the StdVW identifier),
+          <li>a default width value of 700 (F9 50, 14 is the default width identifier), and
+          <li>a nominal width value of 700 (F9 50, 15 is the nominal width identifier).
         </ul>
         All these numbers use Adobe's "number" encoding, which is a variable byte encoding that optimises for numbers [-107,107] in 1 byte, [-1131,1131] in 2 bytes (without the 1 byte range, obviously), [-32768,32767] in 3 bytes, and [-2³¹, 2³¹⁻¹] in 5 bytes.
       </li>
