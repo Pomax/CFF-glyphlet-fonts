@@ -136,14 +136,14 @@
       <li>The "string" index, which (except for the name index) is the only place where strings exist. Anything that uses strings instead points to indices in this section instead. There are also 390 "standard-defined" strings, which aren't encoded in the font at all. That means the first custom string in this index has index 391, the second is 392, and so on.
         <div id="cffstring"></div>
         <ul>
-          <li>10 strings (0A
+          <li>10 strings (0A),
           <li>offsets use 1 byte in this section (01),
-          <li>offsets to individual dictionaries (01, 0C, 1D, 23, 24, 25, 26, 27, 28, 29, 2A for end of list), and
+          <li>offsets to individual dictionaries (01, 0C, 1D, 23, 24, 25, 26, 27, 28, 29; 2A is the end of list), and
           <li>Our ten strings: "Version 1.0", "Custom Glyph Font", "Custom", "c", "m", "o", s", "t", "u", and "~", all ASCII encoded.
         </ul>
       </li>
 
-      <li>The list of globally accessible "subroutines". Subroutines are on of the true powers of CFF fonts: any outline definition can contain instructions to fetch "some data" from the list of global subroutines, and insert it into the outline definition at the point the "fetch" instruction was found. And that can happen at <em>any</em> time. In the middle of a line instruction? Yep. Before we've even started? Sure. Subroutines are a way to take all the charstrings in a font, go "which of them share <em>any</em> substrings that are more than two or three bytes long", and then rip those out, store them as a subroutine instead, and replace them in the original charstrings with "drop into subroutine XYZ here".
+      <li>The list of globally accessible "subroutines". Subroutines are one of the true powers of CFF fonts: any outline definition can contain instructions to fetch "some data" from the list of global subroutines, and insert it into the outline definition at the point the "fetch" instruction was found. And that can happen at <em>any</em> time. In the middle of a line instruction? Yep. Before we've even started? Sure. Subroutines are a way to take all the charstrings in a font, go "which of them share <em>any</em> substrings that are more than two or three bytes long", and then rip those out, store them as a subroutine instead, and replace them in the original charstrings with "drop into subroutine XYZ here".
         <div id="cffgsubr"></div>
         <ul>
           <li>There are 0 global subroutines (00 00)
@@ -176,7 +176,7 @@
         </ul>
       </li>
 
-      <li>Lastly, we find the "private dict" section. This houses a bit more metadata specific to the set of characters it belongs to, as well as the "local" subroutines that are accessible only to those characters. It makes quite a lot of sense, for instance, to have different sets of subroutines for Latin characters, and another private dict for far East-Asian characters. If we wanted to, we can define a CFF font as a multiple-sectioned font, using "font dicts", with each font dict pointing to its own charstrings and private dict, housing its own subroutines. Private dicts also describe <a href="http://partners.adobe.com/public/developer/en/font/T1_SPEC.PDF">older, Type 1</a> features like "Blue zones", which are used to for align purposes. If you need to combine multiple charstrings, and you have blue zones, all kinds of extremely mathematically precise things can happen.
+      <li>Lastly, we find the "private dict" section. This houses a bit more metadata specific to the set of characters it belongs to, as well as the "local" subroutines that are accessible only to those characters. It makes quite a lot of sense, for instance, to have different sets of subroutines for Latin characters, and another private dict for far East-Asian characters. If we wanted to, we can define a CFF font as a multiple-sectioned font, using "font dicts", with each font dict pointing to its own charstrings and private dict, housing its own subroutines. Private dicts also describe <a href="http://partners.adobe.com/public/developer/en/font/T1_SPEC.PDF">older, Type 1</a> features like <a href="http://www.freetype.org/autohinting/blues.html">Blue zones</a>, which are used to for align purposes. If you need to combine multiple charstrings, and you have blue zones, all kinds of extremely mathematically precise things can happen.
         <div id="cffprivate"></div>
         <ul>
           <li>three bytes to say the "blue values" are [0, 0] (8B 8B),
