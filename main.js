@@ -6,6 +6,11 @@ require(
   function(builder, buildTables, addStyleSheet, addMappings) {
     "use strict";
 
+    Array.prototype.forEach.call(document.querySelector("img"), function(img) {
+      img.style.width = img.width + "px";
+      img.style.height = img.height + "px";
+    });
+
     var y = -120;
     var outline = "M  20 "+(100 + y) + " L  20 "+(800 + y) + " 700 "+(800 + y) + " 700 "+(100 + y) + " 20 "+(100 + y)
                + " M 170 "+(250 + y) + " L 550 "+(250 + y) + " 550 "+(650 + y) + " 170 "+(650 + y);

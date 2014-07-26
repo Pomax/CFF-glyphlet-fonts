@@ -35,6 +35,11 @@ h3:before {
   content: "⇨ ";
 }
 
+img {
+  display: block;
+  margin: 2em auto;
+  border: 1px solid black;
+}
 
 header h1 {
   font-size: 300%;

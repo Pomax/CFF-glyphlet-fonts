@@ -21,6 +21,8 @@
 
     <p>The character ~, with our font applied, is now styled as <span class="custom">~</span>, and the string "custom" is similarly styled (as ligature) as <span class="custom">custom</span>. Now, because this is essentially just in-font magic, copy-pasting the first rectangle should lead to you pasting the plain string "~", and copy-pasting the second rectangle should lead to you pasting the plain string "custom".</p>
 
+    <p><img src="images/squares.jpg"></p>
+
     <h2>This is also how icon fonts work.</h2>
 
     <p>So, we have a font that models "a shape", and we have a label that we can type that magically gets converted into that shape. Basically, this is how every (good) icon font that you've ever seen works. But, <em>how</em> do they work? Let's dive in.</p>
@@ -46,6 +48,8 @@
 
     <p>The CFF table is to an OpenType font what a typeface is to a book: essential, but really not the part that makes a font special. What makes OpenType fonts special is that they describe every aspect that you might be able to think of when you think of putting letters together to form words. In addition to the obvious "this is what letters look like" information, OpenType fonts also specify things like the name of each letter that is available in the font, how much of the <a href="http://unicode.org">Unicode</a> standard the font implements, which horizontal and vertical metrics apply to which letters, exactly how the letters are arranged inside the font so that they can quickly be read out, what kind of font classifications apply (is it a fantasy font? is it bold face? is it fixed width? etc), what kind of memory allocation a printer needs to perform in order to be able to even load the font, etc. etc. etc.</p>
 
+    <p><img src="images/opentype.jpg"></p>
+
     <p>For instance, the biggest table in this font is the "name" table, which contains all the strings that describe things like the font name, the font family name, who made it, which version it's on, what (simplified) license applies, who owns the copyright, which preview text to use in font previewers, and more such things. This table is a whopping 519 bytes, almost half the font! The reason it's so big is that even though computers these days don't really care about which operating system you use, OpenType fonts still "have to" contain strings in both "Macintosh" and "Windows" format, which really means ASCII format (which is a 7-bit string format, with one byte per letter) and UTF16 (which uses two bytes per letter; unfortunately for characters that are also in ASCII, the first byte is always a zero byte, so it's basically "ASCII with zero-padding"). As such, a string like "Version 1.0", which is 11 letters (including the space) will take up 11 bytes encoded as a Macintosh string, but because it also needs to be recorded in UTF16, we get an additional "0V0e0r0si0o0n0 010.00" —with zero-bytes in front of every actual letter— which means having an additional 22 bytes. If we didn't have to encode the data twice, we could do without almost two thirds of the table. While it's good that OpenType is about describing everything, sometimes it's a little over the top.</p>
 
     <p>Of course, another reason the name table is so big is not because it's genuinely big, but also because the font itself is actually so very small. It only contains seven letters ("c", "u", "s", "t", "o", "m", and "~"), so the actual font data is small, but in a normal font the name table will generally be much smaller than the three most important tables an OpenType font can have: the cmap table, for mapping characters that you might type for font-interal ids, the GSUB table, for handling glyph substitutions, and the GPOS tables, for handling glyph positioning in relation to each other.</p>
@@ -61,6 +65,8 @@
 
     <p>There are in fact currently nine different subtable formats available (formats 0, 2, 4, 6, 8, 10, 12, 13, and 14), all offering different ways to efficiently encode character ranges with specific properties. Plus, and this is the collection-of-collections part, you don't have to pick just one subtable to "explain" a font's characters. You can use a format 0 subtable for the first 256 characters, a format 4 subtable for the remaining two byte Unicode range, and then a format 12 subtable for the remaining 4 byte Unicode range. To make things even more descriptive, cmap tables are also keyed on platform and language, so you can have one subtable for Macintosh character codes, from a specific input language, to in-font glyph ids, and another for Windows character codes, from a specific codepage, to in-font glyph ids.</p>
 
+    <p><img src="images/cmap.jpg"></p>
+
     <p>The more complete a font is, the larger the cmap table, and the cmap subtables, will be.</p>
 
     <h3>GPOS - glyph positioning magic</h3>
@@ -69,9 +75,13 @@
 
     <p>The GPOS table can in fact perform these (re)positionings in quite a few different ways. It can: adjust position of a single glyph, adjust the position of a pair of glyphs, attach cursive glyphs, attach a combining mark to a base glyph, attach a combining mark to a ligature, attach a combining mark to another mark, position one or more glyphs in context, and position one or more glyphs in chained context.</p>
 
+    <p><img src="images/GPOS.jpg"></p>
+
     <h3>GSUB - glyph substition magic</h3>
 
     <p>A font can also require glyph substitution, for which the GSUB table is used. For instance, a font that uses GSUB might contain two different sets of the numbers 0 through 9, one set for "normal typesetting", and another for "when historically used versions" are required. In "the old days" you would need to use two separate fonts, with the old-style number font applied to each number in your text, but with a modern OpenType font, the font itself can do the substitutions and you don't need to worry about whether all the numbers got styled correctly. However, the GSUB table can also be used to substitute single letters, or multiple letters, with other single or multiple letters, <em>and</em> it can be used to change what letters look like depending on where in a word they are. That might sound weird, but Arabic has four different shapes for <em>each</em> letter, depending on whether it's used on its own (i.e. in isolation like quoting the letter "A"), or used at the start, middle, or end of a word. Good luck trying to do that with a bunch of separate fonts for each of the positions in a word.</p>
+
+    <p><img src="images/GSUB.jpg"></p>
 
     <h3>How much do those things cost?</h3>
 
@@ -82,6 +92,8 @@
     <p>One of the more important aspects of modern fonts is that they're not just for "styling letters", they are for styling full strings, for specific scripts, in specific contexts, in a way that lets a font specify what to do in case of different scripts and different contexts. Things you might think you would need to specify in a word processor are actually things that fonts, not the word processor, can do entirely automatically.</p>
 
     <p>For instance, Chinese and Japanese both use the "<a href="http://en.wikipedia.org/wiki/CJK_Unified_Ideographs">CJK Unified Ideographs</a>" set of characters defined by Unicode. However, while they use the same characters in principle, they don't always look the same in the two languages. As such, a modern OpenType font can contain instructions to apply certain rules when the font is used in a Chinese script context, and use other rules in a Japanese script context. Even within the same script, we might have different ways that text needs to be style. In keeping with Asiatic languages, both Chinese and Japanese can be written either horizontally (from left to right, one line below the previous), or vertically (from top to bottom, one line to the left of the previous). Depending on which writing mode the font is used in, the character metrics will be different. So for GSUB and GPOS tables, the idea is that "things to apply for styling" are encoded as "lookups" (for instance, the GSUB lookup type 4 encodes how to turn several letters into a single other letter, like turning the letter sequence "custom" into a rectangle), and "features" can link to one or more lookups; features marked as "liga", for instance, encode the notion that "there are ligatures available in this font", and then point to specific lookups that can be used to perform the actual substitutions. Finally, fonts will have a list of supported scripts (including a "DFLT" script for when nothing else applies) which can each indicate that one or more features should be active. You might want to have small-caps replacements active for English scripts, for instance, but not for Greek and Coptic.</p>
+
+    <p><img src="images/commontable.jpg"></p>
 
     <p>In this simple font, just to get the word "custom" replaced with our little rectangle, we need have a GSUB lookup defined, with a feature called "liga" that points to that lookup, with a featureset that contains just that single feature, and two scripts —the DFLT script as well as a "latn" script, which covers most western written characters— that both point to the same featureset. Clearly, the script/feature/lookup idea is pretty useful, but it's also pretty complex, and for simple things like a single substitution rule, perhaps a little overkill.</p>
 
@@ -203,7 +215,6 @@
     <div id="sfntstructure"></div>
 
     <!-- scripts last, to make sure the page is "done" as much as possible, first -->
-    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
     <script src="require.js"></script>
     <script>
       if (optimized === false) {
