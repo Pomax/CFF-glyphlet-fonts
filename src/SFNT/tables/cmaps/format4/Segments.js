@@ -9,7 +9,7 @@ define(["Segment", "dataBuilding"], function(Segment, dataBuilder) {
 
   Segments.prototype = {
     addSegment: function(code) {
-      var idx = this.data.length + 1;
+      var idx = this.data.length;
       this.data.push(new Segment({
         end: code,
         start: code,
