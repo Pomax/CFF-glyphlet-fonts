@@ -19,3 +19,9 @@ Why is this useful? What a silly question.
  - Pomax
 
  live version: http://pomax.github.io/CFF-glyphlet-fonts
+
+
+PS: this code is public domain, except in jurisdictions that do not
+recognise the concept of a public domain. For these jurisdictions,
+the license is an "MIT with the overruling stipulation that the
+code is still public domain outside your judicial borders".
