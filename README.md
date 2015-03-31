@@ -18,7 +18,7 @@ r.js -o build.js
 ```
 
 (Windows users will probably need to do something stupid like
-`node node_modules\requirejs\bin\r.js -o build.js`
+`node node\_modules\requirejs\bin\r.js -o build.js`
 because r.js was not packaged as nicely as npm or browserify)
 
 
