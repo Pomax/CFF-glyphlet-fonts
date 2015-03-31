@@ -9,8 +9,16 @@ to an SVG (compound) path, and get a BASE64-encoded OTF back for
 use in an @font-face src property. Define outline, load in, apply
 to single letter.
 
-The code can be built with `node r.js -o build` (windows users will
-probably need to do something stupid like `node c:\Users\YourNameHere\AppData\Roaming\npm\node_modules\requirejs\bin\r.js -o build.js`
+The code can be built with:
+
+```sh
+npm install requirejs
+export PATH="$(npm bin):$PATH"
+r.js -o build.js
+```
+
+(Windows users will probably need to do something stupid like
+`node node\_modules\requirejs\bin\r.js -o build.js`
 because r.js was not packaged as nicely as npm or browserify)
 
 

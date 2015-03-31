@@ -1,3 +1,4 @@
 _res
 .DS_Store
+node_modules
 test
